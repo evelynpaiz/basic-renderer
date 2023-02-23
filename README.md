@@ -6,6 +6,7 @@ This is a lightweight rendering pipeline using OpenGL.
 * [OpenGL](https://www.opengl.org/): used as a low level rendering library.
 * [3rd Party Libraries]: external libraries needed in this project.
     * [glfw](https://github.com/glfw/glfw): Creation of windows, contexts and surfaces. It also receives inputs and events.
+    * [glew](https://github.com/nigels-com/glew): Loading library for Modern OpenGL.
 
 ## References
 The three main references for this rendering engine are:
