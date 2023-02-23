@@ -10,6 +10,6 @@ This is a lightweight rendering pipeline using OpenGL.
 
 ## References
 The three main references for this rendering engine are:
-* [Learn OpenGL](https://github.com/JoeyDeVries/LearnOpenGL)
-* [OpenGL Tutorial](https://github.com/VictorGordan/opengl-tutorials)
-* [Hazel Engine](https://github.com/TheCherno/Hazel)
+* [OpenGL Tutorial](https://github.com/TheCherno/OpenGL) from Yan Chernokov.
+* [Learn OpenGL](https://github.com/JoeyDeVries/LearnOpenGL) from Joey de Vries.
+* [OpenGL Tutorial](https://github.com/VictorGordan/opengl-tutorials) from Victor Gordan.

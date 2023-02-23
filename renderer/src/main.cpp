@@ -1,4 +1,8 @@
 #include <iostream>
+#include <string>
+#include <filesystem>
+#include <fstream>
+#include <sstream>
 
 #ifdef __APPLE__
     #define GL_SILENCE_DEPRECATION
@@ -6,6 +10,20 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
+/**
+ * Shader program sources (vertex & fragment sources).
+ */
+struct ShaderProgramSource
+{
+    std::string vertexSource;
+    std::string fragmentSource;
+    
+    /// Constructor.
+    ShaderProgramSource(const std::string& vs, const std::string& fs)
+        : vertexSource(vs), fragmentSource(fs)
+    {}
+};
 
 /**
  * Compile a shader input.
@@ -70,6 +88,47 @@ static unsigned int CreateShader(const std::string& vertexShader,
     
     // Return the shader program
     return program;
+}
+
+/**
+ * Parse shader input file.
+ *
+ * @param filepath Path to the shader file.
+ */
+static ShaderProgramSource ParseShader(const std::string& filepath)
+{
+    // Open the file
+    std::ifstream stream(filepath);
+    
+    // Define the different shader classes available
+    enum class ShaderType
+    {
+        NONE = -1, VERTEX = 0, FRAGMENT = 1
+    };
+    
+    // Parse the file
+    std::string line;
+    std::stringstream ss[2];
+    ShaderType type = ShaderType::NONE;
+    while (getline(stream, line))
+    {
+        if (line.find("#shader") != std::string::npos)
+        {
+            // Set mode to vertex
+            if (line.find("vertex") != std::string::npos)
+                type = ShaderType::VERTEX;
+            // Set mode to fragment
+            else if (line.find("fragment") != std::string::npos)
+                type = ShaderType::FRAGMENT;
+        }
+        else
+        {
+            ss[(int)type] << line << '\n';
+        }
+    }
+    
+    // Return the shader sources
+    return ShaderProgramSource(ss[0].str(), ss[1].str());
 }
 
 /**
@@ -142,23 +201,8 @@ int main()
     glBindVertexArray(0);
     
     // Build and compile the shader program to be used
-    std::string vertexShader =
-        "#version 330 core\n"
-        "layout (location = 0) in vec2 position;\n"
-        "void main()\n"
-        "{\n"
-        "   gl_Position = vec4(position.x, position.y, 0.0f, 1.0f);\n"
-        "}\0";
-    
-    std::string fragmentShader =
-        "#version 330 core\n"
-        "out vec4 FragColor;\n"
-        "void main()\n"
-        "{\n"
-        "   FragColor = vec4(0.8f, 0.0f, 0.3f, 1.0f);\n"
-        "}\n\0";
-    
-    unsigned int shader = CreateShader(vertexShader, fragmentShader);
+    ShaderProgramSource source = ParseShader("resource/shader/basic.glsl");
+    unsigned int shader = CreateShader(source.vertexSource, source.fragmentSource);
     glUseProgram(shader);
     
     // Loop until the user closes the window
