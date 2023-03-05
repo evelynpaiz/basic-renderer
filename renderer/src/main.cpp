@@ -208,9 +208,6 @@ int main()
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);
     glEnableVertexAttribArray(0);
     
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-    
     // Build and compile the shader program to be used
     ShaderProgramSource source = ParseShader("resource/shader/basic.glsl");
     unsigned int shader = CreateShader(source.vertexSource, source.fragmentSource);
@@ -220,6 +217,11 @@ int main()
     int location = glGetUniformLocation(shader, "u_Color");
     glUniform4f(location, 0.2f, 0.3f, 0.8f, 1.0f);
     
+    glBindVertexArray(0);
+    glUseProgram(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    
     // Loop until the user closes the window
     while (!glfwWindowShouldClose(window))
     {
@@ -227,7 +229,12 @@ int main()
         glClearColor(0.93f, 0.93f, 0.93f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         
+        // Define the uniforms
+        glUseProgram(shader);
+        glUniform4f(location, 0.2f, 0.3f, 0.8f, 1.0f);
+        
         glBindVertexArray(VAO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
         
         // Swap front and back buffers
