@@ -12,7 +12,7 @@
 #include <GLFW/glfw3.h>
 
 /**
- * Shader program sources (vertex & fragment sources).
+ * Representation of a shader program (vertex & fragment sources).
  */
 struct ShaderProgramSource
 {
@@ -26,7 +26,7 @@ struct ShaderProgramSource
 };
 
 /**
- * Compile a shader input.
+ * Compile a shader input source.
  *
  * @param type Shader type.
  * @param source Shader input source.
@@ -59,7 +59,7 @@ static unsigned int CompileShader(unsigned int type, const std::string& source)
 }
 
 /**
- * Genate a shader program from vertex and fragment inputs.
+ * Generate a shader program from vertex and fragment inputs.
  *
  * @param vertexShader Source of vertex shader.
  * @param fragmentShader Source of fragment shader.
@@ -177,23 +177,34 @@ int main()
     // Display the version of OpenGL
     std::cout << glGetString(GL_VERSION) << std::endl;
     
-    // Define the data to be drawn
-    float vertices[6] = {
-        -0.5f, -0.5f,
-         0.0f,  0.5f,
-         0.5f, -0.5f
+    // Define the data to be drawn (vertices and indices)
+    float vertices[] = {
+        -0.5f, -0.5f,   // bottom left (0)
+         0.5f, -0.5f,   // bottom right (1)
+         0.5f,  0.5f,   // top right (2)
+        -0.5f,  0.5f    // top left (3)
     };
     
-    // Generate the buffer and set the data on it
-    unsigned int VBO, VAO;
+    unsigned int indices[] = {
+        0, 1, 2,        // first triangle
+        2, 3, 0         // second triangle
+    };
+    
+    // Generate data handlers (VBO, VAO, and EBO)
+    unsigned int VBO, IBO, VAO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
+    glGenBuffers(1, &IBO);
     
+    // Bind the vertex array object
     glBindVertexArray(VAO);
-    
+    // Copy the vertex data in the vertex buffer
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), vertices, GL_STATIC_DRAW);
-    
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    // Copy the index data in the index buffer
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    // Set the vertex attribute pointers
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);
     glEnableVertexAttribArray(0);
     
@@ -213,7 +224,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
         
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
         
         // Swap front and back buffers
         glfwSwapBuffers(window);
@@ -225,6 +236,7 @@ int main()
     // De-allocate all resources
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &IBO);
     glDeleteProgram(shader);
     
     // Terminate (GLFW)
