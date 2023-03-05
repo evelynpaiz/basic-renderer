@@ -216,6 +216,10 @@ int main()
     unsigned int shader = CreateShader(source.vertexSource, source.fragmentSource);
     glUseProgram(shader);
     
+    // Define the shader uniforms
+    int location = glGetUniformLocation(shader, "u_Color");
+    glUniform4f(location, 0.2f, 0.3f, 0.8f, 1.0f);
+    
     // Loop until the user closes the window
     while (!glfwWindowShouldClose(window))
     {
