@@ -11,6 +11,9 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
+
 /**
  * Representation of a shader program (vertex & fragment sources).
  */
@@ -190,20 +193,16 @@ int main()
         2, 3, 0         // second triangle
     };
     
-    // Generate data handlers (VBO, VAO, and EBO)
-    unsigned int VBO, IBO, VAO;
+    // Generate data handlers (VAO)
+    unsigned int VAO;
     glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &IBO);
-    
     // Bind the vertex array object
     glBindVertexArray(VAO);
+    
     // Copy the vertex data in the vertex buffer
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    VertexBuffer VBO(vertices, sizeof(vertices));
     // Copy the index data in the index buffer
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    IndexBuffer IBO(indices, sizeof(indices) / sizeof(unsigned int));
     // Set the vertex attribute pointers
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);
     glEnableVertexAttribArray(0);
@@ -219,8 +218,8 @@ int main()
     
     glBindVertexArray(0);
     glUseProgram(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    VBO.Unbind();
+    IBO.Unbind();
     
     // Loop until the user closes the window
     while (!glfwWindowShouldClose(window))
@@ -234,8 +233,8 @@ int main()
         glUniform4f(location, 0.2f, 0.3f, 0.8f, 1.0f);
         
         glBindVertexArray(VAO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+        IBO.Bind();
+        glDrawElements(GL_TRIANGLES, IBO.GetCount(), GL_UNSIGNED_INT, nullptr);
         
         // Swap front and back buffers
         glfwSwapBuffers(window);
@@ -246,8 +245,6 @@ int main()
     
     // De-allocate all resources
     glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &IBO);
     glDeleteProgram(shader);
     
     // Terminate (GLFW)
