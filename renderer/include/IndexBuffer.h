@@ -1,7 +1,7 @@
 #pragma once
 
 /**
- * An index buffer used to store indices used to decide what vertices to be drawn.
+ * Stores indices used to decide what vertices to be drawn.
  */
 class IndexBuffer
 {

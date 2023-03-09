@@ -1,7 +1,7 @@
 #pragma once
 
 /**
- * A vertex buffer used to store the vertices in the GPU's memory.
+ * Stores the vertices information in the GPU's memory.
  */
 class VertexBuffer
 {

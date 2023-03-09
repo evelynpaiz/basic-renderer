@@ -13,6 +13,7 @@
 
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "VertexArray.h"
 
 /**
  * Representation of a shader program (vertex & fragment sources).
@@ -193,19 +194,16 @@ int main()
         2, 3, 0         // second triangle
     };
     
-    // Generate data handlers (VAO)
-    unsigned int VAO;
-    glGenVertexArrays(1, &VAO);
-    // Bind the vertex array object
-    glBindVertexArray(VAO);
-    
+    // Generate a vertex array
+    VertexArray VAO;
     // Copy the vertex data in the vertex buffer
     VertexBuffer VBO(vertices, sizeof(vertices));
     // Copy the index data in the index buffer
     IndexBuffer IBO(indices, sizeof(indices) / sizeof(unsigned int));
-    // Set the vertex attribute pointers
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);
-    glEnableVertexAttribArray(0);
+    // Set the layout of the vertex buffer
+    BufferLayout layout;
+    layout.Push<float>(2);
+    VAO.AddVertexBuffer(VBO, layout);
     
     // Build and compile the shader program to be used
     ShaderProgramSource source = ParseShader("resource/shader/basic.glsl");
@@ -232,7 +230,7 @@ int main()
         glUseProgram(shader);
         glUniform4f(location, 0.2f, 0.3f, 0.8f, 1.0f);
         
-        glBindVertexArray(VAO);
+        VAO.Bind();
         IBO.Bind();
         glDrawElements(GL_TRIANGLES, IBO.GetCount(), GL_UNSIGNED_INT, nullptr);
         
@@ -244,7 +242,6 @@ int main()
     }
     
     // De-allocate all resources
-    glDeleteVertexArrays(1, &VAO);
     glDeleteProgram(shader);
     
     // Terminate (GLFW)
