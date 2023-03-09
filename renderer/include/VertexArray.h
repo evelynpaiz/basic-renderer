@@ -12,7 +12,7 @@ public:
     /// Constructors/Destructor
     VertexArray();
     ~VertexArray();
-    // Buffers
+    /// Buffers
     void AddVertexBuffer(const VertexBuffer& vbo, const BufferLayout& layout);
     /// Usage
     void Bind() const;

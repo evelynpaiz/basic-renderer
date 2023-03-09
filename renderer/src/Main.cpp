@@ -1,8 +1,4 @@
 #include <iostream>
-#include <string>
-#include <filesystem>
-#include <fstream>
-#include <sstream>
 
 #ifdef __APPLE__
     #define GL_SILENCE_DEPRECATION
@@ -14,126 +10,7 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "VertexArray.h"
-
-/**
- * Representation of a shader program (vertex & fragment sources).
- */
-struct ShaderProgramSource
-{
-    std::string vertexSource;
-    std::string fragmentSource;
-    
-    /// Constructor.
-    ShaderProgramSource(const std::string& vs, const std::string& fs)
-        : vertexSource(vs), fragmentSource(fs)
-    {}
-};
-
-/**
- * Compile a shader input source.
- *
- * @param type Shader type.
- * @param source Shader input source.
- *
- * @returns Id of shader compiled shader source.
- */
-static unsigned int CompileShader(unsigned int type, const std::string& source)
-{
-    // Define the shader from the input source and compile
-    unsigned int id = glCreateShader(type);
-    const char* src = source.c_str();
-    glShaderSource(id, 1, &src, nullptr);
-    glCompileShader(id);
-    
-    int result;
-    glGetShaderiv(id, GL_COMPILE_STATUS, &result);
-    if (result == GL_FALSE)
-    {
-        int length;
-        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
-        char* message = (char*)alloca(length * sizeof(char));
-        glGetShaderInfoLog(id, length, &length, message);
-        std::cout << "Failed to compile " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << "shader!" << std::endl;
-        std::cout << message << std::endl;
-        glDeleteShader(id);
-        return 0;
-    }
-    
-    return id;
-}
-
-/**
- * Generate a shader program from vertex and fragment inputs.
- *
- * @param vertexShader Source of vertex shader.
- * @param fragmentShader Source of fragment shader.
- *
- * @returns Id of shader program.
- */
-static unsigned int CreateShader(const std::string& vertexShader,
-                        const std::string& fragmentShader) {
-    // Define a shader program
-    unsigned int program = glCreateProgram();
-    
-    // Vertex shader
-    unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
-    // Fragment shader
-    unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
-    
-    // Link shaders
-    glAttachShader(program, vs);
-    glAttachShader(program, fs);
-    glLinkProgram(program);
-    glValidateProgram(program);
-    
-    // De-allocate the shader resources
-    glDeleteShader(vs);
-    glDeleteShader(fs);
-    
-    // Return the shader program
-    return program;
-}
-
-/**
- * Parse shader input file.
- *
- * @param filepath Path to the shader file.
- */
-static ShaderProgramSource ParseShader(const std::string& filepath)
-{
-    // Open the file
-    std::ifstream stream(filepath);
-    
-    // Define the different shader classes available
-    enum class ShaderType
-    {
-        NONE = -1, VERTEX = 0, FRAGMENT = 1
-    };
-    
-    // Parse the file
-    std::string line;
-    std::stringstream ss[2];
-    ShaderType type = ShaderType::NONE;
-    while (getline(stream, line))
-    {
-        if (line.find("#shader") != std::string::npos)
-        {
-            // Set mode to vertex
-            if (line.find("vertex") != std::string::npos)
-                type = ShaderType::VERTEX;
-            // Set mode to fragment
-            else if (line.find("fragment") != std::string::npos)
-                type = ShaderType::FRAGMENT;
-        }
-        else
-        {
-            ss[(int)type] << line << '\n';
-        }
-    }
-    
-    // Return the shader sources
-    return ShaderProgramSource(ss[0].str(), ss[1].str());
-}
+#include "Shader.h"
 
 /**
  * Main function.
@@ -195,29 +72,27 @@ int main()
     };
     
     // Generate a vertex array
-    VertexArray VAO;
+    VertexArray vao;
     // Copy the vertex data in the vertex buffer
-    VertexBuffer VBO(vertices, sizeof(vertices));
+    VertexBuffer vbo(vertices, sizeof(vertices));
     // Copy the index data in the index buffer
-    IndexBuffer IBO(indices, sizeof(indices) / sizeof(unsigned int));
+    IndexBuffer ibo(indices, sizeof(indices) / sizeof(unsigned int));
     // Set the layout of the vertex buffer
     BufferLayout layout;
     layout.Push<float>(2);
-    VAO.AddVertexBuffer(VBO, layout);
+    vao.AddVertexBuffer(vbo, layout);
     
     // Build and compile the shader program to be used
-    ShaderProgramSource source = ParseShader("resource/shader/basic.glsl");
-    unsigned int shader = CreateShader(source.vertexSource, source.fragmentSource);
-    glUseProgram(shader);
+    Shader shader("resource/shader/basic.glsl");
+    shader.Bind();
     
     // Define the shader uniforms
-    int location = glGetUniformLocation(shader, "u_Color");
-    glUniform4f(location, 0.2f, 0.3f, 0.8f, 1.0f);
+    shader.SetVec4("u_Color", 0.2f, 0.3f, 0.8f, 1.0f);
     
-    glBindVertexArray(0);
-    glUseProgram(0);
-    VBO.Unbind();
-    IBO.Unbind();
+    vao.Unbind();
+    vbo.Unbind();
+    ibo.Unbind();
+    shader.Unbind();
     
     // Loop until the user closes the window
     while (!glfwWindowShouldClose(window))
@@ -227,12 +102,12 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
         
         // Define the uniforms
-        glUseProgram(shader);
-        glUniform4f(location, 0.2f, 0.3f, 0.8f, 1.0f);
+        shader.Bind();
+        shader.SetVec4("u_Color", 0.2f, 0.3f, 0.8f, 1.0f);
         
-        VAO.Bind();
-        IBO.Bind();
-        glDrawElements(GL_TRIANGLES, IBO.GetCount(), GL_UNSIGNED_INT, nullptr);
+        vao.Bind();
+        ibo.Bind();
+        glDrawElements(GL_TRIANGLES, ibo.GetCount(), GL_UNSIGNED_INT, nullptr);
         
         // Swap front and back buffers
         glfwSwapBuffers(window);
@@ -240,9 +115,6 @@ int main()
         // Poll for and process events
         glfwPollEvents();
     }
-    
-    // De-allocate all resources
-    glDeleteProgram(shader);
     
     // Terminate (GLFW)
     glfwTerminate();
