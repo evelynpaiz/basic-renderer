@@ -5,7 +5,7 @@
 #include <unordered_map>
 
 /**
- * Representation of a shader program (vertex & fragment sources).
+ * Shader program (executed on the GPU).
  */
 struct ShaderProgramSource
 {

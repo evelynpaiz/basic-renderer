@@ -11,6 +11,7 @@
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "Shader.h"
+#include "Renderer.h"
 
 /**
  * Main function.
@@ -94,20 +95,15 @@ int main()
     ibo.Unbind();
     shader.Unbind();
     
+    // Start the rendering engine
+    Renderer renderer;
+    
     // Loop until the user closes the window
     while (!glfwWindowShouldClose(window))
     {
         // Render
-        glClearColor(0.93f, 0.93f, 0.93f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        
-        // Define the uniforms
-        shader.Bind();
-        shader.SetVec4("u_Color", 0.2f, 0.3f, 0.8f, 1.0f);
-        
-        vao.Bind();
-        ibo.Bind();
-        glDrawElements(GL_TRIANGLES, ibo.GetCount(), GL_UNSIGNED_INT, nullptr);
+        renderer.Clear();
+        renderer.Draw(vao, ibo, shader);
         
         // Swap front and back buffers
         glfwSwapBuffers(window);
