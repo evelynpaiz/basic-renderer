@@ -25,7 +25,7 @@ class Shader
 {
 public:
     /// Constructor/Destructor
-    Shader(const std::filesystem::path& filepath);
+    Shader(const std::filesystem::path& filePath);
     ~Shader();
     /// Usage
     void Bind() const;
@@ -33,6 +33,7 @@ public:
     /// Gets
     int GetUniformLocation(const std::string& name);
     /// Sets
+    void SetInt(const std::string &name, int value);
     void SetVec4(const std::string& name, float x, float y, float z, float w);
     
 private:
@@ -46,7 +47,7 @@ private:
     /// File path of shader source program
     std::filesystem::path m_FilePath;
     /// ID of the shader program
-    unsigned int m_ID;
+    unsigned int m_ID = 0;
     /// Cache of uniform locations
     std::unordered_map<std::string, int> m_UniformLocationCache;
 };

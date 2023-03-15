@@ -11,6 +11,8 @@
 /**
  * Get the size (in bytes) of the data depending on its type.
  *
+ * @param type Data type.
+ *
  * @returns The stride value.
  */
 unsigned int BufferElement::GetSizeOfType(unsigned int type)

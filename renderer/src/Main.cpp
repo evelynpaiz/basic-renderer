@@ -12,6 +12,7 @@
 #include "VertexArray.h"
 #include "Shader.h"
 #include "Renderer.h"
+#include "Texture.h"
 
 /**
  * Main function.
@@ -61,10 +62,10 @@ int main()
     
     // Define the data to be drawn (vertices and indices)
     float vertices[] = {
-        -0.5f, -0.5f,   // bottom left (0)
-         0.5f, -0.5f,   // bottom right (1)
-         0.5f,  0.5f,   // top right (2)
-        -0.5f,  0.5f    // top left (3)
+        -0.5f, -0.5f,  0.0f,  0.0f,     // bottom left (0)
+         0.5f, -0.5f,  1.0f,  0.0f,     // bottom right (1)
+         0.5f,  0.5f,  1.0f,  1.0f,     // top right (2)
+        -0.5f,  0.5f,  0.0f,  1.0f      // top left (3)
     };
     
     unsigned int indices[] = {
@@ -81,14 +82,20 @@ int main()
     // Set the layout of the vertex buffer
     BufferLayout layout;
     layout.Push<float>(2);
+    layout.Push<float>(2);
     vao.AddVertexBuffer(vbo, layout);
     
     // Build and compile the shader program to be used
     Shader shader("resource/shader/basic.glsl");
     shader.Bind();
     
+    // Define the texture
+    Texture texture("resource/texture/container.jpg");
+    texture.Bind();
+    
     // Define the shader uniforms
     shader.SetVec4("u_Color", 0.2f, 0.3f, 0.8f, 1.0f);
+    shader.SetInt("u_Texture", 0);
     
     vao.Unbind();
     vbo.Unbind();

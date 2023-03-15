@@ -10,6 +10,9 @@
 class Renderer
 {
 public:
+    /// Constructor/Destructor
+    Renderer() = default;
+    ~Renderer() = default;
     /// Render
     void Clear() const;
     void Draw(const VertexArray& vao, const IndexBuffer& ibo,

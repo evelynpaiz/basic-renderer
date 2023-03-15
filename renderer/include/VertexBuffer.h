@@ -15,5 +15,5 @@ public:
     
 private:
     /// ID of the vertex buffer
-    unsigned int m_ID;
+    unsigned int m_ID = 0;
 };

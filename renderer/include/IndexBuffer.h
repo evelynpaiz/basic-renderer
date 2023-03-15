@@ -17,7 +17,7 @@ public:
     
 private:
     /// ID of the index buffer
-    unsigned int m_ID;
+    unsigned int m_ID = 0;
     /// Number of indices (element count)
-    unsigned int m_Count;
+    unsigned int m_Count = 0;
 };

@@ -20,5 +20,5 @@ public:
     
 private:
     /// ID of the vertex array
-    unsigned int m_ID;
+    unsigned int m_ID = 0;
 };

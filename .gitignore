@@ -1,6 +1,12 @@
 # OSX
 .DS_Store
 
-#Xcode
+# Xcode
 *.xcworkspace
 *.xcodeproj/*
+
+# Third party libraries
+3rdparty/
+
+# Input resources
+renderer/resource/texture/

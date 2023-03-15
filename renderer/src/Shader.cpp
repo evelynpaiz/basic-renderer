@@ -12,6 +12,9 @@
 
 /**
  * Define the shader program source.
+ *
+ * @param vs Vertex shader source.
+ * @param fs Fragment shader source.
  */
 ShaderProgramSource::ShaderProgramSource(const std::string& vs, const std::string& fs)
     : vertexSource(vs), fragmentSource(fs)
@@ -23,11 +26,13 @@ ShaderProgramSource::ShaderProgramSource(const std::string& vs, const std::strin
 
 /**
  * Generate a shader program.
+ *
+ * @param filePath Path to the source file.
  */
-Shader::Shader(const std::filesystem::path& filepath)
-    : m_FilePath(filepath), m_ID(0)
+Shader::Shader(const std::filesystem::path& filePath)
+    : m_FilePath(filePath)
 {
-    ShaderProgramSource source = ParseShader(filepath);
+    ShaderProgramSource source = ParseShader(filePath);
     m_ID = CreateShader(source.vertexSource, source.fragmentSource);
 }
 
@@ -58,6 +63,8 @@ void Shader::Unbind() const
 /**
  * Get the location number of a uniform.
  *
+ * @param name Name of the uniform.
+ *
  * @returns Uniform location.
  */
 int Shader::GetUniformLocation(const std::string& name)
@@ -76,13 +83,24 @@ int Shader::GetUniformLocation(const std::string& name)
 }
 
 /**
- * Set the value of a uniform (type vector 4).
+ * Set the uniform with a integer value.
  *
  * @param name Uniform name.
- * @param x Uniform value x.
- * @param y Uniform value y.
- * @param z Uniform value z.
- * @param w Uniform value w.
+ * @param value Uniform value.
+ */
+void Shader::SetInt(const std::string& name, int value)
+{
+    glUniform1i(GetUniformLocation(name), value);
+}
+
+/**
+ * Set the uniform with a vector with 4 values (x, y, z, w).
+ *
+ * @param name Uniform name.
+ * @param x Vector input x value.
+ * @param y Vector input y value.
+ * @param z Vector input z value.
+ * @param w Vector input w value.
  */
 void Shader::SetVec4(const std::string& name, float x, float y, float z, float w)
 {
@@ -94,6 +112,8 @@ void Shader::SetVec4(const std::string& name, float x, float y, float z, float w
  *
  * @param type Shader type.
  * @param source Shader input source.
+ *
+ * @returns the ID of the shader program.
  */
 unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
 {
@@ -126,7 +146,7 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
  * @param vertexShader Source of vertex shader.
  * @param fragmentShader Source of fragment shader.
  *
- * @returns Id of shader program.
+ * @returns ID of the shader program.
  */
 unsigned int Shader::CreateShader(const std::string& vertexShader,
                         const std::string& fragmentShader) {
@@ -156,6 +176,8 @@ unsigned int Shader::CreateShader(const std::string& vertexShader,
  * Parse shader input file.
  *
  * @param filepath Path to the shader file.
+ *
+ * @returns The vertex and fragment program source.
  */
 ShaderProgramSource Shader::ParseShader(const std::filesystem::path& filepath)
 {

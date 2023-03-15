@@ -25,6 +25,7 @@ class BufferLayout
 public:
     /// Constructors/Destructor
     BufferLayout() = default;
+    ~BufferLayout() = default;
     /// Gets
     unsigned int GetStride() const;
     const std::vector<BufferElement> GetElements() const;
