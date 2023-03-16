@@ -3,7 +3,11 @@
 
 # Xcode
 *.xcworkspace
-*.xcodeproj/*
+*/*.xcodeproj/*
+
+# Build
+bin/
+bin-int/
 
 # Third party libraries
 3rdparty/
