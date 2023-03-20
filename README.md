@@ -3,29 +3,33 @@ This is a lightweight rendering pipeline using OpenGL.
 
 ## Requirements
 
-* [Premake](https://premake.github.io/download): used to generate the project solution. 
+* [CMake](https://cmake.org): used to generate the project solution. 
 * [OpenGL](https://www.opengl.org/): used as a low level rendering library.
 * 3rd Party Libraries: external libraries needed in this project.
     * [glfw](https://github.com/glfw/glfw): Creation of windows, contexts and surfaces. It also receives inputs and events.
     * [glew](https://github.com/nigels-com/glew): Loading library for Modern OpenGL.
     * [stb](https://github.com/nothings/stb): Utility library. Specifically, we use stb-image for handling images.
     
-## Generate the project solution
+# Build the project solution
 
-Create the project solution in the main folder `basic-renderer\` by calling [premake](https://premake.github.io/docs/Using-Premake):
+Clone the project from the git repository:
 ```
-premake5 [action]
+git clone git@github.com:epaizreyes/basic-renderer
+cd basic-renderer
 ```
-where `action` represents what type of project files to be generated.
 
-For example, generate a Visual Studio 2022 project solution using the command:
+The project solution can be generated using CMake:
+1. For Visual Studio:
 ```
-premake5 vs2022
+cmake -B VisualStudio
 ```
-or generate a Xcode project solution using the command:
+The VisualStudio solution `basic-renderer.sln` can be found in the `VisualStudio` directory.
+2. For XCode:
+
 ```
-premake5 xcode4
+cmake -G Xcode -B XCode
 ```
+The XCode project solution `basic-renderer.xcodeproj` can be found in `XCode` directory.
 
 ## References
 The three main references for this rendering engine are:
