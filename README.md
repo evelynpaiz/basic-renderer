@@ -19,11 +19,13 @@ cd basic-renderer
 ```
 
 The project solution can be generated using CMake:
+
 1. For Visual Studio:
 ```
 cmake -B VisualStudio
 ```
 The VisualStudio solution `basic-renderer.sln` can be found in the `VisualStudio` directory.
+
 2. For XCode:
 
 ```
