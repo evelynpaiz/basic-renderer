@@ -9,8 +9,5 @@ XCode/
 bin/
 bin-int/
 
-# Third party libraries
-3rdparty/
-
 # Input resources
 renderer/resource/texture/

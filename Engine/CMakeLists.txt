@@ -18,6 +18,7 @@ file(
 
 # Define the engine library
 add_library(Engine STATIC ${sources} ${public_headers})
+add_library(BR::Engine ALIAS Engine)
 
 # Define headers for the target
 target_include_directories(

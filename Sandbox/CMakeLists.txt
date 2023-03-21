@@ -14,7 +14,7 @@ target_include_directories(
 )
 
 # Link external libraries
-target_link_libraries(Sandbox PRIVATE Engine)
+target_link_libraries(Sandbox PRIVATE BR::Engine)
 
 # Define solution tree organization
 source_group(
