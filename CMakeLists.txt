@@ -18,12 +18,20 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 include_directories(/usr/local/include)
 include_directories(3rdparty/include)
 
+# Define third party libraries subdirectories
+
+## GLFW
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+
+add_subdirectory(3rdparty/GLFW)
+
 # Define libraries directories
 link_directories(/usr/local/lib)
 
 # Required libraries
 find_package(OpenGL REQUIRED)
-find_package(glfw3 REQUIRED)
 find_package(GLEW REQUIRED)
 
 # Solution project(s)
