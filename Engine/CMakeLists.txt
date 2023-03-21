@@ -20,11 +20,23 @@ file(
 add_library(Engine STATIC ${sources} ${public_headers})
 add_library(BR::Engine ALIAS Engine)
 
-# Define headers for the target
+# Define the include directories for this target
 target_include_directories(
     Engine
     PUBLIC
-    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_include_directories(
+    Engine
+    PUBLIC
+    ${CMAKE_SOURCE_DIR}/3rdparty/glfw/include
+)
+
+target_include_directories(
+    Engine
+    PUBLIC
+    ${CMAKE_SOURCE_DIR}/3rdparty/glew/include
 )
 
 # Define properties for the target
@@ -35,7 +47,7 @@ set_target_properties(
 )
 
 # Link external libraries
-target_link_libraries(Engine OpenGL::GL glfw GLEW)
+target_link_libraries(Engine OpenGL::GL glfw libglew_static)
 
 # Define solution tree organization
 source_group(

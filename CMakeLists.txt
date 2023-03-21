@@ -15,25 +15,31 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Define include directories
-include_directories(/usr/local/include)
 include_directories(3rdparty/include)
 
-# Define third party libraries subdirectories
+# Required libraries
+find_package(OpenGL REQUIRED)
 
+# Third party libraries
 ## GLFW
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
-add_subdirectory(3rdparty/GLFW)
+add_subdirectory(3rdparty/glfw)
 
-# Define libraries directories
-link_directories(/usr/local/lib)
+## GLEW
+set(glew-cmake_BUILD_SHARED OFF CACHE BOOL "" FORCE)
+set(ONLY_LIBS ON CACHE BOOL "" FORCE)
 
-# Required libraries
-find_package(OpenGL REQUIRED)
-find_package(GLEW REQUIRED)
+add_subdirectory(3rdparty/glew)
 
-# Solution project(s)
+# Own libraries and executables
 add_subdirectory(Engine)
 add_subdirectory(Sandbox)
+
+# Define solution tree organization
+source_group(
+    TREE ${CMAKE_CURRENT_SOURCE_DIR}
+    FILES ${sources} ${public_headers}
+)

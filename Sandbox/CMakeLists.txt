@@ -6,11 +6,11 @@ file(GLOB sources src/*.cpp src/*.h include/*.h)
 # Define the executable
 add_executable(Sandbox ${sources})
 
-# Define headers for the target
+# Define include directories
 target_include_directories(
     Sandbox
     PRIVATE
-    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 # Link external libraries
