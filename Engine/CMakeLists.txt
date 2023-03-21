@@ -27,18 +27,6 @@ target_include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-target_include_directories(
-    Engine
-    PUBLIC
-    ${CMAKE_SOURCE_DIR}/3rdparty/glfw/include
-)
-
-target_include_directories(
-    Engine
-    PUBLIC
-    ${CMAKE_SOURCE_DIR}/3rdparty/glew/include
-)
-
 # Define properties for the target
 set_target_properties(
     Engine 
@@ -47,7 +35,7 @@ set_target_properties(
 )
 
 # Link external libraries
-target_link_libraries(Engine OpenGL::GL glfw libglew_static)
+target_link_libraries(Engine OpenGL::GL glfw::glfw glew::glew stb::stb)
 
 # Define solution tree organization
 source_group(
