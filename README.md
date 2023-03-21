@@ -14,7 +14,7 @@ This is a lightweight rendering pipeline using OpenGL.
 
 Clone the project from the git repository:
 ```
-git clone git@github.com:epaizreyes/basic-renderer
+git clone git@github.com:epaizreyes/basic-renderer --recurse-submodules
 cd basic-renderer
 ```
 
