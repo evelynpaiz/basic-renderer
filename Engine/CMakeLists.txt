@@ -5,7 +5,7 @@ file(
     GLOB_RECURSE sources
     LIST_DIRECTORIES false
     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-    src/*.cpp
+    src/*.cpp src/*.h
 )
 
 # Find header files
@@ -16,26 +16,28 @@ file(
     include/*.h
 )
 
-# Define the library
-add_executable(Engine ${sources} ${public_headers})
+# Define the engine library
+add_library(Engine STATIC ${sources} ${public_headers})
 
-# Link external libraries
-target_link_libraries(Engine OpenGL::GL glfw GLEW)
-
-# Define headers
+# Define headers for the target
 target_include_directories(
     Engine
     PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
 )
 
-# Define the target properties
-set_target_properties(Engine PROPERTIES 
+# Define properties for the target
+set_target_properties(
+    Engine 
+    PROPERTIES 
     PUBLIC_HEADER "${public_headers}"
 )
+
+# Link external libraries
+target_link_libraries(Engine OpenGL::GL glfw GLEW)
 
 # Define solution tree organization
 source_group(
     TREE ${CMAKE_CURRENT_SOURCE_DIR}
-    FILES ${sources} ${shaders} ${public_headers}
+    FILES ${sources} ${public_headers}
 )

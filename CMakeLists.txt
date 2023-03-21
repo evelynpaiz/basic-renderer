@@ -1,4 +1,4 @@
-# CMake version and C++ features
+# CMake C++ features
 cmake_minimum_required(VERSION 3.10)
 
 set(CMAKE_SUPPRESS_REGENERATION true)
@@ -28,3 +28,4 @@ find_package(GLEW REQUIRED)
 
 # Solution project(s)
 add_subdirectory(Engine)
+add_subdirectory(Sandbox)

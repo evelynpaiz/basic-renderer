@@ -24,7 +24,7 @@ The project solution can be generated using CMake:
 ```
 cmake -B VisualStudio
 ```
-The VisualStudio solution `basic-renderer.sln` can be found in the `VisualStudio` directory.
+The Visual Studio solution `basic-renderer.sln` can be found in the `VisualStudio` directory.
 
 2. For XCode:
 
