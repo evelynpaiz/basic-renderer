@@ -1,13 +1,6 @@
-# OSX
-.DS_Store
-
 # Project solution
 VisualStudio/
 XCode/
 
-# Build
-bin/
-bin-int/
-
-# Input resources
-renderer/resource/texture/
+# OSX
+.DS_Store
