@@ -83,7 +83,18 @@ int Shader::GetUniformLocation(const std::string& name)
 }
 
 /**
- * Set the uniform with a integer value.
+ * Set the uniform with a bool value.
+ *
+ * @param name Uniform name.
+ * @param value Uniform value.
+ */
+void Shader::SetBool(const std::string& name, bool value)
+{
+    glUniform1i(GetUniformLocation(name), (int)value);
+}
+
+/**
+ * Set the uniform with an integer value.
  *
  * @param name Uniform name.
  * @param value Uniform value.
@@ -91,6 +102,42 @@ int Shader::GetUniformLocation(const std::string& name)
 void Shader::SetInt(const std::string& name, int value)
 {
     glUniform1i(GetUniformLocation(name), value);
+}
+
+/**
+ * Set the uniform with a float value.
+ *
+ * @param name Uniform name.
+ * @param value Uniform value.
+ */
+void Shader::SetFloat(const std::string& name, float value)
+{
+    glUniform1f(GetUniformLocation(name), value);
+}
+
+/**
+ * Set the uniform with a vector with 2 values (x, y).
+ *
+ * @param name Uniform name.
+ * @param x Vector input x value.
+ * @param y Vector input y value.
+ */
+void Shader::SetFloat2(const std::string& name, float x, float y)
+{
+    glUniform2f(GetUniformLocation(name), x, y);
+}
+
+/**
+ * Set the uniform with a vector with 3 values (x, y, z).
+ *
+ * @param name Uniform name.
+ * @param x Vector input x value.
+ * @param y Vector input y value.
+ * @param z Vector input z value.
+ */
+void Shader::SetFloat3(const std::string& name, float x, float y, float z)
+{
+    glUniform3f(GetUniformLocation(name), x, y, z);
 }
 
 /**
@@ -102,7 +149,7 @@ void Shader::SetInt(const std::string& name, int value)
  * @param z Vector input z value.
  * @param w Vector input w value.
  */
-void Shader::SetVec4(const std::string& name, float x, float y, float z, float w)
+void Shader::SetFloat4(const std::string& name, float x, float y, float z, float w)
 {
     glUniform4f(GetUniformLocation(name), x, y, z, w);
 }

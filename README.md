@@ -22,13 +22,13 @@ git submodule update --init
 <ins>**2. Build the project solution:**</ins>
 The project solution can be generated using CMake:
 
-* For Visual Studio:
+* **For Visual Studio**:
 	```
 	cmake -B VisualStudio
 	```
 	The Visual Studio solution `basic-renderer.sln` can be found in the `VisualStudio/` directory.
 
-* For XCode:
+* **For XCode**:
 	```
 	cmake -G Xcode -B XCode
 	```

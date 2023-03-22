@@ -33,14 +33,19 @@ public:
     /// Gets
     int GetUniformLocation(const std::string& name);
     /// Sets
+    void SetBool(const std::string &name, bool value);
     void SetInt(const std::string &name, int value);
-    void SetVec4(const std::string& name, float x, float y, float z, float w);
+    void SetFloat(const std::string &name, float value);
+    void SetFloat2(const std::string& name, float x, float y);
+    void SetFloat3(const std::string& name, float x, float y, float z);
+    void SetFloat4(const std::string& name, float x, float y, float z, float w);
     
 private:
     /// Compilation
     unsigned int CompileShader(unsigned int type, const std::string& source);
     unsigned int CreateShader(const std::string& vertexShader,
                               const std::string& fragmentShader);
+    /// Parsing
     ShaderProgramSource ParseShader(const std::filesystem::path& filepath);
     
 private:

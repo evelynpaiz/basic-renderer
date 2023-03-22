@@ -94,7 +94,7 @@ int main()
     texture.Bind();
     
     // Define the shader uniforms
-    shader.SetVec4("u_Color", 0.2f, 0.3f, 0.8f, 1.0f);
+    shader.SetFloat4("u_Color", 0.2f, 0.3f, 0.8f, 1.0f);
     shader.SetInt("u_Texture", 0);
     
     vao.Unbind();
