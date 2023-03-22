@@ -2,25 +2,40 @@
 
 #include <iostream>
 
-#include <GL/glew.h>
-
 // --------------------------------------------
 // Buffer element
 // --------------------------------------------
 
 /**
- * Get the size (in bytes) of the data depending on its type.
+ * Generate an attribute (element) for a buffer.
  *
- * @param type Data type.
- *
- * @returns The stride value.
+ * @param name Name of the element.
+ * @param type Data type of the element.
+ * @param normalized Normalize the data.
  */
-unsigned int BufferElement::GetSizeOfType(unsigned int type)
+BufferElement::BufferElement(const std::string& name,
+    DataType type, bool normalized)
+    : Name(name), Type(type), Size(GetSizeOfType(type)),
+    Offset(0), Normalized(normalized)
+{}
+
+/**
+ * Get the component count of a data type.
+ *
+ * @returns The count.
+ */
+unsigned int BufferElement::GetComponentCount() const
 {
-    switch (type) {
-        case GL_FLOAT: return 4;
+    switch (Type)
+    {
+        case DataType::Bool: return 1;
+        case DataType::Int: return 1;
+        case DataType::Float: return 1;
+        case DataType::Float2: return 2;
+        case DataType::Float3: return 3;
+        case DataType::Float4: return 4;
     }
-    
+
     std::cout << "Unknown vertex data type!" << std::endl;
     return 0;
 }
@@ -28,6 +43,18 @@ unsigned int BufferElement::GetSizeOfType(unsigned int type)
 // --------------------------------------------
 // Buffer layout
 // --------------------------------------------
+
+/**
+ * Generate a layout for the buffer.
+ *
+ * @param elements List of buffer elements to be set.
+ */
+BufferLayout::BufferLayout(const std::initializer_list<BufferElement>& elements)
+    : m_Elements(elements)
+{
+    // Calculate the offset and stride of the input attributes
+    CalculateOffsetAndStride();
+}
 
 /**
  * Get the space between consecutive vertex attributes.
@@ -50,22 +77,57 @@ const std::vector<BufferElement> BufferLayout::GetElements() const
 }
 
 /**
- * Push and define a vertex attribute.
+ * Get the first element  of the buffer.
  *
- * @tparam T Data type to be pushed.
+ * @returns Iterator pointing to the first buffer element.
  */
-template<typename T>
-void BufferLayout::Push(unsigned int count)
+std::vector<BufferElement>::iterator BufferLayout::begin()
 {
-    static_assert(Push<T>, "this function has to be implemented for desired type");
+    return m_Elements.begin();
 }
 
 /**
- * Push and define a vertex attribute for floats.
+ * Get the last element of the buffer.
+ *
+ * @returns Iterator pointing to the last buffer element.
  */
-template<>
-void BufferLayout::Push<float>(unsigned int count)
+std::vector<BufferElement>::iterator BufferLayout::end()
 {
-    m_Elements.push_back({ GL_FLOAT, count, GL_FALSE });
-    m_Stride += count * BufferElement::GetSizeOfType(GL_FLOAT);
+    return m_Elements.end();
+}
+
+/**
+ * Get the first element of the buffer (constant value).
+ *
+ * @returns Iterator pointing to the first buffer element.
+ */
+std::vector<BufferElement>::const_iterator BufferLayout::begin() const
+{
+    return m_Elements.begin();
+}
+
+/**
+ * Get the last element of the buffer (constant value).
+ *
+ * @returns Iterator pointing to the last buffer element.
+ */
+std::vector<BufferElement>::const_iterator BufferLayout::end() const
+{
+    return m_Elements.end();
+}
+
+/**
+ * Calculate the offset (where the data beggins in the buffer) and the stride
+ * (space between consecutives vertex attributes) for the defined vertex attributes.
+ */
+void BufferLayout::CalculateOffsetAndStride()
+{
+    unsigned int offset = 0;
+    m_Stride = 0;
+    for (auto& element : m_Elements)
+    {
+        element.Offset = offset;
+        offset += element.Size;
+        m_Stride += element.Size;
+    }
 }

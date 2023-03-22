@@ -38,3 +38,23 @@ void VertexBuffer::Unbind() const
 {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
+
+/**
+ * Set the layout for the vertex attributes in the buffer.
+ *
+ * @param layout Buffer layout.
+ */
+void VertexBuffer::SetLayout(const BufferLayout& layout)
+{
+    m_Layout = layout;
+}
+
+/**
+ * Get the layout for the vertex attributes in the buffer.
+ *
+ * @returns Buffer layout.
+ */
+const BufferLayout& VertexBuffer::GetLayout() const
+{
+    return m_Layout;
+}

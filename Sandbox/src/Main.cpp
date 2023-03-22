@@ -80,10 +80,13 @@ int main()
     // Copy the index data in the index buffer
     IndexBuffer ibo(indices, sizeof(indices) / sizeof(unsigned int));
     // Set the layout of the vertex buffer
-    BufferLayout layout;
-    layout.Push<float>(2);
-    layout.Push<float>(2);
-    vao.AddVertexBuffer(vbo, layout);
+    BufferLayout layout = {
+        { "a_Position", DataType::Float2 },
+        { "a_TextureCoord", DataType::Float2 }
+    };
+    vbo.SetLayout(layout);
+    // Add the buffers information to the vertex array
+    vao.AddVertexBuffer(vbo);
     
     // Build and compile the shader program to be used
     Shader shader("resource/shader/basic.glsl");

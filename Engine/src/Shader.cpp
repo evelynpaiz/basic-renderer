@@ -17,7 +17,7 @@
  * @param fs Fragment shader source.
  */
 ShaderProgramSource::ShaderProgramSource(const std::string& vs, const std::string& fs)
-    : vertexSource(vs), fragmentSource(fs)
+    : VertexSource(vs), FragmentSource(fs)
 {}
 
 // --------------------------------------------
@@ -33,7 +33,7 @@ Shader::Shader(const std::filesystem::path& filePath)
     : m_FilePath(filePath)
 {
     ShaderProgramSource source = ParseShader(filePath);
-    m_ID = CreateShader(source.vertexSource, source.fragmentSource);
+    m_ID = CreateShader(source.VertexSource, source.FragmentSource);
 }
 
 /**

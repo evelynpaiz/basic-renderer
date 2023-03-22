@@ -1,20 +1,43 @@
 #pragma once
 
+#include <iostream>
+#include <string>
 #include <vector>
+
+#include <GL/glew.h>
+
+/**
+ * An enumeration for different data types of vertex attributes.
+ */
+enum class DataType
+{
+    Bool,
+    Int,
+    Float, Float2, Float3, Float4
+};
 
 /**
  * A structure to represent a vertex attribute (element).
  */
 struct BufferElement
 {
+    /// Name of the element
+    std::string Name;
     /// Data type
-    unsigned int type;
-    /// Number of components per attribute
-    unsigned int count;
+    DataType Type;
+    /// Size (in bytes) of the element
+    unsigned int Size;
+    /// Offset value for the element
+    unsigned int Offset;
     /// Specifies if the data should be normalized
-    unsigned char normalized;
+    bool Normalized;
     
-    static unsigned int GetSizeOfType(unsigned int type);
+    /// Constructors/Destructor
+    BufferElement(const std::string& name, DataType type,
+                  bool normalized = false);
+    ~BufferElement() = default;
+    /// Gets
+    unsigned int GetComponentCount() const;
 };
 
 /**
@@ -25,15 +48,20 @@ class BufferLayout
 public:
     /// Constructors/Destructor
     BufferLayout() = default;
+    BufferLayout(const std::initializer_list<BufferElement>& elements);
     ~BufferLayout() = default;
     /// Gets
     unsigned int GetStride() const;
     const std::vector<BufferElement> GetElements() const;
-    /// Push new layouts
-    template<typename T>
-    void Push(unsigned int count);
-    template<>
-    void Push<float>(unsigned int count);
+    /// Iteration
+    std::vector<BufferElement>::iterator begin();
+    std::vector<BufferElement>::iterator end();
+    std::vector<BufferElement>::const_iterator begin() const;
+    std::vector<BufferElement>::const_iterator end() const;
+    
+private:
+    /// Calculators
+    void CalculateOffsetAndStride();
 
 private:
     /// Vertex buffer elements
@@ -41,3 +69,45 @@ private:
     /// Space between consecutive vertex attributes
     unsigned int m_Stride = 0;
 };
+
+/**
+ * Get the size (in bytes) of the data depending on its type.
+ *
+ * @param type Data type.
+ *
+ * @returns The size of the data (in bytes).
+ */
+inline unsigned int GetSizeOfType(DataType type)
+{
+    switch (type)
+    {
+        case DataType::Bool: return 1;
+        case DataType::Int: return 4;
+        case DataType::Float: return 4;
+        case DataType::Float2: return 4 * 2;
+        case DataType::Float3: return 4 * 3;
+        case DataType::Float4: return 4 * 4;
+    }
+    
+    std::cout << "Unknown vertex data type!" << std::endl;
+    return 0;
+}
+
+/**
+ * Conversion of the data types to OpenGL type.
+ */
+inline GLenum DataTypeToOpenGLType(DataType type)
+{
+    switch (type)
+    {
+        case DataType::Bool: return GL_BOOL;
+        case DataType::Int: return GL_INT;
+        case DataType::Float: return GL_FLOAT;
+        case DataType::Float2: return GL_FLOAT;
+        case DataType::Float3: return GL_FLOAT;
+        case DataType::Float4: return GL_FLOAT;
+    }
+
+    std::cout << "Unknown vertex data type!" << std::endl;
+    return 0;
+}

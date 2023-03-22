@@ -10,9 +10,9 @@
 struct ShaderProgramSource
 {
     /// Vertex shader
-    std::string vertexSource;
+    std::string VertexSource;
     /// Fragment shader
-    std::string fragmentSource;
+    std::string FragmentSource;
     
     /// Constructor
     ShaderProgramSource(const std::string& vs, const std::string& fs);
