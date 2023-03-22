@@ -18,19 +18,17 @@ file(
 
 # Define the engine library
 add_library(Engine STATIC ${sources} ${public_headers})
-add_library(BR::Engine ALIAS Engine)
+add_library(Renderer::Engine ALIAS Engine)
 
 # Define the include directories for this target
 target_include_directories(
     Engine
     PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
 )
 
 # Define properties for the target
-set_target_properties(
-    Engine 
-    PROPERTIES 
+set_target_properties(Engine PROPERTIES 
     PUBLIC_HEADER "${public_headers}"
 )
 

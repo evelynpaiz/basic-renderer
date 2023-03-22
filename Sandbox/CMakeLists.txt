@@ -10,11 +10,18 @@ add_executable(Sandbox ${sources})
 target_include_directories(
     Sandbox
     PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
 )
 
 # Link external libraries
-target_link_libraries(Sandbox PRIVATE BR::Engine)
+target_link_libraries(Sandbox PRIVATE Renderer::Engine)
+
+# Define as starting project
+set_target_properties(Sandbox PROPERTIES
+    VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+    XCODE_GENERATE_SCHEME TRUE
+    XCODE_SCHEME_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+)
 
 # Define solution tree organization
 source_group(

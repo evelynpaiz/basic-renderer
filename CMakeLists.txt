@@ -27,11 +27,8 @@ set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 add_subdirectory(3rdparty/glfw)
 add_library(glfw::glfw ALIAS glfw)
 
-target_include_directories(
-    glfw
-    PRIVATE
-    ${CMAKE_SOURCE_DIR}/3rdparty/glfw/include
-)
+set_target_properties(glfw PROPERTIES FOLDER "glfw3")
+set_target_properties(update_mappings PROPERTIES FOLDER "glfw3")
 
 ## GLEW
 set(glew-cmake_BUILD_SHARED OFF CACHE BOOL "" FORCE)
@@ -40,11 +37,7 @@ set(ONLY_LIBS ON CACHE BOOL "" FORCE)
 add_subdirectory(3rdparty/glew)
 add_library(glew::glew ALIAS libglew_static)
 
-target_include_directories(
-    libglew_static
-    PRIVATE
-    ${CMAKE_SOURCE_DIR}/3rdparty/glew/include
-)
+set_target_properties(libglew_static PROPERTIES FOLDER "glew")
 
 ## STB
 add_library(stb::stb INTERFACE IMPORTED)
@@ -57,9 +50,3 @@ target_include_directories(
 # Own libraries and executables
 add_subdirectory(Engine)
 add_subdirectory(Sandbox)
-
-# Define solution tree organization
-source_group(
-    TREE ${CMAKE_CURRENT_SOURCE_DIR}
-    FILES ${sources} ${public_headers}
-)
