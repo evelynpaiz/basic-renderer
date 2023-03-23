@@ -35,7 +35,7 @@ The project solution can be generated using CMake:
 	The XCode project solution `basic-renderer.xcodeproj` can be found in `XCode/` directory.
 
 ## Third party libraries
-The external libraries needed in this project have been added as git submodules. These can be found in the `3rdparty` directory.
+The external libraries needed in this project have been added as git submodules. These can be found in the `3rdparty/` directory.
 * [glfw](https://github.com/glfw/glfw): Creation of windows, contexts and surfaces. It also receives inputs and events.
 * [glew](https://github.com/nigels-com/glew): Loading library for Modern OpenGL.
 * [stb](https://github.com/nothings/stb): Utility library. Specifically, we use stb-image for handling images.

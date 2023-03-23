@@ -87,6 +87,7 @@ int main()
     vbo.SetLayout(layout);
     // Add the buffers information to the vertex array
     vao.AddVertexBuffer(vbo);
+    vao.SetIndexBuffer(ibo);
     
     // Build and compile the shader program to be used
     Shader shader("resource/shader/basic.glsl");
@@ -112,8 +113,8 @@ int main()
     while (!glfwWindowShouldClose(window))
     {
         // Render
-        renderer.Clear();
-        renderer.Draw(vao, ibo, shader);
+        renderer.Clear(0.93f, 0.93f, 0.93f);
+        renderer.Draw(vao, shader);
         
         // Swap front and back buffers
         glfwSwapBuffers(window);
