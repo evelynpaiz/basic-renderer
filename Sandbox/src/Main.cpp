@@ -7,18 +7,22 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
-#include "VertexArray.h"
-#include "Shader.h"
-#include "Renderer.h"
-#include "Texture.h"
+#include "Core/Log.h"
+#include "Renderer/VertexBuffer.h"
+#include "Renderer/IndexBuffer.h"
+#include "Renderer/VertexArray.h"
+#include "Renderer/Shader.h"
+#include "Renderer/Renderer.h"
+#include "Renderer/Texture.h"
 
 /**
  * Main function.
  */
 int main()
 {
+    // Initialize the logging manager
+    Log::Init();
+    
     // Initialize GLFW
     if (!glfwInit())
     {
@@ -58,7 +62,7 @@ int main()
     }
     
     // Display the version of OpenGL
-    std::cout << glGetString(GL_VERSION) << std::endl;
+    CORE_INFO((const char*)glGetString(GL_VERSION));
     
     // Define the data to be drawn (vertices and indices)
     float vertices[] = {

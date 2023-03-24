@@ -1,8 +1,8 @@
 #pragma once
 
-#include "VertexArray.h"
-#include "IndexBuffer.h"
-#include "Shader.h"
+#include "Renderer/VertexArray.h"
+#include "Renderer/IndexBuffer.h"
+#include "Renderer/Shader.h"
 
 /**
  * Rendering engine.

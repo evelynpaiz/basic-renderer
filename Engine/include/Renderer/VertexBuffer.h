@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BufferLayout.h"
+#include "Renderer/BufferLayout.h"
 
 /**
  * Stores the vertices information in the GPU's memory.

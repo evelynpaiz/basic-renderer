@@ -1,4 +1,4 @@
-#include "IndexBuffer.h"
+#include "Renderer/IndexBuffer.h"
 
 #include <GL/glew.h>
 

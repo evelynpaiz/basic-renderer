@@ -18,6 +18,14 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 find_package(OpenGL REQUIRED)
 
 # Third party libraries
+## SPDLOG
+add_library(spdlog::spdlog INTERFACE IMPORTED)
+target_include_directories(
+    spdlog::spdlog
+    INTERFACE 
+    ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/spdlog/include/
+)
+
 ## GLFW
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
