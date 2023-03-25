@@ -1,7 +1,5 @@
 #include "Renderer/BufferLayout.h"
 
-#include <iostream>
-
 // --------------------------------------------
 // Buffer element
 // --------------------------------------------
@@ -36,7 +34,7 @@ unsigned int BufferElement::GetComponentCount() const
         case DataType::Float4: return 4;
     }
 
-    std::cout << "Unknown vertex data type!" << std::endl;
+    CORE_ASSERT(false, "Unknown vertex data type!");
     return 0;
 }
 

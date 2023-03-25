@@ -1,10 +1,12 @@
 #include "Renderer/Shader.h"
 
-#include <iostream>
 #include <fstream>
 #include <sstream>
 
 #include <GL/glew.h>
+
+#include "Core/Log.h"
+#include "Core/Assert.h"
 
 // --------------------------------------------
 // Shader program source
@@ -76,7 +78,7 @@ int Shader::GetUniformLocation(const std::string& name)
     // Retrieve the location of the uniform and cache it too
     int location = glGetUniformLocation(m_ID, name.c_str());
     if (location == -1)
-        std::cout << "Warning: uniform " << name << " doesn't exist!" << std::endl;
+        CORE_WARN("Uniform " + name + " doesn't exist!");
     
     m_UniformLocationCache[name] = location;
     return location;
@@ -178,8 +180,10 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
         glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
         char* message = (char*)alloca(length * sizeof(char));
         glGetShaderInfoLog(id, length, &length, message);
-        std::cout << "Failed to compile " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << "shader!" << std::endl;
-        std::cout << message << std::endl;
+        std::string t = (type == GL_VERTEX_SHADER ? "vertex" : "fragment");
+        
+        CORE_ERROR("Failed to compile " + t + " shader!");
+        CORE_ASSERT(result == GL_TRUE, message);
         glDeleteShader(id);
         return 0;
     }

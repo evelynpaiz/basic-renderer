@@ -1,5 +1,3 @@
-#include <iostream>
-
 #ifdef __APPLE__
     #define GL_SILENCE_DEPRECATION
 #endif
@@ -8,6 +6,7 @@
 #include <GLFW/glfw3.h>
 
 #include "Core/Log.h"
+#include "Core/Assert.h"
 #include "Renderer/VertexBuffer.h"
 #include "Renderer/IndexBuffer.h"
 #include "Renderer/VertexArray.h"
@@ -26,7 +25,7 @@ int main()
     // Initialize GLFW
     if (!glfwInit())
     {
-        std::cout << "Failed to initialize GLFW!" << std::endl;
+        CORE_ASSERT(false, "Failed to initialize GLFW!");
         return -1;
     }
     
@@ -45,7 +44,7 @@ int main()
     
     if (!window)
     {
-        std::cout << "Failed to create a GLFW window!" << std::endl;
+        CORE_ASSERT(window, "Failed to create a GLFW window!");
         glfwTerminate();
         return -1;
     }
@@ -56,7 +55,7 @@ int main()
     // Initialize GLEW
     if (glewInit() != GLEW_OK)
     {
-        std::cout << "Failed to initialize GLEW!" << std::endl;
+        CORE_ASSERT(false, "Failed to initialize GLEW!");
         glfwTerminate();
         return -1;
     }

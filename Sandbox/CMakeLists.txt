@@ -16,7 +16,7 @@ target_include_directories(
 # Link external libraries
 target_link_libraries(Sandbox PRIVATE Renderer::Engine)
 
-# Define as starting project
+# Define the target properties
 set_target_properties(Sandbox PROPERTIES
     VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
     XCODE_GENERATE_SCHEME TRUE

@@ -1,10 +1,11 @@
 #pragma once
 
-#include <iostream>
 #include <string>
 #include <vector>
 
 #include <GL/glew.h>
+
+#include "Core/Assert.h"
 
 /**
  * An enumeration for different data types of vertex attributes.
@@ -89,7 +90,7 @@ inline unsigned int GetSizeOfType(DataType type)
         case DataType::Float4: return 4 * 4;
     }
     
-    std::cout << "Unknown vertex data type!" << std::endl;
+    CORE_ASSERT(false, "Unknown vertex data type!");
     return 0;
 }
 
@@ -108,6 +109,6 @@ inline GLenum DataTypeToOpenGLType(DataType type)
         case DataType::Float4: return GL_FLOAT;
     }
 
-    std::cout << "Unknown vertex data type!" << std::endl;
+    CORE_ASSERT(false, "Unknown vertex data type!");
     return 0;
 }

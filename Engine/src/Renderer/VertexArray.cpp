@@ -2,6 +2,8 @@
 
 #include <GL/glew.h>
 
+#include "Core/Assert.h"
+
 /**
  * Generate a vertex array.
  */
@@ -28,11 +30,8 @@ VertexArray::~VertexArray()
 void VertexArray::AddVertexBuffer(const VertexBuffer& vbo)
 {
     // Check if the vertex buffer has a layout defined
-    if (vbo.GetLayout().GetElements().empty())
-    {
-        std::cout << "Vertex buffer has no layout!" << std::endl;
-        return;
-    }
+    CORE_ASSERT(vbo.GetLayout().GetElements().size(),
+                "Vertex buffer has no layout!");
     
     // Bind the vertex array and the buffer
     Bind();
