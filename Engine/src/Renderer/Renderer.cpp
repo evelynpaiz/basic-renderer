@@ -28,15 +28,15 @@ void Renderer::Clear(float r, float g, float b, float a) const
  * Render primitives (triangles) from array data.
  *
  * @param vao Vertex array.
- * @param ibo Index buffer.
  * @param shader Shader program.
  */
-void Renderer::Draw(const VertexArray& vao, const Shader& shader) const
+void Renderer::Draw(const std::shared_ptr<VertexArray>& vao,
+                    const std::shared_ptr<Shader>& shader) const
 {
-    shader.Bind();
-    vao.Bind();
-    vao.GetIndexBuffer().Bind();
+    shader->Bind();
+    vao->Bind();
+    vao->GetIndexBuffer()->Bind();
     
-    glDrawElements(GL_TRIANGLES, vao.GetIndexBuffer().GetCount(),
+    glDrawElements(GL_TRIANGLES, vao->GetIndexBuffer()->GetCount(),
                    GL_UNSIGNED_INT, nullptr);
 }

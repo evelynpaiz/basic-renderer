@@ -18,6 +18,75 @@ enum class DataType
 };
 
 /**
+ * Get the component count of a data type.
+ *
+ * @param type Data type.
+ *
+ * @returns The number of components that the data has.
+ */
+inline unsigned int GetCompCountOfType(DataType type)
+{
+    switch (type)
+    {
+        case DataType::Bool: return 1;
+        case DataType::Int: return 1;
+        case DataType::Float: return 1;
+        case DataType::Float2: return 2;
+        case DataType::Float3: return 3;
+        case DataType::Float4: return 4;
+    }
+
+    CORE_ASSERT(false, "Unknown vertex data type!");
+    return 0;
+}
+
+/**
+ * Get the size (in bytes) of the data depending on its type.
+ *
+ * @param type Data type.
+ *
+ * @returns The size of the data (in bytes).
+ */
+inline unsigned int GetSizeOfType(DataType type)
+{
+    switch (type)
+    {
+        case DataType::Bool: return 1;
+        case DataType::Int: return 4;
+        case DataType::Float: return 4;
+        case DataType::Float2: return 4 * 2;
+        case DataType::Float3: return 4 * 3;
+        case DataType::Float4: return 4 * 4;
+    }
+    
+    CORE_ASSERT(false, "Unknown vertex data type!");
+    return 0;
+}
+
+/**
+ * Conversion of the data types to OpenGL type.
+ *
+ * @param type Data type.
+ *
+ * @returns OpenGL data type.
+ */
+inline GLenum DataTypeToOpenGLType(DataType type)
+{
+    switch (type)
+    {
+        case DataType::Bool: return GL_BOOL;
+        case DataType::Int: return GL_INT;
+        case DataType::Float: return GL_FLOAT;
+        case DataType::Float2: return GL_FLOAT;
+        case DataType::Float3: return GL_FLOAT;
+        case DataType::Float4: return GL_FLOAT;
+    }
+
+    CORE_ASSERT(false, "Unknown vertex data type!");
+    return 0;
+}
+
+/**
  * A structure to represent a vertex attribute (element).
  */
 struct BufferElement
@@ -37,8 +106,6 @@ struct BufferElement
     BufferElement(const std::string& name, DataType type,
                   bool normalized = false);
     ~BufferElement() = default;
-    /// Gets
-    unsigned int GetComponentCount() const;
 };
 
 /**
@@ -70,45 +137,3 @@ private:
     /// Space between consecutive vertex attributes
     unsigned int m_Stride = 0;
 };
-
-/**
- * Get the size (in bytes) of the data depending on its type.
- *
- * @param type Data type.
- *
- * @returns The size of the data (in bytes).
- */
-inline unsigned int GetSizeOfType(DataType type)
-{
-    switch (type)
-    {
-        case DataType::Bool: return 1;
-        case DataType::Int: return 4;
-        case DataType::Float: return 4;
-        case DataType::Float2: return 4 * 2;
-        case DataType::Float3: return 4 * 3;
-        case DataType::Float4: return 4 * 4;
-    }
-    
-    CORE_ASSERT(false, "Unknown vertex data type!");
-    return 0;
-}
-
-/**
- * Conversion of the data types to OpenGL type.
- */
-inline GLenum DataTypeToOpenGLType(DataType type)
-{
-    switch (type)
-    {
-        case DataType::Bool: return GL_BOOL;
-        case DataType::Int: return GL_INT;
-        case DataType::Float: return GL_FLOAT;
-        case DataType::Float2: return GL_FLOAT;
-        case DataType::Float3: return GL_FLOAT;
-        case DataType::Float4: return GL_FLOAT;
-    }
-
-    CORE_ASSERT(false, "Unknown vertex data type!");
-    return 0;
-}

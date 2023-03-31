@@ -25,33 +25,33 @@ VertexArray::~VertexArray()
  * Link an input vertex buffer to the vertex array.
  *
  * @param vbo Vertex buffer.
- * @param layout Layout of the attributes of the vertex buffer.
  */
-void VertexArray::AddVertexBuffer(const VertexBuffer& vbo)
+void VertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vbo)
 {
     // Check if the vertex buffer has a layout defined
-    CORE_ASSERT(vbo.GetLayout().GetElements().size(),
+    CORE_ASSERT(vbo->GetLayout().GetElements().size(),
                 "Vertex buffer has no layout!");
     
     // Bind the vertex array and the buffer
     Bind();
-    vbo.Bind();
+    vbo->Bind();
     // Define the vertex attribute pointers
-    const auto& layout = vbo.GetLayout();
+    const auto& layout = vbo->GetLayout();
     for (const auto& element : layout)
     {
-        glVertexAttribPointer(m_Index, element.GetComponentCount(),
+        glVertexAttribPointer(m_Index, GetCompCountOfType(element.Type),
             DataTypeToOpenGLType(element.Type), element.Normalized,
             layout.GetStride(), (const void*)(size_t)element.Offset);
         glEnableVertexAttribArray(m_Index);
         m_Index++;
     }
     
-    vbo.Unbind();
+    vbo->Unbind();
     Unbind();
     
     // Add to the list of vertex buffers linked
     m_VertexBuffers.push_back(vbo);
+    
 }
 
 /**
@@ -59,7 +59,7 @@ void VertexArray::AddVertexBuffer(const VertexBuffer& vbo)
  *
  * @param ibo Index buffer object.
  */
-void VertexArray::SetIndexBuffer(const IndexBuffer& ibo)
+void VertexArray::SetIndexBuffer(const std::shared_ptr<IndexBuffer>& ibo)
 {
     m_IndexBuffer = ibo;
 }
@@ -85,7 +85,7 @@ void VertexArray::Unbind() const
  *
  * @returns Set of vertex buffers.
  */
-const std::vector<VertexBuffer>& VertexArray::GetVertexBuffers() const
+const std::vector<std::shared_ptr<VertexBuffer>>& VertexArray::GetVertexBuffers() const
 {
     return m_VertexBuffers;
 }
@@ -95,7 +95,7 @@ const std::vector<VertexBuffer>& VertexArray::GetVertexBuffers() const
  *
  * @returns The index buffer.
  */
-const IndexBuffer& VertexArray::GetIndexBuffer() const
+const std::shared_ptr<IndexBuffer>& VertexArray::GetIndexBuffer() const
 {
     return m_IndexBuffer;
 }

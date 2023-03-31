@@ -16,14 +16,23 @@ public:
     VertexArray();
     ~VertexArray();
     /// Buffers
-    void AddVertexBuffer(const VertexBuffer& vbo);
-    void SetIndexBuffer(const IndexBuffer& ibo);
+    void AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vbo);
+    void SetIndexBuffer(const std::shared_ptr<IndexBuffer>& ibo);
     /// Usage
     void Bind() const;
     void Unbind() const;
     /// Gets
-    const std::vector<VertexBuffer>& GetVertexBuffers() const;
-    const IndexBuffer& GetIndexBuffer() const;
+    const std::vector<std::shared_ptr<VertexBuffer>>& GetVertexBuffers() const;
+    const std::shared_ptr<IndexBuffer>& GetIndexBuffer() const;
+    
+// Remove the possibility of copying this resource
+public:
+    /// Constructors
+    VertexArray(const VertexArray&) = delete;
+    VertexArray(VertexArray&&) = delete;
+    /// Operators
+    VertexArray& operator=(const VertexArray&) = delete;
+    VertexArray& operator=(VertexArray&&) = delete;
     
 private:
     /// ID of the vertex array
@@ -32,7 +41,7 @@ private:
     unsigned int m_Index = 0;
     
     /// Linked vertex buffers (possible to have more than one)
-    std::vector<VertexBuffer> m_VertexBuffers;
+    std::vector<std::shared_ptr<VertexBuffer>> m_VertexBuffers;
     /// Linked index buffer
-    IndexBuffer m_IndexBuffer;
+    std::shared_ptr<IndexBuffer> m_IndexBuffer;
 };

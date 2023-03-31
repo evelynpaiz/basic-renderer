@@ -8,7 +8,7 @@
 class VertexBuffer
 {
 public:
-    /// Constructors/Destructor
+    /// Constructor/Destructor
     VertexBuffer(const void *vertices, const unsigned int size);
     ~VertexBuffer();
     /// Usage
@@ -17,6 +17,15 @@ public:
     /// Buffer layout
     void SetLayout(const BufferLayout& layout);
     const BufferLayout& GetLayout() const;
+    
+// Remove the possibility of copying this resource
+public:
+    /// Constructors
+    VertexBuffer(const VertexBuffer&) = delete;
+    VertexBuffer(VertexBuffer&&) = delete;
+    /// Operators
+    VertexBuffer& operator=(const VertexBuffer&) = delete;
+    VertexBuffer& operator=(VertexBuffer&&) = delete;
     
 private:
     /// ID of the vertex buffer

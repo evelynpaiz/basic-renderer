@@ -17,27 +17,6 @@ BufferElement::BufferElement(const std::string& name,
     Offset(0), Normalized(normalized)
 {}
 
-/**
- * Get the component count of a data type.
- *
- * @returns The count.
- */
-unsigned int BufferElement::GetComponentCount() const
-{
-    switch (Type)
-    {
-        case DataType::Bool: return 1;
-        case DataType::Int: return 1;
-        case DataType::Float: return 1;
-        case DataType::Float2: return 2;
-        case DataType::Float3: return 3;
-        case DataType::Float4: return 4;
-    }
-
-    CORE_ASSERT(false, "Unknown vertex data type!");
-    return 0;
-}
-
 // --------------------------------------------
 // Buffer layout
 // --------------------------------------------

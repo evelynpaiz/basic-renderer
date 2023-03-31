@@ -40,6 +40,15 @@ public:
     void SetFloat3(const std::string& name, float x, float y, float z);
     void SetFloat4(const std::string& name, float x, float y, float z, float w);
     
+// Remove the possibility of copying this resource
+public:
+    /// Constructors
+    Shader(const Shader&) = delete;
+    Shader(Shader&&) = delete;
+    /// Operators
+    Shader& operator=(const Shader&) = delete;
+    Shader& operator=(Shader&&) = delete;
+    
 private:
     /// Compilation
     unsigned int CompileShader(unsigned int type, const std::string& source);

@@ -14,6 +14,15 @@ public:
     void Bind(unsigned int slot = 0) const;
     void Unbind() const;
     
+// Remove the possibility of copying this resource
+public:
+    /// Constructors
+    Texture(const Texture&) = delete;
+    Texture(Texture&&) = delete;
+    /// Operators
+    Texture& operator=(const Texture&) = delete;
+    Texture& operator=(Texture&&) = delete;
+    
 private:
     /// Path to the file
     std::filesystem::path m_FilePath;

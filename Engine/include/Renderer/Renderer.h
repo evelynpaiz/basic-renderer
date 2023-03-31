@@ -16,5 +16,6 @@ public:
     /// Render
     void Clear() const;
     void Clear(float r, float g, float b, float a = 1.0f) const;
-    void Draw(const VertexArray& vao, const Shader& shader) const;
+    void Draw(const std::shared_ptr<VertexArray>& vao,
+              const std::shared_ptr<Shader>& shader) const;
 };

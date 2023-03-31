@@ -63,6 +63,14 @@ int main()
     // Display the version of OpenGL
     CORE_INFO((const char*)glGetString(GL_VERSION));
     
+    // Define the layout of the data to be defined:
+    // position : (x, y)
+    // texture coords : (u, v)
+    BufferLayout layout = {
+        { "a_Position", DataType::Float2 },
+        { "a_TextureCoord", DataType::Float2 }
+    };
+    
     // Define the data to be drawn (vertices and indices)
     float vertices[] = {
         -0.5f, -0.5f,  0.0f,  0.0f,     // bottom left (0)
@@ -77,37 +85,32 @@ int main()
     };
     
     // Generate a vertex array
-    VertexArray vao;
+    auto vao = std::make_shared<VertexArray>();
     // Copy the vertex data in the vertex buffer
-    VertexBuffer vbo(vertices, sizeof(vertices));
+    auto vbo = std::make_shared<VertexBuffer>(vertices, sizeof(vertices));
+    vbo->SetLayout(layout);
     // Copy the index data in the index buffer
-    IndexBuffer ibo(indices, sizeof(indices) / sizeof(unsigned int));
-    // Set the layout of the vertex buffer
-    BufferLayout layout = {
-        { "a_Position", DataType::Float2 },
-        { "a_TextureCoord", DataType::Float2 }
-    };
-    vbo.SetLayout(layout);
+    auto ibo = std::make_shared<IndexBuffer>(indices, sizeof(indices) / sizeof(unsigned int));
     // Add the buffers information to the vertex array
-    vao.AddVertexBuffer(vbo);
-    vao.SetIndexBuffer(ibo);
+    vao->AddVertexBuffer(vbo);
+    vao->SetIndexBuffer(ibo);
     
     // Build and compile the shader program to be used
-    Shader shader("resource/shader/basic.glsl");
-    shader.Bind();
+    auto shader = std::make_shared<Shader>("resource/shader/basic.glsl");
+    shader->Bind();
     
     // Define the texture
-    Texture texture("resource/texture/container.jpg");
-    texture.Bind();
+    auto texture = std::make_shared<Texture>("resource/texture/container.jpg");
+    texture->Bind();
     
     // Define the shader uniforms
-    shader.SetFloat4("u_Color", 0.2f, 0.3f, 0.8f, 1.0f);
-    shader.SetInt("u_Texture", 0);
+    shader->SetFloat4("u_Color", 0.2f, 0.3f, 0.8f, 1.0f);
+    shader->SetInt("u_Texture", 0);
     
-    vao.Unbind();
-    vbo.Unbind();
-    ibo.Unbind();
-    shader.Unbind();
+    vao->Unbind();
+    vbo->Unbind();
+    ibo->Unbind();
+    shader->Unbind();
     
     // Start the rendering engine
     Renderer renderer;

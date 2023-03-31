@@ -27,5 +27,5 @@ void main()
     vec4 textureColor = texture(u_Texture, v_TextureCoord);
     vec4 inputColor = u_Color;
     
-    color = textureColor;
+    color = textureColor * inputColor;
 }

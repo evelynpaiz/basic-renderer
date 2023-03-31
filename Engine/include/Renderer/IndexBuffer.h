@@ -7,7 +7,6 @@ class IndexBuffer
 {
 public:
     /// Constructors/Destructor
-    IndexBuffer() = default;
     IndexBuffer(const unsigned int *indices, const unsigned int count);
     ~IndexBuffer();
     /// Usage
@@ -15,6 +14,15 @@ public:
     void Unbind() const;
     /// Gets
     unsigned int GetCount() const;
+    
+// Remove the possibility of copying this resource
+public:
+    /// Constructors
+    IndexBuffer(const IndexBuffer&) = delete;
+    IndexBuffer(IndexBuffer&&) = delete;
+    /// Operators
+    IndexBuffer& operator=(const IndexBuffer&) = delete;
+    IndexBuffer& operator=(IndexBuffer&&) = delete;
     
 private:
     /// ID of the index buffer
