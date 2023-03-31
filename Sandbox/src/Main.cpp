@@ -99,12 +99,12 @@ int main()
     auto shader = std::make_shared<Shader>("resource/shader/basic.glsl");
     shader->Bind();
     
-    // Define the texture
-    auto texture = std::make_shared<Texture>("resource/texture/container.jpg");
-    texture->Bind();
+    // Define the texture(s)
+    auto texture1 = std::make_shared<Texture>("resource/texture/container.jpg");
     
     // Define the shader uniforms
     shader->SetFloat4("u_Color", 0.2f, 0.3f, 0.8f, 1.0f);
+    texture1->Bind(0);
     shader->SetInt("u_Texture", 0);
     
     vao->Unbind();
