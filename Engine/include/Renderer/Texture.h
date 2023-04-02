@@ -7,7 +7,7 @@
  */
 class Texture {
 public:
-    /// Constructors/Destructor
+    /// Constructor(s)/ Destructor
     Texture(const std::filesystem::path& filePath, bool flip = true);
     ~Texture();
     /// Usage

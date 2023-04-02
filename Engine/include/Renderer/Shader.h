@@ -14,8 +14,9 @@ struct ShaderProgramSource
     /// Fragment shader
     std::string FragmentSource;
     
-    /// Constructor
+    /// Constructor(s)/ Destructor
     ShaderProgramSource(const std::string& vs, const std::string& fs);
+    ~ShaderProgramSource() = default;
 };
 
 /**
@@ -24,7 +25,7 @@ struct ShaderProgramSource
 class Shader
 {
 public:
-    /// Constructor/Destructor
+    /// Constructor(s)/ Destructor
     Shader(const std::filesystem::path& filePath);
     ~Shader();
     /// Usage

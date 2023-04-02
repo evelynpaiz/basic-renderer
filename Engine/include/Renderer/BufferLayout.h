@@ -102,7 +102,7 @@ struct BufferElement
     /// Specifies if the data should be normalized
     bool Normalized;
     
-    /// Constructors/Destructor
+    /// Constructor(s)/ Destructor
     BufferElement(const std::string& name, DataType type,
                   bool normalized = false);
     ~BufferElement() = default;
@@ -114,14 +114,14 @@ struct BufferElement
 class BufferLayout
 {
 public:
-    /// Constructors/Destructor
+    /// Constructor(s)/ Destructor
     BufferLayout() = default;
     BufferLayout(const std::initializer_list<BufferElement>& elements);
     ~BufferLayout() = default;
     /// Gets
     unsigned int GetStride() const;
     const std::vector<BufferElement> GetElements() const;
-    /// Iteration
+    /// Iteration support
     std::vector<BufferElement>::iterator begin();
     std::vector<BufferElement>::iterator end();
     std::vector<BufferElement>::const_iterator begin() const;

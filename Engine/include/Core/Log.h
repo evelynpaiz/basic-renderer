@@ -28,8 +28,10 @@ private:
 class FlagLogSymbol : public spdlog::custom_flag_formatter
 {
 public:
+    /// Format
     void format(const spdlog::details::log_msg &msg,
                 const std::tm &, spdlog::memory_buf_t &dest) override;
+    /// Copy/ Clone
     std::unique_ptr<spdlog::custom_flag_formatter> clone() const override;
     
 private:

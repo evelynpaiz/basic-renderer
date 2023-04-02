@@ -12,7 +12,7 @@
 class VertexArray
 {
 public:
-    /// Constructors/Destructor
+    /// Constructor(s)/ Destructor
     VertexArray();
     ~VertexArray();
     /// Buffers

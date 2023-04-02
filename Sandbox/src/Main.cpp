@@ -7,6 +7,8 @@
 
 #include "Core/Log.h"
 #include "Core/Assert.h"
+#include "Core/Window.h"
+
 #include "Renderer/VertexBuffer.h"
 #include "Renderer/IndexBuffer.h"
 #include "Renderer/VertexArray.h"
@@ -22,46 +24,8 @@ int main()
     // Initialize the logging manager
     Log::Init();
     
-    // Initialize GLFW
-    if (!glfwInit())
-    {
-        CORE_ASSERT(false, "Failed to initialize GLFW!");
-        return -1;
-    }
-    
-    // Configure GLFW
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    #ifdef __APPLE__
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    #endif
-    
-    // Create a windowed mode window and its OpenGL context
-    GLFWwindow* window;
-    window = glfwCreateWindow(800, 600, "Basic Renderer", nullptr, nullptr);
-    
-    if (!window)
-    {
-        CORE_ASSERT(window, "Failed to create a GLFW window!");
-        glfwTerminate();
-        return -1;
-    }
-    
-    // Make the window's context current
-    glfwMakeContextCurrent(window);
-    
-    // Initialize GLEW
-    if (glewInit() != GLEW_OK)
-    {
-        CORE_ASSERT(false, "Failed to initialize GLEW!");
-        glfwTerminate();
-        return -1;
-    }
-    
-    // Display the version of OpenGL
-    CORE_INFO((const char*)glGetString(GL_VERSION));
+    // Define a window for the renderer
+    std::unique_ptr<Window> window = std::make_unique<Window>("Basic Renderer", 800, 600);
     
     // Define the layout of the data to be defined:
     // position : (x, y)
@@ -100,11 +64,11 @@ int main()
     shader->Bind();
     
     // Define the texture(s)
-    auto texture1 = std::make_shared<Texture>("resource/texture/container.jpg");
+    auto texture = std::make_shared<Texture>("resource/texture/container.jpg");
     
     // Define the shader uniforms
     shader->SetFloat4("u_Color", 0.2f, 0.3f, 0.8f, 1.0f);
-    texture1->Bind(0);
+    texture->Bind(0);
     shader->SetInt("u_Texture", 0);
     
     vao->Unbind();
@@ -116,19 +80,13 @@ int main()
     Renderer renderer;
     
     // Loop until the user closes the window
-    while (!glfwWindowShouldClose(window))
+    while (!glfwWindowShouldClose((GLFWwindow*)window->GetNativeWindow()))
     {
         // Render
         renderer.Clear(0.93f, 0.93f, 0.93f);
         renderer.Draw(vao, shader);
         
-        // Swap front and back buffers
-        glfwSwapBuffers(window);
-        
-        // Poll for and process events
-        glfwPollEvents();
+        // Update the window
+        window->OnUpdate();
     }
-    
-    // Terminate (GLFW)
-    glfwTerminate();
 }

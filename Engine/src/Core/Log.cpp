@@ -45,10 +45,14 @@ std::shared_ptr<spdlog::logger> &Log::GetCoreLogger()
 /**
  * Clone the flag.
  *
+ * @param msg Log message.
+ * @param tm Time information.
+ * @param dest Destination buffer.
+ *
  * @returns A unique pointer to the log level symbol flag.
  */
 void FlagLogSymbol::format(const spdlog::details::log_msg &msg,
-                           const std::tm &, spdlog::memory_buf_t &dest)
+                           const std::tm &tm, spdlog::memory_buf_t &dest)
 {
     std::string symbol = m_Symbols[msg.level];
     dest.append(symbol.data(), symbol.data() + symbol.size());

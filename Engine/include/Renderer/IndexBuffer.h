@@ -6,7 +6,7 @@
 class IndexBuffer
 {
 public:
-    /// Constructors/Destructor
+    /// Constructor(s)/ Destructor
     IndexBuffer(const unsigned int *indices, const unsigned int count);
     ~IndexBuffer();
     /// Usage

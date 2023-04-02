@@ -8,7 +8,7 @@
 class VertexBuffer
 {
 public:
-    /// Constructor/Destructor
+    /// Constructor(s)/ Destructor
     VertexBuffer(const void *vertices, const unsigned int size);
     ~VertexBuffer();
     /// Usage

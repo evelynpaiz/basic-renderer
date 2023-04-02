@@ -12,6 +12,7 @@
  * Generate a texture from the input source file.
  *
  * @param filePath Texture file path.
+ * @param flip Fip the texture vertically.
  */
 Texture::Texture(const std::filesystem::path& filePath, bool flip)
     : m_FilePath(filePath), m_Flip(flip)
@@ -29,6 +30,8 @@ Texture::~Texture()
 
 /**
  * Bind the texture.
+ *
+ * @param slot Texture slot position.
  */
 void Texture::Bind(unsigned int slot) const
 {
