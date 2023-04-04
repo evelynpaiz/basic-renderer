@@ -5,6 +5,21 @@
 struct GLFWwindow;
 
 /**
+ * A representation of the information inside a window.
+ */
+struct WindowData
+{
+    /// Window title
+    std::string Title;
+    /// Window size
+    unsigned int Width, Height;
+    
+    /// Constructor(s)/ Destructor
+    WindowData(const std::string& title, const int width, const int height);
+    ~WindowData() = default;
+};
+
+/**
  * Defines the display containing the running application.
  */
 class Window
@@ -35,11 +50,8 @@ private:
     void Shutdown();
     
 private:
-    /// Window title
-    std::string m_Title;
-    /// Window size
-    unsigned int m_Width, m_Height;
-    
     /// Native window (GLFW)
     GLFWwindow* m_Window;
+    /// Window information
+    WindowData m_Data;
 };

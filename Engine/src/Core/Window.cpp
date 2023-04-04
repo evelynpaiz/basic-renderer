@@ -6,18 +6,72 @@
 #include "Core/Log.h"
 #include "Core/Assert.h"
 
+// --------------------------------------------
 // Variable initialization
 // --------------------------------------------
+
 /// Window counter for GLFW.
 static unsigned int g_WindowCount = 0;
 
 // --------------------------------------------
+// Event management
+// --------------------------------------------
 
 /**
+ * Function to be called when a GLFW error occurs.
+ *
+ * @param error Error type.
+ * @param description Description of the error.
+ */
+static void ErrorCallback(int error, const char *description) noexcept
+{
+    CORE_ERROR("GLFW Error ({0}): {1}", error, description);
+}
+
+/**
+ * Function to be called when a window resize event happens.
+ *
+ * @param window Native window.
+ * @param width Updated window size (width).
+ * @param height Updated window size (height).
+ */
+static void WindowResizeCallback(GLFWwindow *window, int width, int height) noexcept
+{
+    // Recover the window information
+    WindowData &data = *(WindowData *)glfwGetWindowUserPointer(window);
+    
+    // Update the size of the window
+    data.Width = width;
+    data.Height = height;
+    CORE_TRACE("Window {0} resized: {1} x {2}", data.Title, width, height);
+}
+
+// --------------------------------------------
+// Window Data
+// --------------------------------------------
+/**
+ * Define the information of a window.
+ *
+ * @param title Window name.
+ * @param width Size (width) of the window.
+ * @param height Size (height) of the window.
+ */
+WindowData::WindowData(const std::string& title, const int width, const int height)
+    : Title(title), Width(width), Height(height)
+{}
+
+// --------------------------------------------
+// Window
+// --------------------------------------------
+/**
  * Generate a window.
+ *
+ * @param title Window name.
+ * @param width Size (width) of the window.
+ * @param height Size (height) of the window.
  */
 Window::Window(const std::string& title, const int width, const int height)
-    : m_Title(title), m_Width(width), m_Height(height)
+    : m_Data(title, width, height)
 {
     Init();
 }
@@ -49,7 +103,7 @@ void Window::OnUpdate() const
  */
 unsigned int Window::GetWidth() const
 {
-    return m_Width;
+    return m_Data.Width;
 }
 
 /**
@@ -59,7 +113,7 @@ unsigned int Window::GetWidth() const
  */
 unsigned int Window::GetHeight() const
 {
-    return m_Height;
+    return m_Data.Height;
 }
 
 /**
@@ -82,6 +136,8 @@ void Window::Init()
     {
         CORE_TRACE("Initializing GLFW");
         CORE_ASSERT(glfwInit(), "Failed to initialize GLFW!");
+        
+        glfwSetErrorCallback(ErrorCallback);
     }
     
     // Configure GLFW
@@ -94,8 +150,10 @@ void Window::Init()
 #endif
     
     // Create a windowed mode window and its OpenGL context
-    CORE_INFO("Creating {0} window ({1} x {2})", m_Title, m_Width, m_Height);
-    m_Window = glfwCreateWindow(m_Width, m_Height, m_Title.c_str(), nullptr, nullptr);
+    CORE_INFO("Creating {0} window ({1} x {2})", m_Data.Title,
+              m_Data.Width, m_Data.Height);
+    m_Window = glfwCreateWindow(m_Data.Width, m_Data.Height,
+                                m_Data.Title.c_str(), nullptr, nullptr);
     CORE_ASSERT(m_Window, "Failed to create a GLFW window!");
     
     // Make the window's context current
@@ -108,6 +166,12 @@ void Window::Init()
     // Display the version of OpenGL
     CORE_INFO("Using OpenGL version {0}",
               (const char*)glGetString(GL_VERSION));
+    
+    // Set the pointer to the window data
+    glfwSetWindowUserPointer(m_Window, &m_Data);
+    
+    // Define the event callbacks
+    glfwSetWindowSizeCallback(m_Window, WindowResizeCallback);
 }
 
 /**

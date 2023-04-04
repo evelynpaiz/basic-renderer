@@ -25,7 +25,7 @@ int main()
     Log::Init();
     
     // Define a window for the renderer
-    std::unique_ptr<Window> window = std::make_unique<Window>("Basic Renderer", 800, 600);
+    auto window = std::make_unique<Window>("Basic Renderer", 800, 600);
     
     // Define the layout of the data to be defined:
     // position : (x, y)
