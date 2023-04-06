@@ -121,39 +121,66 @@ void Shader::SetFloat(const std::string& name, float value)
  * Set the uniform with a vector with 2 values (x, y).
  *
  * @param name Uniform name.
- * @param x Vector input x value.
- * @param y Vector input y value.
+ * @param value Vector input value.
  */
-void Shader::SetFloat2(const std::string& name, float x, float y)
+void Shader::SetVec2(const std::string& name, const glm::vec2& value)
 {
-    glUniform2f(GetUniformLocation(name), x, y);
+    glUniform2fv(glGetUniformLocation(m_ID, name.c_str()), 1, &value[0]);
 }
 
 /**
  * Set the uniform with a vector with 3 values (x, y, z).
  *
  * @param name Uniform name.
- * @param x Vector input x value.
- * @param y Vector input y value.
- * @param z Vector input z value.
+ * @param value Vector input value.
  */
-void Shader::SetFloat3(const std::string& name, float x, float y, float z)
+void Shader::SetVec3(const std::string& name, const glm::vec3& value)
 {
-    glUniform3f(GetUniformLocation(name), x, y, z);
+    glUniform3fv(glGetUniformLocation(m_ID, name.c_str()), 1, &value[0]);
 }
 
 /**
  * Set the uniform with a vector with 4 values (x, y, z, w).
  *
  * @param name Uniform name.
- * @param x Vector input x value.
- * @param y Vector input y value.
- * @param z Vector input z value.
- * @param w Vector input w value.
+ * @param value Vector input value.
  */
-void Shader::SetFloat4(const std::string& name, float x, float y, float z, float w)
+void Shader::SetVec4(const std::string& name, const glm::vec4& value)
 {
-    glUniform4f(GetUniformLocation(name), x, y, z, w);
+    glUniform4fv(glGetUniformLocation(m_ID, name.c_str()), 1, &value[0]);
+}
+
+/**
+ * Set the uniform with a matrix with 2x2 values.
+ *
+ * @param name Uniform name.
+ * @param value Matrix input value.
+ */
+void Shader::SetMat2(const std::string& name, const glm::mat2& value)
+{
+    glUniformMatrix2fv(glGetUniformLocation(m_ID, name.c_str()), 1, GL_FALSE, &value[0][0]);
+}
+
+/**
+ * Set the uniform with a matrix with 3x3 values.
+ *
+ * @param name Uniform name.
+ * @param value Matrix input value.
+ */
+void Shader::SetMat3(const std::string& name, const glm::mat3& value)
+{
+    glUniformMatrix3fv(glGetUniformLocation(m_ID, name.c_str()), 1, GL_FALSE, &value[0][0]);
+}
+
+/**
+ * Set the uniform with a matrix with 4x4 values.
+ *
+ * @param name Uniform name.
+ * @param value Matrix input value.
+ */
+void Shader::SetMat4(const std::string& name, const glm::mat4& value)
+{
+    glUniformMatrix4fv(glGetUniformLocation(m_ID, name.c_str()), 1, GL_FALSE, &value[0][0]);
 }
 
 /**

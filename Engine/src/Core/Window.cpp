@@ -172,6 +172,9 @@ void Window::Init()
     
     // Define the event callbacks
     glfwSetWindowSizeCallback(m_Window, WindowResizeCallback);
+    
+    // Configure global state
+    glEnable(GL_DEPTH_TEST);
 }
 
 /**

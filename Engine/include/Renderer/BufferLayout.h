@@ -12,9 +12,9 @@
  */
 enum class DataType
 {
-    Bool,
-    Int,
-    Float, Float2, Float3, Float4
+    Bool, Int, Float,
+    Vec2, Vec3, Vec4,
+    Mat2, Mat3, Mat4
 };
 
 /**
@@ -31,9 +31,12 @@ inline unsigned int GetCompCountOfType(DataType type)
         case DataType::Bool: return 1;
         case DataType::Int: return 1;
         case DataType::Float: return 1;
-        case DataType::Float2: return 2;
-        case DataType::Float3: return 3;
-        case DataType::Float4: return 4;
+        case DataType::Vec2: return 2;
+        case DataType::Vec3: return 3;
+        case DataType::Vec4: return 4;
+        case DataType::Mat2: return 2;
+        case DataType::Mat3: return 3;
+        case DataType::Mat4: return 4;
     }
 
     CORE_ASSERT(false, "Unknown vertex data type!");
@@ -54,9 +57,12 @@ inline unsigned int GetSizeOfType(DataType type)
         case DataType::Bool: return 1;
         case DataType::Int: return 4;
         case DataType::Float: return 4;
-        case DataType::Float2: return 4 * 2;
-        case DataType::Float3: return 4 * 3;
-        case DataType::Float4: return 4 * 4;
+        case DataType::Vec2: return 4 * 2;
+        case DataType::Vec3: return 4 * 3;
+        case DataType::Vec4: return 4 * 4;
+        case DataType::Mat2: return 4 * 2 * 2;
+        case DataType::Mat3: return 4 * 3 * 3;
+        case DataType::Mat4: return 4 * 4 * 4;
     }
     
     CORE_ASSERT(false, "Unknown vertex data type!");
@@ -77,9 +83,12 @@ inline GLenum DataTypeToOpenGLType(DataType type)
         case DataType::Bool: return GL_BOOL;
         case DataType::Int: return GL_INT;
         case DataType::Float: return GL_FLOAT;
-        case DataType::Float2: return GL_FLOAT;
-        case DataType::Float3: return GL_FLOAT;
-        case DataType::Float4: return GL_FLOAT;
+        case DataType::Vec2: return GL_FLOAT;
+        case DataType::Vec3: return GL_FLOAT;
+        case DataType::Vec4: return GL_FLOAT;
+        case DataType::Mat2: return GL_FLOAT;
+        case DataType::Mat3: return GL_FLOAT;
+        case DataType::Mat4: return GL_FLOAT;
     }
 
     CORE_ASSERT(false, "Unknown vertex data type!");

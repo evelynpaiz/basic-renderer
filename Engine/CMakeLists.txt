@@ -33,7 +33,7 @@ set_target_properties(Engine PROPERTIES
 )
 
 # Link external libraries
-target_link_libraries(Engine spdlog::spdlog OpenGL::GL glfw::glfw glew::glew stb::stb)
+target_link_libraries(Engine spdlog::spdlog OpenGL::GL glfw::glfw glew::glew glm::glm stb::stb)
 
 # Define solution tree organization
 source_group(

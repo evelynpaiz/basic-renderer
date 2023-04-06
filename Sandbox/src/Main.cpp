@@ -5,6 +5,9 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "Core/Log.h"
 #include "Core/Assert.h"
 #include "Core/Window.h"
@@ -31,8 +34,8 @@ int main()
     // position : (x, y)
     // texture coords : (u, v)
     BufferLayout layout = {
-        { "a_Position", DataType::Float2 },
-        { "a_TextureCoord", DataType::Float2 }
+        { "a_Position", DataType::Vec2 },
+        { "a_TextureCoord", DataType::Vec2 }
     };
     
     // Define the data to be drawn (vertices and indices)
@@ -67,10 +70,24 @@ int main()
     auto texture = std::make_shared<Texture>("resource/texture/container.jpg");
     
     // Define the shader uniforms
-    shader->SetFloat4("u_Color", 0.2f, 0.3f, 0.8f, 1.0f);
+    shader->SetVec4("u_Color", glm::vec4(0.2f, 0.3f, 0.8f, 1.0f));
+    
     texture->Bind(0);
     shader->SetInt("u_Texture", 0);
     
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::rotate(model, glm::radians(-45.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    
+    glm::mat4 view = glm::mat4(1.0f);
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+    
+    //glm::mat4 proj = glm::ortho(-4.0f, 4.0f, -3.0f, 3.0f, -1.0f, 100.0f);
+    glm::mat4 proj = glm::perspective(glm::radians(45.0f),
+        (float)window->GetWidth()/(float)window->GetHeight(), 0.1f, 100.0f);
+    
+    shader->SetMat4("u_Transform", proj * view * model);
+
+    // Unbind the resources
     vao->Unbind();
     vbo->Unbind();
     ibo->Unbind();
@@ -83,7 +100,7 @@ int main()
     while (!glfwWindowShouldClose((GLFWwindow*)window->GetNativeWindow()))
     {
         // Render
-        renderer.Clear(0.93f, 0.93f, 0.93f);
+        renderer.Clear(glm::vec4(0.93f, 0.93f, 0.93f, 1.0f));
         renderer.Draw(vao, shader);
         
         // Update the window

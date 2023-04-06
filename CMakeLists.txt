@@ -47,6 +47,14 @@ add_library(glew::glew ALIAS libglew_static)
 
 set_target_properties(libglew_static PROPERTIES FOLDER "glew")
 
+## GLM
+add_library(glm::glm INTERFACE IMPORTED)
+target_include_directories(
+    glm::glm
+    INTERFACE 
+    ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/glm/
+)
+
 ## STB
 add_library(stb::stb INTERFACE IMPORTED)
 target_include_directories(

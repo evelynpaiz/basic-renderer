@@ -7,20 +7,17 @@
  */
 void Renderer::Clear() const
 {
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 /**
  * Clear the buffers to preset values.
  *
- * @param r Background color (red value)
- * @param g Background color (green value)
- * @param b Background color (blue value)
- * @param a Background color (alpha value)
+ * @param color Background color.
  */
-void Renderer::Clear(float r, float g, float b, float a) const
+void Renderer::Clear(const glm::vec4& color) const
 {
-    glClearColor(r, g, b, a);
+    glClearColor(color.r, color.g, color.b, color.a);
     Clear();
 }
 
