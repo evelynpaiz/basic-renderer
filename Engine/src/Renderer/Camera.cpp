@@ -3,16 +3,16 @@
 #include "Core/Log.h"
 
 /**
- * Generate a camera with a defined resolution.
+ * Generate a camera.
  *
  * @param width Viewport size (width).
  * @param height Viewport size (height).
+ * @param near Distance to the near plane.
+ * @param far Distance to the far plane.
  */
-Camera::Camera(const int width, const int height)
-    : m_Width(width), m_Height(height)
-{
-    UpdateCameraMatrices();
-}
+Camera::Camera(const int width, const int height, const float near, const float far)
+    : m_Width(width), m_Height(height), m_NearPlane(near), m_FarPlane(far)
+{}
 
 /**
  * Get the camera resolution (width).
@@ -170,6 +170,18 @@ void Camera::SetRotation(const glm::vec3& rotation)
     m_Rotation = rotation;
     UpdateViewMatrix();
 }
+
+/**
+ * Update the camera view matrix.
+ */
+void Camera::UpdateViewMatrix()
+{}
+
+/**
+ * Update the camera projection matrix.
+ */
+void Camera::UpdateProjectionMatrix()
+{}
 
 /**
  * Update the camera matrices.

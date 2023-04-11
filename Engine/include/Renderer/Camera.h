@@ -8,29 +8,22 @@
 class Camera
 {
 public:
-    /// Constructor(s)/ Destructor
-    Camera(const int width, const int height);
+    /// Destructor
     virtual ~Camera() = default;
     /// Gets
     unsigned int GetWidth() const;
     unsigned int GetHeight() const;
     float GetAspectRatio() const;
-    
     float GetNearPlane() const;
     float GetFarPlane() const;
-    
     const glm::vec3& GetPosition() const;
     const glm::vec3& GetRotation() const;
-    
     const glm::mat4& GetViewMatrix() const;
     const glm::mat4& GetProjectionMatrix() const;
-    
     /// Sets
     void SetViewportSize(const int width, const int height);
-    
     void SetNearPlane(const float nearPlane);
     void SetFarPlane(const float farPlane);
-    
     void SetPosition(const glm::vec3& position);
     void SetRotation(const glm::vec3& rotation);
     
@@ -44,21 +37,22 @@ public:
     Camera& operator=(Camera&&) = delete;
     
 protected:
-    /// Matrices handler (update)
-    virtual void UpdateViewMatrix() = 0;
-    virtual void UpdateProjectionMatrix() = 0;
+    /// Constructor(s)
+    Camera(const int width, const int height, const float near,
+           const float far);
+    /// Transformation matrices
+    virtual void UpdateViewMatrix();
+    virtual void UpdateProjectionMatrix();
     void UpdateCameraMatrices();
     
-private:
+protected:
     /// Camera resolution
     unsigned int m_Width, m_Height;
     
-    /// Camera near plane
-    float m_NearPlane = 0.0f;
-    /// Camera far plane
-    float m_FarPlane = 0.0f;
+    /// Distance to near and far plane
+    float m_NearPlane, m_FarPlane;
     
-    /// Camera position
+    /// Camera position (x, y, z)
     glm::vec3 m_Position = glm::vec3(0.0f);
     /// Camera orientation (yaw, pitch and roll angles)
     glm::vec3 m_Rotation = glm::vec3(0.0f);

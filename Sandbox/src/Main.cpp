@@ -15,9 +15,13 @@
 #include "Renderer/VertexBuffer.h"
 #include "Renderer/IndexBuffer.h"
 #include "Renderer/VertexArray.h"
+
 #include "Renderer/Shader.h"
-#include "Renderer/Renderer.h"
 #include "Renderer/Texture.h"
+
+#include "Renderer/PerspectiveCamera.h"
+
+#include "Renderer/Renderer.h"
 
 /**
  * Main function.
@@ -27,8 +31,15 @@ int main()
     // Initialize the logging manager
     Log::Init();
     
+    // Timing
+    float deltaTime = 0.0f; // (time between current frame and last frame)
+    float lastFrame = 0.0f;
+    
     // Define a window for the renderer
-    auto window = std::make_unique<Window>("Basic Renderer", 800, 600);
+    const int viewportWidth = 800;
+    const int viewportHeight = 600;
+    auto window = std::make_unique<Window>("Basic Renderer", viewportWidth,
+                                           viewportHeight);
     
     // Define the layout of the data to be defined:
     // position : (x, y)
@@ -69,6 +80,10 @@ int main()
     // Define the texture(s)
     auto texture = std::make_shared<Texture>("resource/texture/container.jpg");
     
+    // Define the rendering camera
+    auto camera = std::make_shared<PerspectiveCamera>(viewportWidth, viewportHeight);
+    camera->SetPosition(glm::vec3(0.0f, 0.0f, 3.0f));
+    
     // Define the shader uniforms
     shader->SetVec4("u_Color", glm::vec4(0.2f, 0.3f, 0.8f, 1.0f));
     
@@ -78,12 +93,8 @@ int main()
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::rotate(model, glm::radians(-45.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     
-    glm::mat4 view = glm::mat4(1.0f);
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-    
-    //glm::mat4 proj = glm::ortho(-4.0f, 4.0f, -3.0f, 3.0f, -1.0f, 100.0f);
-    glm::mat4 proj = glm::perspective(glm::radians(45.0f),
-        (float)window->GetWidth()/(float)window->GetHeight(), 0.1f, 100.0f);
+    glm::mat4 view = camera->GetViewMatrix();
+    glm::mat4 proj = camera->GetProjectionMatrix();
     
     shader->SetMat4("u_Transform", proj * view * model);
 
@@ -99,9 +110,22 @@ int main()
     // Loop until the user closes the window
     while (!glfwWindowShouldClose((GLFWwindow*)window->GetNativeWindow()))
     {
+        // Per-frame time logic
+        float currentFrame = static_cast<float>(glfwGetTime());
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+        
         // Render
+        shader->Bind();
+        view = camera->GetViewMatrix();
+        proj = camera->GetProjectionMatrix();
+        shader->SetMat4("u_Transform", proj * view * model);
+        
         renderer.Clear(glm::vec4(0.93f, 0.93f, 0.93f, 1.0f));
         renderer.Draw(vao, shader);
+        
+        // Update the camera
+        camera->OnUpdate(deltaTime);
         
         // Update the window
         window->OnUpdate();
