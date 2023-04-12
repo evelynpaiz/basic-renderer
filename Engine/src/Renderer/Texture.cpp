@@ -1,12 +1,10 @@
+#include "enginepch.h"
 #include "Renderer/Texture.h"
 
 #include <GL/glew.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-
-#include "Core/Log.h"
-#include "Core/Assert.h"
 
 /**
  * Generate a texture from the input source file.

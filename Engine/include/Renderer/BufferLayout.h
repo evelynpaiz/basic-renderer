@@ -1,11 +1,6 @@
 #pragma once
 
-#include <string>
-#include <vector>
-
 #include <GL/glew.h>
-
-#include "Core/Assert.h"
 
 /**
  * An enumeration for different data types of vertex attributes.

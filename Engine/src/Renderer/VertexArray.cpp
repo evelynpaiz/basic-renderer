@@ -1,8 +1,7 @@
+#include "enginepch.h"
 #include "Renderer/VertexArray.h"
 
 #include <GL/glew.h>
-
-#include "Core/Assert.h"
 
 /**
  * Generate a vertex array.

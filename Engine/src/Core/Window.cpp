@@ -1,10 +1,8 @@
+#include "enginepch.h"
 #include "Core/Window.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-
-#include "Core/Log.h"
-#include "Core/Assert.h"
 
 // --------------------------------------------
 // Variable initialization

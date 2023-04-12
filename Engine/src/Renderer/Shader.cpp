@@ -1,12 +1,7 @@
+#include "enginepch.h"
 #include "Renderer/Shader.h"
 
-#include <fstream>
-#include <sstream>
-
 #include <GL/glew.h>
-
-#include "Core/Log.h"
-#include "Core/Assert.h"
 
 // --------------------------------------------
 // Shader program source

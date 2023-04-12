@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vector>
-
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
 #include <spdlog/pattern_formatter.h>

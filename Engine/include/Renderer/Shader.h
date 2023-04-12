@@ -2,10 +2,6 @@
 
 #include <glm/glm.hpp>
 
-#include <filesystem>
-#include <string>
-#include <unordered_map>
-
 /**
  * Shader program (executed on the GPU).
  */

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.16)
 
 # Find source files
 file(
@@ -34,6 +34,9 @@ set_target_properties(Engine PROPERTIES
 
 # Link external libraries
 target_link_libraries(Engine spdlog::spdlog OpenGL::GL glfw::glfw glew::glew glm::glm stb::stb)
+
+# Define pre-compiled header
+target_precompile_headers(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/enginepch.h)
 
 # Define solution tree organization
 source_group(

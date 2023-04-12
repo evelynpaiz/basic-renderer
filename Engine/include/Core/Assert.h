@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Core/Log.h"
-
 // Enable assertion messages if we are in DEBUG mode
 // and define a debug break according to the used platform
 #ifndef NDEBUG

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.16)
 
 # Find source files
 file(GLOB sources src/*.cpp src/*.h include/*.h)

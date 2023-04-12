@@ -1,6 +1,5 @@
+#include "enginepch.h"
 #include "Camera/Camera.h"
-
-#include "Core/Log.h"
 
 /**
  * Generate a camera.

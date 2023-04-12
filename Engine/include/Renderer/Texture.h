@@ -1,7 +1,5 @@
 #pragma once
 
-#include <filesystem>
-
 /**
  * An image used to add details to an rendered geometry.
  */

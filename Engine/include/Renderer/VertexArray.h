@@ -4,8 +4,6 @@
 #include "Renderer/IndexBuffer.h"
 #include "Renderer/BufferLayout.h"
 
-#include <vector>
-
 /**
  * A vertex array used to describe how the vertex attributes are stored (its layout) in a vertex buffer.
  */
