@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include "Renderer/Camera.h"
+#include "Camera/Camera.h"
 
 /**
  * Captures the scene and displays the resulting image in a viewport (camera abstraction).

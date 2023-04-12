@@ -1,4 +1,4 @@
-#include "Renderer/PerspectiveCamera.h"
+#include "Camera/PerspectiveCamera.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>

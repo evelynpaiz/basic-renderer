@@ -8,20 +8,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Core/Log.h"
-#include "Core/Assert.h"
-#include "Core/Window.h"
-
-#include "Renderer/VertexBuffer.h"
-#include "Renderer/IndexBuffer.h"
-#include "Renderer/VertexArray.h"
-
-#include "Renderer/Shader.h"
-#include "Renderer/Texture.h"
-
-#include "Renderer/PerspectiveCamera.h"
-
-#include "Renderer/Renderer.h"
+#include "Engine.h"
 
 /**
  * Main function.
@@ -74,11 +61,11 @@ int main()
     vao->SetIndexBuffer(ibo);
     
     // Build and compile the shader program to be used
-    auto shader = std::make_shared<Shader>("resource/shader/basic.glsl");
+    auto shader = std::make_shared<Shader>("resources/shaders/basic.glsl");
     shader->Bind();
     
     // Define the texture(s)
-    auto texture = std::make_shared<Texture>("resource/texture/container.jpg");
+    auto texture = std::make_shared<Texture>("resources/textures/container.jpg");
     
     // Define the rendering camera
     auto camera = std::make_shared<PerspectiveCamera>(viewportWidth, viewportHeight);
