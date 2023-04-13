@@ -1,9 +1,6 @@
 [submodule "3rdparty/stb"]
 	path = 3rdparty/stb
 	url = https://github.com/nothings/stb.git
-[submodule "3rdparty/spdlog"]
-	path = 3rdparty/spdlog
-	url = https://github.com/gabime/spdlog.git
 [submodule "3rdparty/glm"]
 	path = 3rdparty/glm
 	url = https://github.com/g-truc/glm.git
@@ -13,3 +10,6 @@
 [submodule "3rdparty/glew"]
 	path = 3rdparty/glew
 	url = https://github.com/epaizreyes/glew.git
+[submodule "3rdparty/spdlog"]
+	path = 3rdparty/spdlog
+	url = https://github.com/epaizreyes/spdlog.git

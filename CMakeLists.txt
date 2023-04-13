@@ -19,12 +19,10 @@ find_package(OpenGL REQUIRED)
 
 # Third party libraries
 ## SPDLOG
-add_library(spdlog::spdlog INTERFACE IMPORTED)
-target_include_directories(
-    spdlog::spdlog
-    INTERFACE 
-    ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/spdlog/include/
-)
+set(SPDLOG_BUILD_ONLY_HEADERS ON CACHE BOOL "" FORCE)
+
+add_subdirectory(3rdparty/spdlog)
+add_library(spdlog::spdlog ALIAS spdlog_header_only)
 
 ## GLFW
 set(GLFW_MAPPING OFF CACHE BOOL "" FORCE)
@@ -48,12 +46,6 @@ add_library(glew::glew ALIAS glew)
 
 ## GLM
 add_subdirectory(3rdparty/glm)
-##add_library(glm::glm INTERFACE IMPORTED)
-##target_include_directories(
-##    glm::glm
-##    INTERFACE 
-##    ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/glm/
-##)
 
 ## STB
 add_library(stb::stb INTERFACE IMPORTED)
