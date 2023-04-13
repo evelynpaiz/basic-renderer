@@ -47,12 +47,13 @@ add_subdirectory(3rdparty/glew)
 add_library(glew::glew ALIAS glew)
 
 ## GLM
-add_library(glm::glm INTERFACE IMPORTED)
-target_include_directories(
-    glm::glm
-    INTERFACE 
-    ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/glm/
-)
+add_subdirectory(3rdparty/glm)
+##add_library(glm::glm INTERFACE IMPORTED)
+##target_include_directories(
+##    glm::glm
+##    INTERFACE 
+##    ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/glm/
+##)
 
 ## STB
 add_library(stb::stb INTERFACE IMPORTED)
