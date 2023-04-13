@@ -39,13 +39,12 @@ add_library(glfw::glfw ALIAS glfw)
 set_target_properties(glfw PROPERTIES FOLDER "")
 
 ## GLEW
-set(glew-cmake_BUILD_SHARED OFF CACHE BOOL "" FORCE)
+set(GLEW_BUILD_SHARED OFF CACHE BOOL "" FORCE)
+set(GLEW_INSTALL OFF CACHE BOOL "" FORCE)
 set(ONLY_LIBS ON CACHE BOOL "" FORCE)
 
 add_subdirectory(3rdparty/glew)
-add_library(glew::glew ALIAS libglew_static)
-
-set_target_properties(libglew_static PROPERTIES FOLDER "glew")
+add_library(glew::glew ALIAS glew)
 
 ## GLM
 add_library(glm::glm INTERFACE IMPORTED)
