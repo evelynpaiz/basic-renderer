@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Event/Event.h"
+
 struct GLFWwindow;
 
 /**
@@ -11,6 +13,8 @@ struct WindowData
     std::string Title;
     /// Window size
     unsigned int Width, Height;
+    /// Callback function to handle events
+    std::function<void(Event&)> EventCallback;
     
     /// Constructor(s)/ Destructor
     WindowData(const std::string& title, const int width, const int height);
@@ -29,9 +33,12 @@ public:
     /// Update
     void OnUpdate() const;
     /// Gets
+    const std::string& GetTitle() const;
     unsigned int GetWidth() const;
     unsigned int GetHeight() const;
     void* GetNativeWindow() const;
+    /// Sets
+    void SetEventCallback(const std::function<void(Event&)>& callback);
     
 // Remove the possibility of copying this resource
 public:

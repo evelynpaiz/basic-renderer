@@ -4,6 +4,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "Event/WindowEvent.h"
+
 // --------------------------------------------
 // Variable initialization
 // --------------------------------------------
@@ -36,12 +38,30 @@ static void ErrorCallback(int error, const char *description) noexcept
 static void WindowResizeCallback(GLFWwindow *window, int width, int height) noexcept
 {
     // Recover the window information
-    WindowData &data = *(WindowData *)glfwGetWindowUserPointer(window);
+    WindowData &data = *(WindowData*)glfwGetWindowUserPointer(window);
     
     // Update the size of the window
     data.Width = width;
     data.Height = height;
-    CORE_TRACE("Window {0} resized: {1} x {2}", data.Title, width, height);
+    
+    // Call the event callback function with a window resize event
+    WindowResizeEvent event(data.Title, width, height);
+    data.EventCallback(event);
+}
+
+/**
+ * Function to be called when a window close event happens.
+ *
+ * @param window Native window.
+ */
+static void WindowCloseCallback(GLFWwindow *window)
+{
+    // Recover the window information
+    WindowData &data = *(WindowData*)glfwGetWindowUserPointer(window);
+    
+    // Call the event callback function with a window close event
+    WindowCloseEvent event(data.Title);
+    data.EventCallback(event);
 }
 
 // --------------------------------------------
@@ -95,9 +115,19 @@ void Window::OnUpdate() const
 }
 
 /**
+ * Get the title of the window.
+ *
+ * @returns The window name.
+ */
+const std::string& Window::GetTitle() const
+{
+    return m_Data.Title;
+}
+
+/**
  * Get the size (width) of the window.
  *
- * @returns the width of the window.
+ * @returns The width of the window.
  */
 unsigned int Window::GetWidth() const
 {
@@ -107,7 +137,7 @@ unsigned int Window::GetWidth() const
 /**
  * Get the size (height) of the window.
  *
- * @returns the height of the window.
+ * @returns The height of the window.
  */
 unsigned int Window::GetHeight() const
 {
@@ -117,11 +147,21 @@ unsigned int Window::GetHeight() const
 /**
  * Get the GLFW window.
  *
- * @returns the native window.
+ * @returns The native window.
  */
 void* Window::GetNativeWindow() const
 {
     return m_Window;
+}
+
+/**
+ * Set the event callback function for this window.
+ *
+ * @param callback The event callback function.
+ */
+void Window::SetEventCallback(const std::function<void (Event &)>& callback)
+{
+    m_Data.EventCallback = callback;
 }
 
 /**
@@ -170,6 +210,7 @@ void Window::Init()
     
     // Define the event callbacks
     glfwSetWindowSizeCallback(m_Window, WindowResizeCallback);
+    glfwSetWindowCloseCallback(m_Window, WindowCloseCallback);
     
     // Configure global state
     glEnable(GL_DEPTH_TEST);

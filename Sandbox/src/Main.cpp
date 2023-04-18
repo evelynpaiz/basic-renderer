@@ -9,10 +9,19 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "Engine.h"
+#include "Sandbox.h"
+
 
 /**
  * Main function.
  */
+int main()
+{
+    Log::Init();
+    auto application = std::make_unique<Sandbox>();
+    application->Run();
+}
+/*
 int main()
 {
     // Initialize the logging manager
@@ -98,7 +107,7 @@ int main()
     while (!glfwWindowShouldClose((GLFWwindow*)window->GetNativeWindow()))
     {
         // Per-frame time logic
-        float currentFrame = static_cast<float>(glfwGetTime());
+        float currentFrame = (float)glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         
@@ -118,3 +127,4 @@ int main()
         window->OnUpdate();
     }
 }
+*/
