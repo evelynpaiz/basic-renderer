@@ -54,8 +54,4 @@ public:
     EventType GetEventType() const override;
     const char* GetName() const override;
     std::string GetDescription() const override;
-    
-private:
-    /// Size
-    unsigned int m_Width, m_Height;
 };

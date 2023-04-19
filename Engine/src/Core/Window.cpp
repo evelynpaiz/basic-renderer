@@ -5,6 +5,8 @@
 #include <GLFW/glfw3.h>
 
 #include "Event/WindowEvent.h"
+#include "Event/KeyEvent.h"
+#include "Event/MouseEvent.h"
 
 // --------------------------------------------
 // Variable initialization
@@ -45,8 +47,11 @@ static void WindowResizeCallback(GLFWwindow *window, int width, int height) noex
     data.Height = height;
     
     // Call the event callback function with a window resize event
-    WindowResizeEvent event(data.Title, width, height);
-    data.EventCallback(event);
+    if (data.EventCallback)
+    {
+        WindowResizeEvent event(data.Title, width, height);
+        data.EventCallback(event);
+    }
 }
 
 /**
@@ -60,7 +65,127 @@ static void WindowCloseCallback(GLFWwindow *window)
     WindowData &data = *(WindowData*)glfwGetWindowUserPointer(window);
     
     // Call the event callback function with a window close event
-    WindowCloseEvent event(data.Title);
+    if (data.EventCallback)
+    {
+        WindowCloseEvent event(data.Title);
+        data.EventCallback(event);
+    }
+}
+
+/**
+ * Function to be called when a key event happens.
+ *
+ * @param window Native window.
+ * @param key The key thas has been pressed or released.
+ * @param scancode The system specific scan code of the key.
+ * @param action (pressed, released or repeat).
+ * @param mods Bit fild describing the modifiers keys held down.
+ */
+static void KeyCallback(GLFWwindow *window, int key, int scancode,
+                             int action, int mods) noexcept
+{
+    // Key pressed counter
+    static unsigned int keyCount = 1;
+    
+    // Recover the window information
+    WindowData &data = *(WindowData*)glfwGetWindowUserPointer(window);
+    if (!data.EventCallback)
+        return;
+    
+    // Call the event callback function with the respective keyboard event
+    switch (action)
+    {
+        case GLFW_PRESS:
+        {
+            KeyPressedEvent event(key, keyCount);
+            data.EventCallback(event);
+            break;
+        }
+        case GLFW_RELEASE:
+        {
+            keyCount = 1;
+            KeyReleasedEvent event(key);
+            data.EventCallback(event);
+            break;
+        }
+        case GLFW_REPEAT:
+        {
+            keyCount++;
+            KeyPressedEvent event(key, keyCount);
+            data.EventCallback(event);
+            break;
+        }
+    }
+}
+
+/**
+ * Function to be called when a mouse button event happens.
+ *
+ * @param window Native window.
+ * @param button The button thas has been pressed or released.
+ * @param action (pressed, released or scroll).
+ * @param mods Bit fild describing the modifiers keys held down.
+ */
+static void MouseButtonCallback(GLFWwindow *window, int button, int action,
+                          int mods) noexcept
+{
+    // Recover the window information
+    WindowData &data = *(WindowData*)glfwGetWindowUserPointer(window);
+    if (!data.EventCallback)
+        return;
+    
+    // Call the event callback function with the respective mouse event
+    switch (action)
+    {
+        case GLFW_PRESS:
+        {
+            MouseButtonPressedEvent event(button);
+            data.EventCallback(event);
+            break;
+        }
+        case GLFW_RELEASE:
+        {
+            MouseButtonReleasedEvent event(button);
+            data.EventCallback(event);
+            break;
+        }
+    }
+}
+
+/**
+ * Function to be called when a mouse scrolled event happens.
+ *
+ * @param window Native window.
+ * @param xOffset The scroll offset in the x-axis (horizontally).
+ * @param yOffset The scroll offset in the y-axis (vertically).
+ */
+static void MouseScrolledCallback(GLFWwindow *window, double xOffset,
+                                double yOffset) noexcept
+{
+    // Recover the window information
+    WindowData &data = *(WindowData*)glfwGetWindowUserPointer(window);
+    if (!data.EventCallback)
+        return;
+    
+    MouseScrolledEvent event((float)xOffset, (float)yOffset);
+    data.EventCallback(event);
+}
+
+/**
+ * Function to be called when a mouse moved event happens.
+ *
+ * @param window Native window.
+ * @param x The mouse position in the x-axis.
+ * @param y The mouse position in the y-axis.
+ */
+static void MouseMovedCallback(GLFWwindow *window, double x, double y) noexcept
+{
+    // Recover the window information
+    WindowData &data = *(WindowData*)glfwGetWindowUserPointer(window);
+    if (!data.EventCallback)
+        return;
+    
+    MouseMovedEvent event((float)x, (float)y);
     data.EventCallback(event);
 }
 
@@ -211,6 +336,12 @@ void Window::Init()
     // Define the event callbacks
     glfwSetWindowSizeCallback(m_Window, WindowResizeCallback);
     glfwSetWindowCloseCallback(m_Window, WindowCloseCallback);
+    
+    glfwSetKeyCallback(m_Window, KeyCallback);
+    
+    glfwSetMouseButtonCallback(m_Window, MouseButtonCallback);
+    glfwSetScrollCallback(m_Window, MouseScrolledCallback);
+    glfwSetCursorPosCallback(m_Window, MouseMovedCallback);
     
     // Configure global state
     glEnable(GL_DEPTH_TEST);

@@ -60,7 +60,8 @@ void Application::OnEvent(Event& e)
     dispatcher.Dispatch<WindowCloseEvent>(
         BIND_EVENT_FN(Application::OnWindowClose));
     
-    CORE_DEBUG("{0}", e);
+    // Print the information of the event (DEGUB)
+    // CORE_DEBUG("{0}", e);
 }
 
 /**

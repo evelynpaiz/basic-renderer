@@ -15,13 +15,15 @@
 /**
  * Main function.
  */
+/*
 int main()
 {
     Log::Init();
     auto application = std::make_unique<Sandbox>();
     application->Run();
 }
-/*
+ */
+// TODO move the code to a rendering layer
 int main()
 {
     // Initialize the logging manager
@@ -127,4 +129,3 @@ int main()
         window->OnUpdate();
     }
 }
-*/
