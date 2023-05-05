@@ -39,9 +39,49 @@ void Application::Run()
         /// TODO: remove it
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
+        // Render layers (from bottom to top)
+        for (std::shared_ptr<Layer>& layer : m_LayerStack)
+            layer->OnUpdate();
+        
         // Update the window
         m_Window->OnUpdate();
     }
+}
+
+/**
+ * Add a new rendering layer to the application.
+ * @param layer New rendering layer.
+ */
+void Application::PushLayer(const std::shared_ptr<Layer>& layer)
+{
+    m_LayerStack.PushLayer(layer);
+}
+
+/**
+ * Add a new overlay layer (rendered on top) to the application.
+ * @param overlay New overlay layer.
+ */
+void Application::PushOverlay(const std::shared_ptr<Layer>& overlay)
+{
+    m_LayerStack.PushOverlay(overlay);
+}
+
+/**
+ * Remove a rendering layer from the application.
+ * @param layer Rendering layer.
+ */
+void Application::PopLayer(const std::shared_ptr<Layer>& layer)
+{
+    m_LayerStack.PopLayer(layer);
+}
+
+/**
+ * Remove an overlay layer (rendered on top) from the application.
+ * @param overlay Overlay layer.
+ */
+void Application::PopOverlay(const std::shared_ptr<Layer>& overlay)
+{
+    m_LayerStack.PopOverlay(overlay);
 }
 
 /**
@@ -60,6 +100,14 @@ void Application::OnEvent(Event& e)
     dispatcher.Dispatch<WindowCloseEvent>(
         BIND_EVENT_FN(Application::OnWindowClose));
     
+    // Dispatch the event to the rendered layers (check from top to bottom)
+    for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
+    {
+        if (e.Handled)
+            break;
+        (*it)->OnEvent(e);
+    }
+    
     // Print the information of the event (DEGUB)
     // CORE_DEBUG("{0}", e);
 }
@@ -68,6 +116,7 @@ void Application::OnEvent(Event& e)
  * Function to be called when a window resize event happens.
  *
  * @param e Event to be handled.
+ * @return True if the event has been handled.
  */
 bool Application::OnWindowResize(WindowResizeEvent &e)
 {
@@ -78,6 +127,7 @@ bool Application::OnWindowResize(WindowResizeEvent &e)
  * Function to be called when a window close event happens.
  *
  * @param e Event to be handled.
+ * @return True if the event has been handled.
  */
 bool Application::OnWindowClose(WindowCloseEvent &e)
 {
