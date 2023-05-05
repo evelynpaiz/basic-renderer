@@ -14,7 +14,7 @@ public:
     // Layer handlers
     virtual void OnAttach();
     virtual void OnDetach();
-    virtual void OnUpdate();
+    virtual void OnUpdate(float deltaTime);
     virtual void OnEvent(Event& event);
     // Get(s)
     const std::string& GetName() const;

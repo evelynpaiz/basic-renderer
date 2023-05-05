@@ -11,6 +11,7 @@
 // --------------------------------------------
 #include "Core/Window.h"
 #include "Core/Application.h"
+#include "Core/Layer.h"
 
 // --------------------------------------------
 // Renderer

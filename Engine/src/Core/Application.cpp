@@ -36,12 +36,9 @@ void Application::Run()
         float deltaTime = currentFrame - m_LastFrame;
         m_LastFrame = currentFrame;
         
-        /// TODO: remove it
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
         // Render layers (from bottom to top)
         for (std::shared_ptr<Layer>& layer : m_LayerStack)
-            layer->OnUpdate();
+            layer->OnUpdate(deltaTime);
         
         // Update the window
         m_Window->OnUpdate();
@@ -107,9 +104,6 @@ void Application::OnEvent(Event& e)
             break;
         (*it)->OnEvent(e);
     }
-    
-    // Print the information of the event (DEGUB)
-    // CORE_DEBUG("{0}", e);
 }
 
 /**

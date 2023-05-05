@@ -24,7 +24,7 @@ void Layer::OnDetach()
 /**
  * Render this layer.
  */
-void Layer::OnUpdate()
+void Layer::OnUpdate(float deltaTime)
 {}
 
 /**

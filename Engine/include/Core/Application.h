@@ -44,9 +44,8 @@ private:
     ///< Application status
     bool m_Running = true;
     
-    ///< Rendering time
-    float m_LastFrame = 0.0f;
-    
     ///< Layers to be rendered
     LayerStack m_LayerStack;
+    ///< Rendering time
+    float m_LastFrame = 0.0f;
 };
