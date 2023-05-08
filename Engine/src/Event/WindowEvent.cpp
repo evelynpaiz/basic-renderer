@@ -16,7 +16,7 @@ WindowEvent::WindowEvent(const std::string& title)
 /**
  * Get the title of the window.
  *
- * @returns The window name.
+ * @return The window name.
  */
 const std::string& WindowEvent::GetTitle() const
 {
@@ -42,7 +42,7 @@ WindowResizeEvent::WindowResizeEvent(const std::string& title, unsigned int widt
 /**
  * Get the resize event size.
  *
- * @returns The updated size (width).
+ * @return The updated size (width).
  */
 unsigned int WindowResizeEvent::GetWidth() const
 {
@@ -51,7 +51,7 @@ unsigned int WindowResizeEvent::GetWidth() const
 /**
  * Get the resize event size.
  *
- * @returns The updated size (height).
+ * @return The updated size (height).
  */
 unsigned int WindowResizeEvent::GetHeight() const
 {
@@ -61,7 +61,7 @@ unsigned int WindowResizeEvent::GetHeight() const
 /**
  * Get the type of the event.
  *
- * @returns WindowResize type.
+ * @return WindowResize type.
  */
 EventType WindowResizeEvent::GetEventTypeStatic()
 {
@@ -71,7 +71,7 @@ EventType WindowResizeEvent::GetEventTypeStatic()
 /**
  * Get the type of the event.
  *
- * @returns WindowResize type.
+ * @return WindowResize type.
  */
 EventType WindowResizeEvent::GetEventType() const
 {
@@ -81,7 +81,7 @@ EventType WindowResizeEvent::GetEventType() const
 /**
  * Get the name of the event.
  *
- * @returns WindowResizeEvent name.
+ * @return WindowResizeEvent name.
  */
 const char* WindowResizeEvent::GetName() const
 {
@@ -91,7 +91,7 @@ const char* WindowResizeEvent::GetName() const
 /**
  * Get the description of the event.
  *
- * @returns Event description (updated size).
+ * @return Event description (updated size).
  */
 std::string WindowResizeEvent::GetDescription() const
 {
@@ -116,7 +116,7 @@ WindowCloseEvent::WindowCloseEvent(const std::string& title)
 /**
  * Get the type of the event.
  *
- * @returns WindowClose type.
+ * @return WindowClose type.
  */
 EventType WindowCloseEvent::GetEventTypeStatic()
 {
@@ -126,7 +126,7 @@ EventType WindowCloseEvent::GetEventTypeStatic()
 /**
  * Get the type of the event.
  *
- * @returns WindowClose type.
+ * @return WindowClose type.
  */
 EventType WindowCloseEvent::GetEventType() const
 {
@@ -136,7 +136,7 @@ EventType WindowCloseEvent::GetEventType() const
 /**
  * Get the name of the event.
  *
- * @returns WindowResizeEvent name.
+ * @return WindowResizeEvent name.
  */
 const char* WindowCloseEvent::GetName() const
 {
@@ -146,7 +146,7 @@ const char* WindowCloseEvent::GetName() const
 /**
  * Get the description of the event.
  *
- * @returns Event description (closed window).
+ * @return Event description (closed window).
  */
 std::string WindowCloseEvent::GetDescription() const
 {

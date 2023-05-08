@@ -16,7 +16,7 @@ MouseButtonEvent::MouseButtonEvent(const int button)
 /**
  * Get the numerical code of the mouse button.
  *
- * @returns The mouse code.
+ * @return The mouse code.
  */
 int MouseButtonEvent::GetMouseButton() const
 {
@@ -39,7 +39,7 @@ MouseButtonPressedEvent::MouseButtonPressedEvent(const int button)
 /**
  * Get the type of the event.
  *
- * @returns MouseButtonPressed type.
+ * @return MouseButtonPressed type.
  */
 EventType MouseButtonPressedEvent::GetEventTypeStatic()
 {
@@ -49,7 +49,7 @@ EventType MouseButtonPressedEvent::GetEventTypeStatic()
 /**
  * Get the type of the event.
  *
- * @returns MouseButtonPressed type.
+ * @return MouseButtonPressed type.
  */
 EventType MouseButtonPressedEvent::GetEventType() const
 {
@@ -59,7 +59,7 @@ EventType MouseButtonPressedEvent::GetEventType() const
 /**
  * Get the name of the event.
  *
- * @returns MouseButtonPressedEvent name.
+ * @return MouseButtonPressedEvent name.
  */
 const char* MouseButtonPressedEvent::GetName() const
 {
@@ -69,7 +69,7 @@ const char* MouseButtonPressedEvent::GetName() const
 /**
  * Get the description of the event.
  *
- * @returns Event description (mouse button pressed).
+ * @return Event description (mouse button pressed).
  */
 std::string MouseButtonPressedEvent::GetDescription() const
 {
@@ -94,7 +94,7 @@ MouseButtonReleasedEvent::MouseButtonReleasedEvent(const int button)
 /**
  * Get the type of the event.
  *
- * @returns MouseButtonReleased type.
+ * @return MouseButtonReleased type.
  */
 EventType MouseButtonReleasedEvent::GetEventTypeStatic()
 {
@@ -104,7 +104,7 @@ EventType MouseButtonReleasedEvent::GetEventTypeStatic()
 /**
  * Get the type of the event.
  *
- * @returns MouseButtonReleased type.
+ * @return MouseButtonReleased type.
  */
 EventType MouseButtonReleasedEvent::GetEventType() const
 {
@@ -114,7 +114,7 @@ EventType MouseButtonReleasedEvent::GetEventType() const
 /**
  * Get the name of the event.
  *
- * @returns MouseButtonReleasedEvent name.
+ * @return MouseButtonReleasedEvent name.
  */
 const char* MouseButtonReleasedEvent::GetName() const
 {
@@ -124,7 +124,7 @@ const char* MouseButtonReleasedEvent::GetName() const
 /**
  * Get the description of the event.
  *
- * @returns Event description (mouse button released).
+ * @return Event description (mouse button released).
  */
 std::string MouseButtonReleasedEvent::GetDescription() const
 {
@@ -150,7 +150,7 @@ MouseScrolledEvent::MouseScrolledEvent(const float xOffset, const float yOffset)
 /**
  * Get the scroll offset.
  *
- * @returns The offset in the x-axis.
+ * @return The offset in the x-axis.
  */
 float MouseScrolledEvent::GetXOffset() const
 {
@@ -160,7 +160,7 @@ float MouseScrolledEvent::GetXOffset() const
 /**
  * Get the scroll offset.
  *
- * @returns The offset in the y-axis.
+ * @return The offset in the y-axis.
  */
 float MouseScrolledEvent::GetYOffset() const
 {
@@ -170,7 +170,7 @@ float MouseScrolledEvent::GetYOffset() const
 /**
  * Get the type of the event.
  *
- * @returns MouseScrolled type.
+ * @return MouseScrolled type.
  */
 EventType MouseScrolledEvent::GetEventTypeStatic()
 {
@@ -180,7 +180,7 @@ EventType MouseScrolledEvent::GetEventTypeStatic()
 /**
  * Get the type of the event.
  *
- * @returns MouseScrolled type.
+ * @return MouseScrolled type.
  */
 EventType MouseScrolledEvent::GetEventType() const
 {
@@ -190,7 +190,7 @@ EventType MouseScrolledEvent::GetEventType() const
 /**
  * Get the name of the event.
  *
- * @returns MouseScrolledEvent name.
+ * @return MouseScrolledEvent name.
  */
 const char* MouseScrolledEvent::GetName() const
 {
@@ -200,7 +200,7 @@ const char* MouseScrolledEvent::GetName() const
 /**
  * Get the description of the event.
  *
- * @returns Event description (mouse scrolled).
+ * @return Event description (mouse scrolled).
  */
 std::string MouseScrolledEvent::GetDescription() const
 {
@@ -226,7 +226,7 @@ MouseMovedEvent::MouseMovedEvent(const float x, const float y)
 /**
  * Get the mouse position.
  *
- * @returns The mouse position in the x-axis.
+ * @return The mouse position in the x-axis.
  */
 float MouseMovedEvent::GetX() const
 {
@@ -236,7 +236,7 @@ float MouseMovedEvent::GetX() const
 /**
  * Get the mouse position.
  *
- * @returns The mouse position in the y-axis.
+ * @return The mouse position in the y-axis.
  */
 float MouseMovedEvent::GetY() const
 {
@@ -246,7 +246,7 @@ float MouseMovedEvent::GetY() const
 /**
  * Get the type of the event.
  *
- * @returns MouseMoved type.
+ * @return MouseMoved type.
  */
 EventType MouseMovedEvent::GetEventTypeStatic()
 {
@@ -256,7 +256,7 @@ EventType MouseMovedEvent::GetEventTypeStatic()
 /**
  * Get the type of the event.
  *
- * @returns MouseMoved type.
+ * @return MouseMoved type.
  */
 EventType MouseMovedEvent::GetEventType() const
 {
@@ -266,7 +266,7 @@ EventType MouseMovedEvent::GetEventType() const
 /**
  * Get the name of the event.
  *
- * @returns MouseMovedEvent name.
+ * @return MouseMovedEvent name.
  */
 const char* MouseMovedEvent::GetName() const
 {
@@ -276,7 +276,7 @@ const char* MouseMovedEvent::GetName() const
 /**
  * Get the description of the event.
  *
- * @returns Event description (mouse moved).
+ * @return Event description (mouse moved).
  */
 std::string MouseMovedEvent::GetDescription() const
 {

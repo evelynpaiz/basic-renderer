@@ -16,7 +16,7 @@ KeyEvent::KeyEvent(const int keyCode)
 /**
  * Get the numerical code of the key.
  *
- * @returns The key code.
+ * @return The key code.
  */
 int KeyEvent::GetKeyCode() const
 {
@@ -40,7 +40,7 @@ KeyPressedEvent::KeyPressedEvent(const int keyCode, const unsigned int repeatCou
 /**
  * Get the number of times the key has been pressed.
  *
- * @returns The key repeat count.
+ * @return The key repeat count.
  */
 unsigned int KeyPressedEvent::GetRepeatCount() const
 {
@@ -50,7 +50,7 @@ unsigned int KeyPressedEvent::GetRepeatCount() const
 /**
  * Get the type of the event.
  *
- * @returns KeyPressed type.
+ * @return KeyPressed type.
  */
 EventType KeyPressedEvent::GetEventTypeStatic()
 {
@@ -60,7 +60,7 @@ EventType KeyPressedEvent::GetEventTypeStatic()
 /**
  * Get the type of the event.
  *
- * @returns KeyPressed type.
+ * @return KeyPressed type.
  */
 EventType KeyPressedEvent::GetEventType() const
 {
@@ -70,7 +70,7 @@ EventType KeyPressedEvent::GetEventType() const
 /**
  * Get the name of the event.
  *
- * @returns KeyPressedEvent name.
+ * @return KeyPressedEvent name.
  */
 const char* KeyPressedEvent::GetName() const
 {
@@ -80,7 +80,7 @@ const char* KeyPressedEvent::GetName() const
 /**
  * Get the description of the event.
  *
- * @returns Event description (key pressed).
+ * @return Event description (key pressed).
  */
 std::string KeyPressedEvent::GetDescription() const
 {
@@ -105,7 +105,7 @@ KeyReleasedEvent::KeyReleasedEvent(const int keyCode)
 /**
  * Get the type of the event.
  *
- * @returns KeyReleased type.
+ * @return KeyReleased type.
  */
 EventType KeyReleasedEvent::GetEventTypeStatic()
 {
@@ -115,7 +115,7 @@ EventType KeyReleasedEvent::GetEventTypeStatic()
 /**
  * Get the type of the event.
  *
- * @returns KeyReleased type.
+ * @return KeyReleased type.
  */
 EventType KeyReleasedEvent::GetEventType() const
 {
@@ -125,7 +125,7 @@ EventType KeyReleasedEvent::GetEventType() const
 /**
  * Get the name of the event.
  *
- * @returns KeyReleasedEvent name.
+ * @return KeyReleasedEvent name.
  */
 const char* KeyReleasedEvent::GetName() const
 {
@@ -135,7 +135,7 @@ const char* KeyReleasedEvent::GetName() const
 /**
  * Get the description of the event.
  *
- * @returns Event description (key released).
+ * @return Event description (key released).
  */
 std::string KeyReleasedEvent::GetDescription() const
 {
