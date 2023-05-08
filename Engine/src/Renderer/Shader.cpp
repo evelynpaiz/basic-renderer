@@ -62,7 +62,7 @@ void Shader::Unbind() const
  *
  * @param name Name of the uniform.
  *
- * @returns Uniform location.
+ * @return Uniform location.
  */
 int Shader::GetUniformLocation(const std::string& name)
 {
@@ -184,7 +184,7 @@ void Shader::SetMat4(const std::string& name, const glm::mat4& value)
  * @param type Shader type.
  * @param source Shader input source.
  *
- * @returns the ID of the shader program.
+ * @return the ID of the shader program.
  */
 unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
 {
@@ -219,7 +219,7 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
  * @param vertexShader Source of vertex shader.
  * @param fragmentShader Source of fragment shader.
  *
- * @returns ID of the shader program.
+ * @return ID of the shader program.
  */
 unsigned int Shader::CreateShader(const std::string& vertexShader,
                         const std::string& fragmentShader) {
@@ -250,7 +250,7 @@ unsigned int Shader::CreateShader(const std::string& vertexShader,
  *
  * @param filepath Path to the shader file.
  *
- * @returns The vertex and fragment program source.
+ * @return The vertex and fragment program source.
  */
 ShaderProgramSource Shader::ParseShader(const std::filesystem::path& filepath)
 {

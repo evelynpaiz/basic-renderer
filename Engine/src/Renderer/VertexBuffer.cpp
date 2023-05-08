@@ -41,9 +41,10 @@ void VertexBuffer::Unbind() const
 }
 
 /**
- * Set the layout for the vertex attributes in the buffer.
+ * Set the layout of the buffer, specifying the arrangement and format
+ * of vertex attributes within the buffer.
  *
- * @param layout Buffer layout.
+ * @param layout The buffer layout.
  */
 void VertexBuffer::SetLayout(const BufferLayout& layout)
 {
@@ -51,9 +52,10 @@ void VertexBuffer::SetLayout(const BufferLayout& layout)
 }
 
 /**
- * Get the layout for the vertex attributes in the buffer.
+ * Retrieve the current layout of the buffer, specifying the arrangement and format
+ * of vertex attributes within the buffer.
  *
- * @returns Buffer layout.
+ * @return The layout of the buffer.
  */
 const BufferLayout& VertexBuffer::GetLayout() const
 {

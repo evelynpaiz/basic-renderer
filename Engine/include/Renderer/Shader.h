@@ -3,35 +3,42 @@
 #include <glm/glm.hpp>
 
 /**
- * Shader program (executed on the GPU).
+ * Represents the source code for a shader program.
  */
 struct ShaderProgramSource
 {
-    /// Vertex shader
+    ///< Vertex shader source code
     std::string VertexSource;
-    /// Fragment shader
+    ///< Fragment shader source code
     std::string FragmentSource;
     
-    /// Constructor(s)/ Destructor
+    // Constructor(s)/Destructor
     ShaderProgramSource(const std::string& vs, const std::string& fs);
     ~ShaderProgramSource() = default;
 };
 
 /**
- * A shader program (runned in the graphics pipeline).
+ * Represents a shader program executed on the GPU.
+ *
+ * The `Shader` class provides functionality to load, compile, and use shader programs in
+ * the graphics pipeline. Shaders can be loaded from file paths and bound for use in rendering
+ * operations. The class also supports setting various types of uniform values in the shaders.
+ *
+ * Copying or moving `Shader` objects is disabled to ensure single ownership and prevent
+ * unintended shader duplication.
  */
 class Shader
 {
 public:
-    /// Constructor(s)/ Destructor
+    // Constructor(s)/Destructor
     Shader(const std::filesystem::path& filePath);
     ~Shader();
-    /// Usage
+    // Usage
     void Bind() const;
     void Unbind() const;
-    /// Gets
+    // Get(s)
     int GetUniformLocation(const std::string& name);
-    /// Sets
+    // Set(s)
     void SetBool(const std::string &name, bool value);
     void SetInt(const std::string &name, int value);
     void SetFloat(const std::string &name, float value);
@@ -44,28 +51,28 @@ public:
     void SetMat3(const std::string& name, const glm::mat3& value);
     void SetMat4(const std::string& name, const glm::mat4& value);
     
-// Remove the possibility of copying this resource
+private:
+    // Compilation
+    unsigned int CompileShader(unsigned int type, const std::string& source);
+    unsigned int CreateShader(const std::string& vertexShader,
+                              const std::string& fragmentShader);
+    // Parsing
+    ShaderProgramSource ParseShader(const std::filesystem::path& filepath);
+    
+// Remove the possibility of copying or moving this resource
 public:
-    /// Constructors
+    // Constructors
     Shader(const Shader&) = delete;
     Shader(Shader&&) = delete;
-    /// Operators
+    // Operators
     Shader& operator=(const Shader&) = delete;
     Shader& operator=(Shader&&) = delete;
     
 private:
-    /// Compilation
-    unsigned int CompileShader(unsigned int type, const std::string& source);
-    unsigned int CreateShader(const std::string& vertexShader,
-                              const std::string& fragmentShader);
-    /// Parsing
-    ShaderProgramSource ParseShader(const std::filesystem::path& filepath);
-    
-private:
-    /// File path of shader source program
+    ///< File path of shader source program.
     std::filesystem::path m_FilePath;
-    /// ID of the shader program
+    ///< ID of the shader program.
     unsigned int m_ID = 0;
-    /// Cache of uniform locations
+    ///< Cache of uniform locations.
     std::unordered_map<std::string, int> m_UniformLocationCache;
 };

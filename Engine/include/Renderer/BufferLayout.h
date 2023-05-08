@@ -3,7 +3,10 @@
 #include <GL/glew.h>
 
 /**
- * An enumeration for different data types of vertex attributes.
+ * Enumeration of vertex attribute data types.
+ *
+ * The `DataType` enumeration represents different data types that can be used for vertex attributes.
+ * It includes boolean, integer, floating-point, vectors (2D, 3D, 4D), and matrices (2x2, 3x3, 4x4) types.
  */
 enum class DataType
 {
@@ -17,7 +20,7 @@ enum class DataType
  *
  * @param type Data type.
  *
- * @returns The number of components that the data has.
+ * @return The number of components that the data has.
  */
 inline unsigned int GetCompCountOfType(DataType type)
 {
@@ -43,7 +46,7 @@ inline unsigned int GetCompCountOfType(DataType type)
  *
  * @param type Data type.
  *
- * @returns The size of the data (in bytes).
+ * @return The size of the data (in bytes).
  */
 inline unsigned int GetSizeOfType(DataType type)
 {
@@ -65,11 +68,11 @@ inline unsigned int GetSizeOfType(DataType type)
 }
 
 /**
- * Conversion of the data types to OpenGL type.
+ * Convert the data type to its corresponding OpenGL type.
  *
  * @param type Data type.
  *
- * @returns OpenGL data type.
+ * @return OpenGL data type.
  */
 inline GLenum DataTypeToOpenGLType(DataType type)
 {
@@ -91,53 +94,60 @@ inline GLenum DataTypeToOpenGLType(DataType type)
 }
 
 /**
- * A structure to represent a vertex attribute (element).
+ * Represents a vertex attribute (element).
  */
 struct BufferElement
 {
-    /// Name of the element
+    ///< Name of the element.
     std::string Name;
-    /// Data type
+    ///< Data type.
     DataType Type;
-    /// Size (in bytes) of the element
+    ///< Size (in bytes) of the element.
     unsigned int Size;
-    /// Offset value for the element
+    ///< Offset value for the element.
     unsigned int Offset;
-    /// Specifies if the data should be normalized
+    ///< Specifies if the data should be normalized.
     bool Normalized;
     
-    /// Constructor(s)/ Destructor
+    // Constructor(s)/Destructor
     BufferElement(const std::string& name, DataType type,
                   bool normalized = false);
     ~BufferElement() = default;
 };
 
 /**
- * Description of a vertex attribute.
+ * Describes the layout of vertex attributes within a single vertex buffer.
+ *
+ * The `BufferLayout` class represents a collection of `BufferElements` that define the
+ * arrangement and format of vertex attributes in a vertex buffer. It provides methods to retrieve
+ * information about the elements in the layout.
+ *
+ * `BufferLayout` objects are typically used in conjunction with a `VertexBuffer` to define
+ * the structure of vertex data stored in GPU memory.
  */
 class BufferLayout
 {
 public:
-    /// Constructor(s)/ Destructor
+    // Constructor(s)/ Destructor
     BufferLayout() = default;
     BufferLayout(const std::initializer_list<BufferElement>& elements);
     ~BufferLayout() = default;
-    /// Gets
+    // Gets
     unsigned int GetStride() const;
     const std::vector<BufferElement> GetElements() const;
-    /// Iteration support
+    // Iteration support
     std::vector<BufferElement>::iterator begin();
     std::vector<BufferElement>::iterator end();
     std::vector<BufferElement>::const_iterator begin() const;
     std::vector<BufferElement>::const_iterator end() const;
     
 private:
-    /// Calculators
+    // Calculators
     void CalculateOffsetAndStride();
 
 private:
-    /// Vertex buffer elements
+    ///< Vertex buffer elements.
     std::vector<BufferElement> m_Elements;
-    /// Space between consecutive vertex attributes
+    ///< Space between consecutive vertex attributes.
     unsigned int m_Stride = 0;
 };

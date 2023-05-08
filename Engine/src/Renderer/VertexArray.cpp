@@ -82,7 +82,7 @@ void VertexArray::Unbind() const
 /**
  * Get all the associated vertex buffers to this vertex array.
  *
- * @returns Set of vertex buffers.
+ * @return Set of vertex buffers.
  */
 const std::vector<std::shared_ptr<VertexBuffer>>& VertexArray::GetVertexBuffers() const
 {
@@ -92,7 +92,7 @@ const std::vector<std::shared_ptr<VertexBuffer>>& VertexArray::GetVertexBuffers(
 /**
  * Get the index buffer associated to this vertex array.
  *
- * @returns The index buffer.
+ * @return The index buffer.
  */
 const std::shared_ptr<IndexBuffer>& VertexArray::GetIndexBuffer() const
 {

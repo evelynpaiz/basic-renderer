@@ -45,7 +45,7 @@ void IndexBuffer::Unbind() const
 /**
  * Get the number of indices.
  *
- * @returns The count of indices.
+ * @return The count of indices.
  */
 unsigned int IndexBuffer::GetCount() const
 {

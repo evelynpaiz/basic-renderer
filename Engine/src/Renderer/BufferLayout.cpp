@@ -37,7 +37,7 @@ BufferLayout::BufferLayout(const std::initializer_list<BufferElement>& elements)
 /**
  * Get the space between consecutive vertex attributes.
  *
- * @returns The stride value.
+ * @return The stride value.
  */
 unsigned int BufferLayout::GetStride() const
 {
@@ -47,7 +47,7 @@ unsigned int BufferLayout::GetStride() const
 /**
  * Get all the elements inside the vertex buffer layout.
  *
- * @returns Buffer elements.
+ * @return Buffer elements.
  */
 const std::vector<BufferElement> BufferLayout::GetElements() const
 {
@@ -57,7 +57,7 @@ const std::vector<BufferElement> BufferLayout::GetElements() const
 /**
  * Get the first element  of the buffer.
  *
- * @returns Iterator pointing to the first buffer element.
+ * @return Iterator pointing to the first buffer element.
  */
 std::vector<BufferElement>::iterator BufferLayout::begin()
 {
@@ -67,7 +67,7 @@ std::vector<BufferElement>::iterator BufferLayout::begin()
 /**
  * Get the last element of the buffer.
  *
- * @returns Iterator pointing to the last buffer element.
+ * @return Iterator pointing to the last buffer element.
  */
 std::vector<BufferElement>::iterator BufferLayout::end()
 {
@@ -77,7 +77,7 @@ std::vector<BufferElement>::iterator BufferLayout::end()
 /**
  * Get the first element of the buffer (constant value).
  *
- * @returns Iterator pointing to the first buffer element.
+ * @return Iterator pointing to the first buffer element.
  */
 std::vector<BufferElement>::const_iterator BufferLayout::begin() const
 {
@@ -87,7 +87,7 @@ std::vector<BufferElement>::const_iterator BufferLayout::begin() const
 /**
  * Get the last element of the buffer (constant value).
  *
- * @returns Iterator pointing to the last buffer element.
+ * @return Iterator pointing to the last buffer element.
  */
 std::vector<BufferElement>::const_iterator BufferLayout::end() const
 {
@@ -95,7 +95,7 @@ std::vector<BufferElement>::const_iterator BufferLayout::end() const
 }
 
 /**
- * Calculate the offset (where the data beggins in the buffer) and the stride
+ * Calculate the offset (starting position of each vertex attribute) and the stride
  * (space between consecutives vertex attributes) for the defined vertex attributes.
  */
 void BufferLayout::CalculateOffsetAndStride()
