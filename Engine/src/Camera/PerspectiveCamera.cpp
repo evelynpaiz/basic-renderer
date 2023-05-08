@@ -31,7 +31,7 @@ void PerspectiveCamera::OnUpdate(const float ts) const
 /**
  * Get the camera rotation angle in the y-axis.
  *
- * @returns Yaw angle (degrees).
+ * @return Yaw angle (degrees).
  */
 float PerspectiveCamera::GetYaw() const
 {
@@ -41,7 +41,7 @@ float PerspectiveCamera::GetYaw() const
 /**
  * Get the camera rotation angle in the x-axis.
  *
- * @returns Pitch angle (degrees).
+ * @return Pitch angle (degrees).
  */
 float PerspectiveCamera::GetPitch() const
 {
@@ -51,7 +51,7 @@ float PerspectiveCamera::GetPitch() const
 /**
  * Get the camera rotation angle in the z-axis.
  *
- * @returns Roll angle (degrees).
+ * @return Roll angle (degrees).
  */
 float PerspectiveCamera::GetRoll() const
 {
@@ -61,7 +61,7 @@ float PerspectiveCamera::GetRoll() const
 /**
  * Get the camera field of view.
  *
- * @returns Field of view angle (degrees).
+ * @return Field of view angle (degrees).
  */
 float PerspectiveCamera::GetFieldOfView() const
 {
@@ -71,7 +71,7 @@ float PerspectiveCamera::GetFieldOfView() const
 /**
  * Get the camera target coordinates (x, y, z).
  *
- * @returns Camera target.
+ * @return Camera target.
  */
 const glm::vec3& PerspectiveCamera::GetTarget() const
 {
@@ -157,7 +157,7 @@ void PerspectiveCamera::UpdateProjectionMatrix()
 /**
  * Get the camera orientation defined as a quaternion.
  *
- * @returns The camera orientation.
+ * @return The camera orientation.
  */
 glm::quat PerspectiveCamera::GetOrientation() const
 {
@@ -168,7 +168,7 @@ glm::quat PerspectiveCamera::GetOrientation() const
 /**
  * Get the camera's up direction vector.
  *
- * @returns The up vector.
+ * @return The up vector.
  */
 glm::vec3 PerspectiveCamera::GetUpDirection() const
 {
@@ -178,7 +178,7 @@ glm::vec3 PerspectiveCamera::GetUpDirection() const
 /**
  * Get the camera's right direction vector.
  *
- * @returns The right vector.
+ * @return The right vector.
  */
 glm::vec3 PerspectiveCamera::GetRightDirection() const
 {
@@ -188,7 +188,7 @@ glm::vec3 PerspectiveCamera::GetRightDirection() const
 /**
  * Get the camera's forward direction vector.
  *
- * @returns The forward vector.
+ * @return The forward vector.
  */
 glm::vec3 PerspectiveCamera::GetFowardDirection() const
 {

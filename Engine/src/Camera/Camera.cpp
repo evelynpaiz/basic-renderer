@@ -16,7 +16,7 @@ Camera::Camera(const int width, const int height, const float near, const float 
 /**
  * Get the camera resolution (width).
  *
- * @returns Viewport width.
+ * @return Viewport width.
  */
 unsigned int Camera::GetWidth() const
 {
@@ -26,7 +26,7 @@ unsigned int Camera::GetWidth() const
 /**
  * Get the camera resolution (height).
  *
- * @returns Viewport height.
+ * @return Viewport height.
  */
 unsigned int Camera::GetHeight() const
 {
@@ -36,7 +36,7 @@ unsigned int Camera::GetHeight() const
 /**
  * Get the camera aspect ratio.
  *
- * @returns The aspect ratio (width/height).
+ * @return The aspect ratio (width/height).
  */
 float Camera::GetAspectRatio() const
 {
@@ -46,7 +46,7 @@ float Camera::GetAspectRatio() const
 /**
  * Get the distance from the camera position to the near plane.
  *
- * @returns The near plane distance.
+ * @return The near plane distance.
  */
 float Camera::GetNearPlane() const
 {
@@ -56,7 +56,7 @@ float Camera::GetNearPlane() const
 /**
  * Get the distance from the camera position to the far plane.
  *
- * @returns The far plane distance.
+ * @return The far plane distance.
  */
 float Camera::GetFarPlane() const
 {
@@ -66,7 +66,7 @@ float Camera::GetFarPlane() const
 /**
  * Get the camera position (x, y, z).
  *
- * @returns The camera position coordinates.
+ * @return The camera position coordinates.
  */
 const glm::vec3& Camera::GetPosition() const
 {
@@ -76,7 +76,7 @@ const glm::vec3& Camera::GetPosition() const
 /**
  * Get the camera orientation (yaw, pitch, roll).
  *
- * @returns The camera rotation angles.
+ * @return The camera rotation angles.
  */
 const glm::vec3& Camera::GetRotation() const
 {
@@ -86,7 +86,7 @@ const glm::vec3& Camera::GetRotation() const
 /**
  * Get the camera view matrix (transformation from world space to view/camera space).
  *
- * @returns The view matrix.
+ * @return The view matrix.
  */
 const glm::mat4& Camera::GetViewMatrix() const
 {
@@ -96,7 +96,7 @@ const glm::mat4& Camera::GetViewMatrix() const
 /**
  * Get the camera projection matrix (transformation from view/camera space to screen space).
  *
- * @returns The projection matrix.
+ * @return The projection matrix.
  */
 const glm::mat4& Camera::GetProjectionMatrix() const
 {
