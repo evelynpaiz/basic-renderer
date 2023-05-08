@@ -6,12 +6,20 @@
 #include "Event/WindowEvent.h"
 
 /**
- * Rendering application handler.
+ * Handles the rendering application.
+ *
+ * The `Application` class represents the main application handler for the rendering engine. It
+ * provides methods to create and run the application, as well as handle window events. Layers can
+ * be pushed and popped to manage the rendering process. The class encapsulates a window and
+ * manages the application's main loop.
+ *
+ * Copying or moving `Application` objects is disabled to ensure single ownership and prevent
+ * unintended duplication.
  */
 class Application
 {
 public:
-    // Constructor(s)/ Destructor
+    // Constructor(s)/Destructor
     Application(const std::string &name = "Basic Renderer", const int width = 800,
                 const int height = 600);
     virtual ~Application() = default;
@@ -23,7 +31,8 @@ public:
     void PushOverlay(const std::shared_ptr<Layer>& overlay);
     void PopLayer(const std::shared_ptr<Layer>& layer);
     void PopOverlay(const std::shared_ptr<Layer>& overlay);
-    
+   
+// Remove the possibility of copying or moving this resource
 private:
     // Events handlers
     bool OnWindowResize(WindowResizeEvent &e);
@@ -39,13 +48,13 @@ public:
     Application& operator=(Application&&) = delete;
     
 private:
-    ///< Application window
+    ///< Application window.
     std::unique_ptr<Window> m_Window;
-    ///< Application status
+    ///< Application status.
     bool m_Running = true;
     
-    ///< Layers to be rendered
+    ///< Layers to be rendered.
     LayerStack m_LayerStack;
-    ///< Rendering time
+    ///< Rendering time.
     float m_LastFrame = 0.0f;
 };

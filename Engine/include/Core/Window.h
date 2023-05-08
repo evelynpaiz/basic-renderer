@@ -5,58 +5,64 @@
 struct GLFWwindow;
 
 /**
- * A representation of the information inside a window.
+ * Represents the information inside a window.
  */
 struct WindowData
 {
-    /// Window title
+    ///< Window title.
     std::string Title;
-    /// Window size
+    ///< Window size.
     unsigned int Width, Height;
-    /// Callback function to handle events
+    ///< Callback function to handle events.
     std::function<void(Event&)> EventCallback;
     
-    /// Constructor(s)/ Destructor
+    // Constructor(s)/Destructor
     WindowData(const std::string& title, const int width, const int height);
     ~WindowData() = default;
 };
 
 /**
- * Defines the display containing the running application.
+ * Defines a window that contains the running application.
+ *
+ * The `Window` class represents a window in the application. It provides methods to create, update,
+ * and interact with the window. The event callback function can be set to handle window events.
+ *
+ * Copying or moving `Window` objects is disabled to ensure single ownership and prevent unintended
+ * window duplication.
  */
 class Window
 {
 public:
-    /// Constructor(s)/ Destructor
+    // Constructor(s)/Destructor
     Window(const std::string& title, const int width, const int height);
     ~Window();
-    /// Update
+    // Update
     void OnUpdate() const;
-    /// Gets
+    // Get(s)
     const std::string& GetTitle() const;
     unsigned int GetWidth() const;
     unsigned int GetHeight() const;
     void* GetNativeWindow() const;
-    /// Sets
+    // Set(s)
     void SetEventCallback(const std::function<void(Event&)>& callback);
     
-// Remove the possibility of copying this resource
+private:
+    // Init/Close
+    void Init();
+    void Shutdown();
+    
+// Remove the possibility of copying or moving this resource
 public:
-    /// Constructors
+    // Constructors
     Window(const Window&) = delete;
     Window(Window&&) = delete;
-    /// Operators
+    // Operators
     Window& operator=(const Window&) = delete;
     Window& operator=(Window&&) = delete;
     
 private:
-    /// Init/Close
-    void Init();
-    void Shutdown();
-    
-private:
-    /// Native window (GLFW)
+    ///< Native window (GLFW).
     GLFWwindow* m_Window;
-    /// Window information
+    ///< Window information.
     WindowData m_Data;
 };

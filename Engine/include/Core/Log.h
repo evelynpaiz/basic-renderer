@@ -6,34 +6,41 @@
 
 /**
  * Logging manager used as a wraper for spdlog.
+ *
+ * The `Log` class provides a centralized logging manager that serves as a wrapper for the spdlog
+ * library. It allows initializing the logging system and provides access to the logger instance.
  */
 class Log
 {
 public:
-    /// Initialization
+    // Initialization
     static void Init();
-    /// Gets
+    // Get(s)
     static std::shared_ptr<spdlog::logger> &GetCoreLogger();
     
 private:
-    /// Logger(s)
+    ///< Core logger
     static std::shared_ptr<spdlog::logger> s_CoreLogger;
 };
 
 /**
  * Custum flag (log level symbols) used to format the log messages to its destination.
+ *
+ * The `FlagLogSymbol` class is a custom flag formatter for spdlog that formats log messages
+ * with log level symbols. It allows customizing the symbols associated with each log level for more
+ * visually appealing and informative logs.
  */
 class FlagLogSymbol : public spdlog::custom_flag_formatter
 {
 public:
-    /// Format
+    // Format
     void format(const spdlog::details::log_msg &msg,
                 const std::tm &, spdlog::memory_buf_t &dest) override;
-    /// Copy/ Clone
+    // Copy/ Clone
     std::unique_ptr<spdlog::custom_flag_formatter> clone() const override;
     
 private:
-    /// Log level symbol equivalence
+    ///< Log level symbol equivalence.
     const std::vector<std::string> m_Symbols = { "📓", "📘", "📗", "⚠️", "🛑", "⚡️", "" };
 };
 

@@ -30,9 +30,9 @@ void Log::Init()
 }
 
 /**
- * Get the logger.
+ * Get the engine logger instance.
  *
- * @returns Engine logger.
+ * @return Engine logger.
  */
 std::shared_ptr<spdlog::logger> &Log::GetCoreLogger()
 {
@@ -44,13 +44,13 @@ std::shared_ptr<spdlog::logger> &Log::GetCoreLogger()
 // --------------------------------------------
 
 /**
- * Clone the flag.
+ * Format the log message with log level symbols.
  *
  * @param msg Log message.
  * @param tm Time information.
  * @param dest Destination buffer.
  *
- * @returns A unique pointer to the log level symbol flag.
+ * @return A unique pointer to the log level symbol flag.
  */
 void FlagLogSymbol::format(const spdlog::details::log_msg &msg,
                            const std::tm &tm, spdlog::memory_buf_t &dest)
@@ -60,9 +60,9 @@ void FlagLogSymbol::format(const spdlog::details::log_msg &msg,
 }
 
 /**
- * Clone the flag.
+ * Create a copy of the `FlagLogSymbol` object.
  *
- * @returns A unique pointer to the log level symbol flag.
+ * @return A unique pointer to the log level symbol flag.
  */
 std::unique_ptr<spdlog::custom_flag_formatter> FlagLogSymbol::clone() const
 {

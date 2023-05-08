@@ -242,7 +242,7 @@ void Window::OnUpdate() const
 /**
  * Get the title of the window.
  *
- * @returns The window name.
+ * @return The window name.
  */
 const std::string& Window::GetTitle() const
 {
@@ -252,7 +252,7 @@ const std::string& Window::GetTitle() const
 /**
  * Get the size (width) of the window.
  *
- * @returns The width of the window.
+ * @return The width of the window.
  */
 unsigned int Window::GetWidth() const
 {
@@ -262,7 +262,7 @@ unsigned int Window::GetWidth() const
 /**
  * Get the size (height) of the window.
  *
- * @returns The height of the window.
+ * @return The height of the window.
  */
 unsigned int Window::GetHeight() const
 {
@@ -272,7 +272,7 @@ unsigned int Window::GetHeight() const
 /**
  * Get the GLFW window.
  *
- * @returns The native window.
+ * @return The native window.
  */
 void* Window::GetNativeWindow() const
 {

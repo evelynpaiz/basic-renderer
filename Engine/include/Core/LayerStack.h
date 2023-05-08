@@ -3,7 +3,11 @@
 #include "Core/Layer.h"
 
 /**
- * Manage a stack of layers in the rendering engine (stack wrapper).
+ * Manages a stack of layers in the rendering engine.
+ *
+ * The `LayerStack` class provides a way to manage a stack of layers in the rendering engine.
+ * Layers can be pushed and popped onto the stack, allowing for dynamic management of the rendering
+ * order. It also provides iterator methods for iterating over the layers in the stack.
  */
 class LayerStack
 {
@@ -28,8 +32,8 @@ public:
     std::vector<std::shared_ptr<Layer>>::const_reverse_iterator rend() const;
     
 private:
-    ///< Set of layers in the stack
+    ///< Set of layers in the stack.
     std::vector<std::shared_ptr<Layer>> m_Layers;
-    ///< Insert index (separating the overlays and rendering layers)
+    ///< Insert index (separating the overlays and rendering layers).
     unsigned int m_LayerInsertIndex = 0;
 };
