@@ -52,6 +52,9 @@ void ViewerLayer::OnEvent(Event &e)
     CORE_DEBUG("{0}", e);
 }
 
+/**
+ * Initialize all components inside the viewer layer.
+ */
 void ViewerLayer::InitializeViewer()
 {
     // Define the layout of the data to be defined:

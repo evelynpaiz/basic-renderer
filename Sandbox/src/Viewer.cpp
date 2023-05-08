@@ -1,9 +1,9 @@
-#include "Sandbox.h"
+#include "Viewer.h"
 
 /**
  * Generate a (sandbox) rendering application.
  */
-Sandbox::Sandbox(const std::string &name, const int width, const int height)
+Viewer::Viewer(const std::string &name, const int width, const int height)
     : Application(name, width, height)
 {
     // Push the viewer layer to the layer stack
@@ -14,7 +14,7 @@ Sandbox::Sandbox(const std::string &name, const int width, const int height)
 /**
  * Delete this application.
  */
-Sandbox::~Sandbox()
+Viewer::~Viewer()
 {
     PopLayer(m_ViewerLayer);
 }

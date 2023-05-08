@@ -5,12 +5,19 @@
 #include <glm/glm.hpp>
 
 /**
- * Rendering layer containg a basic 3D viewer.
+ * Rendering layer containing a basic 3D viewer.
+ *
+ * The `ViewerLayer` class is a derived class of the Layer class and represents a rendering layer
+ * specifically designed for a basic 3D viewer. It provides functionality for attaching, detaching, updating,
+ * and handling events specific to the viewer layer.
+ *
+ * Copying or moving `ViewerLayer` objects is disabled to ensure single ownership and prevent
+ * unintended layer duplication.
  */
 class ViewerLayer : public Layer
 {
 public:
-    // Constructor(s)/ Destructor
+    // Constructor(s)/Destructor
     ViewerLayer(int width, int height);
     ~ViewerLayer() = default;
     // Layer handlers
@@ -22,42 +29,42 @@ public:
 private:
     void InitializeViewer();
     
-// Remove the possibility of copying this resource
+// Remove the possibility of copying or moving this resource
 public:
-    /// Constructors
+    // Constructors
     ViewerLayer(const ViewerLayer&) = delete;
     ViewerLayer(ViewerLayer&&) = delete;
-    /// Operators
+    // Operators
     ViewerLayer& operator=(const ViewerLayer&) = delete;
     ViewerLayer& operator=(ViewerLayer&&) = delete;
     
 private:
-    ///< Size of the viewport
+    ///< Size of the viewport.
     int m_ViewportWidth = 0;
     int m_ViewportHeight = 0;
     
-    ///< Renderer
+    ///< Renderer.
     Renderer m_Renderer;
-    ///< Camera
+    ///< Camera.
     std::shared_ptr<PerspectiveCamera> m_Camera;
     
-    ///< Vertex array
+    ///< Vertex array.
     std::shared_ptr<VertexArray> m_VertexArray;
-    ///< Vertex buffer
+    ///< Vertex buffer.
     std::shared_ptr<VertexBuffer> m_VertexBuffer;
-    ///< Index buffer
+    ///< Index buffer.
     std::shared_ptr<IndexBuffer> m_IndexBuffer;
     
-    ///< Layout of the data
+    ///< Layout of the data.
     BufferLayout m_Layout;
     
-    ///< Shader
+    ///< Shader.
     std::shared_ptr<Shader> m_Shader;
     
-    ///< Texture
+    ///< Texture.
     std::shared_ptr<Texture> m_Texture;
     
-    ///< Transformation matrices
+    ///< Transformation matrices.
     glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
     glm::mat4 m_ViewMatrix = glm::mat4(1.0f);
     glm::mat4 m_ProjMatrix = glm::mat4(1.0f);
