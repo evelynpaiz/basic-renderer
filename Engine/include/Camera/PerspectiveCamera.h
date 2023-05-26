@@ -19,42 +19,85 @@ class PerspectiveCamera : public Camera
 {
 public:
     // Constructor(s)/ Destructor
+    // ----------------------------------------
     PerspectiveCamera(const int width, const int height, const float fov = 45.0f,
                       const float near = 0.1f, const float far = 100.0f);
+    
     // Update
+    // ----------------------------------------
     void OnUpdate(const float ts) const;
-    // Get(s)
-    float GetYaw() const;
-    float GetPitch() const;
-    float GetRoll() const;
-    float GetFieldOfView() const;
-    const glm::vec3& GetTarget() const;
-    // Set(s)
-    void SetYaw(const float yaw);
-    void SetPitch(const float pitch);
-    void SetRoll(const float roll);
-    void SetFieldOfView(const float fov);
-    void SetTarget(const glm::vec3& target);
+    
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Get the camera rotation angle in the y-axis.
+    /// @return Yaw angle (degrees).
+    float GetYaw() const { return m_Rotation.x; }
+    /// @brief Get the camera rotation angle in the x-axis.
+    /// @return Pitch angle (degrees).
+    float GetPitch() const { return m_Rotation.y; }
+    /// @brief Get the camera rotation angle in the z-axis.
+    /// @return Roll angle (degrees).
+    float GetRoll() const { return m_Rotation.z; }
+    /// @brief Get the camera field of view.
+    /// @return Field of view angle (degrees).
+    float GetFieldOfView() const { return m_FieldOfView; }
+    /// @brief Get the camera target coordinates (x, y, z).
+    /// @return Camera target.
+    const glm::vec3& GetTarget() const { return m_Target; }
+    
+    // Setter(s)
+    // ----------------------------------------
+    /// @brief Change the camera rotation in the y-axis.
+    /// @param yaw The camera rotation angle.
+    void SetYaw(const float yaw)
+    {
+        m_Rotation.x = yaw;
+        UpdateViewMatrix();
+    }
+    /// @brief Change the camera rotation in the x-axis.
+    /// @param pitch The camera rotation angle.
+    void SetPitch(const float pitch)
+    {
+        m_Rotation.y = pitch;
+        UpdateViewMatrix();
+    }
+    /// @brief Change the camera rotation in the z-axis.
+    /// @param roll The camera rotation angle.
+    void SetRoll(const float roll)
+    {
+        m_Rotation.z = roll;
+        UpdateViewMatrix();
+    }
+    /// @brief Change the camera field of view.
+    /// @param fov The camera field of view (angle).
+    void SetFieldOfView(const float fov)
+    {
+        m_FieldOfView = fov;
+        UpdateProjectionMatrix();
+    }
+    /// @brief Change the camera target coordinates.
+    /// @param target The camera target (x, y, z).
+    void SetTarget(const glm::vec3& target)
+    {
+        m_Target = target;
+        UpdateViewMatrix();
+    }
     
 protected:
     // Transformation matrices
+    // ----------------------------------------
     void UpdateViewMatrix() override;
     void UpdateProjectionMatrix() override;
+    
     // Calculations
+    // ----------------------------------------
     glm::quat GetOrientation() const;
     glm::vec3 GetUpDirection() const;
     glm::vec3 GetRightDirection() const;
     glm::vec3 GetFowardDirection() const;
     
-// Remove the possibility of copying or moving this resource
-public:
-    // Constructors
-    PerspectiveCamera(const PerspectiveCamera&) = delete;
-    PerspectiveCamera(PerspectiveCamera&&) = delete;
-    // Operators
-    PerspectiveCamera& operator=(const PerspectiveCamera&) = delete;
-    PerspectiveCamera& operator=(PerspectiveCamera&&) = delete;
-    
+    // Perspective camera variables
+    // ----------------------------------------
 protected:
     ///< Camera field of view (angle in degrees).
     float m_FieldOfView;
@@ -63,4 +106,14 @@ protected:
     glm::vec3 m_Target = glm::vec3(0.0f);
     ///< World up axis (default: y-axis).
     glm::vec3 m_WorldUp = { 0.0f, 1.0f, 0.0f };
+    
+    // Disable the copying or moving of this resource
+    // ----------------------------------------
+public:
+    // Constructors
+    PerspectiveCamera(const PerspectiveCamera&) = delete;
+    PerspectiveCamera(PerspectiveCamera&&) = delete;
+    // Operators
+    PerspectiveCamera& operator=(const PerspectiveCamera&) = delete;
+    PerspectiveCamera& operator=(PerspectiveCamera&&) = delete;
 };

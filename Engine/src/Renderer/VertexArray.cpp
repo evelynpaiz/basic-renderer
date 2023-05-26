@@ -19,7 +19,6 @@ VertexArray::~VertexArray()
     glDeleteVertexArrays(1, &m_ID);
 }
 
-
 /**
  * Link an input vertex buffer to the vertex array.
  *
@@ -54,16 +53,6 @@ void VertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vbo)
 }
 
 /**
- * Link an input index buffer to the vertex array.
- *
- * @param ibo Index buffer object.
- */
-void VertexArray::SetIndexBuffer(const std::shared_ptr<IndexBuffer>& ibo)
-{
-    m_IndexBuffer = ibo;
-}
-
-/**
  * Bind the vertex array.
  */
 void VertexArray::Bind() const
@@ -77,24 +66,4 @@ void VertexArray::Bind() const
 void VertexArray::Unbind() const
 {
     glBindVertexArray(0);
-}
-
-/**
- * Get all the associated vertex buffers to this vertex array.
- *
- * @return Set of vertex buffers.
- */
-const std::vector<std::shared_ptr<VertexBuffer>>& VertexArray::GetVertexBuffers() const
-{
-    return m_VertexBuffers;
-}
-
-/**
- * Get the index buffer associated to this vertex array.
- *
- * @return The index buffer.
- */
-const std::shared_ptr<IndexBuffer>& VertexArray::GetIndexBuffer() const
-{
-    return m_IndexBuffer;
 }

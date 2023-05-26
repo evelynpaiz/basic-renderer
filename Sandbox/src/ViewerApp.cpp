@@ -1,9 +1,13 @@
-#include "Viewer.h"
+#include "ViewerApp.h"
 
 /**
  * Generate a (sandbox) rendering application.
+ *
+ * @param name Name of the application.
+ * @param width Size of the window (width).
+ * @param height Size of the window (height).
  */
-Viewer::Viewer(const std::string &name, const int width, const int height)
+ViewerApp::ViewerApp(const std::string &name, const int width, const int height)
     : Application(name, width, height)
 {
     // Push the viewer layer to the layer stack
@@ -14,7 +18,7 @@ Viewer::Viewer(const std::string &name, const int width, const int height)
 /**
  * Delete this application.
  */
-Viewer::~Viewer()
+ViewerApp::~ViewerApp()
 {
     PopLayer(m_ViewerLayer);
 }

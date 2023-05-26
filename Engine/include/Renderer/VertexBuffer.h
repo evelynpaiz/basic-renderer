@@ -16,27 +16,40 @@ class VertexBuffer
 {
 public:
     // Constructor(s)/Destructor
+    // ----------------------------------------
     VertexBuffer(const void *vertices, const unsigned int size);
     ~VertexBuffer();
+    
     // Usage
+    // ----------------------------------------
     void Bind() const;
     void Unbind() const;
+    
     // Buffer layout
-    void SetLayout(const BufferLayout& layout);
-    const BufferLayout& GetLayout() const;
+    // ----------------------------------------
+    /// @brief Retrieve the current layout of the buffer, specifying the arrangement and format
+    /// of vertex attributes within the buffer.
+    /// @return The layout of the buffer.
+    const BufferLayout& GetLayout() const { return m_Layout; }
+    /// @brief Set the layout of the buffer, specifying the arrangement and format
+    /// of vertex attributes within the buffer.
+    /// @param layout The buffer layout.
+    void SetLayout(const BufferLayout& layout) { m_Layout = layout; }
     
-// Remove the possibility of copying or moving this resource
-public:
-    // Constructors
-    VertexBuffer(const VertexBuffer&) = delete;
-    VertexBuffer(VertexBuffer&&) = delete;
-    // Operators
-    VertexBuffer& operator=(const VertexBuffer&) = delete;
-    VertexBuffer& operator=(VertexBuffer&&) = delete;
-    
+    // Vertex buffer variables
+    // ----------------------------------------
 private:
     ///< ID of the vertex buffer.
     unsigned int m_ID = 0;
     ///< Layout for the vertex attributes.
     BufferLayout m_Layout;
+    
+    // Disable the copying or moving of this resource
+    // ----------------------------------------
+public:
+    VertexBuffer(const VertexBuffer&) = delete;
+    VertexBuffer(VertexBuffer&&) = delete;
+
+    VertexBuffer& operator=(const VertexBuffer&) = delete;
+    VertexBuffer& operator=(VertexBuffer&&) = delete;
 };

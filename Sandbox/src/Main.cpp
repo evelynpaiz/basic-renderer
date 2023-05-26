@@ -3,7 +3,7 @@
 #endif
 
 #include "Engine.h"
-#include "Viewer.h"
+#include "ViewerApp.h"
 
 /**
  * Entry point of the application.
@@ -19,6 +19,6 @@ int main()
     Log::Init();
     
     // Create the application
-    auto application = std::make_unique<Viewer>("3D Viewer", 800, 600);
+    auto application = std::make_unique<ViewerApp>("3D Viewer", 800, 600);
     application->Run();
 }

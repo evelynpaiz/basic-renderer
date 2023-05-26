@@ -4,7 +4,6 @@
 #include "Renderer/IndexBuffer.h"
 #include "Renderer/BufferLayout.h"
 
-
 /**
  * Represents a vertex array that describes how vertex attributes are stored in vertex buffer(s).
  *
@@ -19,27 +18,42 @@ class VertexArray
 {
 public:
     // Constructor(s)/Destructor
+    // ----------------------------------------
     VertexArray();
     ~VertexArray();
-    // Buffers
-    void AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vbo);
-    void SetIndexBuffer(const std::shared_ptr<IndexBuffer>& ibo);
+    
     // Usage
+    // ----------------------------------------
     void Bind() const;
     void Unbind() const;
-    // Get(s)
-    const std::vector<std::shared_ptr<VertexBuffer>>& GetVertexBuffers() const;
-    const std::shared_ptr<IndexBuffer>& GetIndexBuffer() const;
     
-// Remove the possibility of copying or moving this resource
-public:
-    // Constructors
-    VertexArray(const VertexArray&) = delete;
-    VertexArray(VertexArray&&) = delete;
-    // Operators
-    VertexArray& operator=(const VertexArray&) = delete;
-    VertexArray& operator=(VertexArray&&) = delete;
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Get all the associated vertex buffers to this vertex array.
+    /// @return Set of vertex buffers.
+    const std::vector<std::shared_ptr<VertexBuffer>>& GetVertexBuffers() const
+    {
+        return m_VertexBuffers;
+    }
+    /// @brief Get the index buffer associated to this vertex array.
+    /// @return The index buffer.
+    const std::shared_ptr<IndexBuffer>& GetIndexBuffer() const
+    {
+        return m_IndexBuffer;
+    }
     
+    // Setter(s)
+    // ----------------------------------------
+    void AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vbo);
+    /// @brief Link an input index buffer to the vertex array.
+    /// @param ibo Index buffer object.
+    void SetIndexBuffer(const std::shared_ptr<IndexBuffer>& ibo)
+    {
+        m_IndexBuffer = ibo;
+    }
+    
+    // Vertex array variables
+    // ----------------------------------------
 private:
     ///< ID of the vertex array.
     unsigned int m_ID = 0;
@@ -50,4 +64,13 @@ private:
     std::vector<std::shared_ptr<VertexBuffer>> m_VertexBuffers;
     ///< Linked index buffer.
     std::shared_ptr<IndexBuffer> m_IndexBuffer;
+    
+    // Disable the copying or moving of this resource
+    // ----------------------------------------
+public:
+    VertexArray(const VertexArray&) = delete;
+    VertexArray(VertexArray&&) = delete;
+
+    VertexArray& operator=(const VertexArray&) = delete;
+    VertexArray& operator=(VertexArray&&) = delete;
 };

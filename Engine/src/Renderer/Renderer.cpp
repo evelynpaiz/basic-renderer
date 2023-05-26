@@ -8,7 +8,10 @@
  */
 void Renderer::Clear() const
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
+    
+    if (m_DepthTest)
+            glClear(GL_DEPTH_BUFFER_BIT);
 }
 
 /**
@@ -37,4 +40,19 @@ void Renderer::Draw(const std::shared_ptr<VertexArray>& vao,
     
     glDrawElements(GL_TRIANGLES, vao->GetIndexBuffer()->GetCount(),
                    GL_UNSIGNED_INT, nullptr);
+}
+
+/**
+ * @brief Define if the depth testing is enable in the renderer.
+ *
+ * @param enable Enable or not the depth testing.
+ */
+void Renderer::setDepthTest(bool enabled)
+{
+    if (enabled)
+        glEnable(GL_DEPTH_TEST);
+    else
+        glDisable(GL_DEPTH_TEST);
+
+    m_DepthTest = enabled;
 }

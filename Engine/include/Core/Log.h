@@ -14,10 +14,20 @@ class Log
 {
 public:
     // Initialization
+    // ----------------------------------------
     static void Init();
-    // Get(s)
-    static std::shared_ptr<spdlog::logger> &GetCoreLogger();
     
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Get the engine logger instance.
+    /// @return Engine logger.
+    static std::shared_ptr<spdlog::logger> &GetCoreLogger()
+    {
+        return s_CoreLogger;
+    }
+    
+    // Log variables
+    // ----------------------------------------
 private:
     ///< Core logger
     static std::shared_ptr<spdlog::logger> s_CoreLogger;
@@ -34,11 +44,16 @@ class FlagLogSymbol : public spdlog::custom_flag_formatter
 {
 public:
     // Format
+    // ----------------------------------------
     void format(const spdlog::details::log_msg &msg,
                 const std::tm &, spdlog::memory_buf_t &dest) override;
-    // Copy/ Clone
+    
+    // Copy/Clone
+    // ----------------------------------------
     std::unique_ptr<spdlog::custom_flag_formatter> clone() const override;
     
+    // Flag log symbol variables
+    // ----------------------------------------
 private:
     ///< Log level symbol equivalence.
     const std::vector<std::string> m_Symbols = { "📓", "📘", "📗", "⚠️", "🛑", "⚡️", "" };

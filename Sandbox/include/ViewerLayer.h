@@ -18,26 +18,24 @@ class ViewerLayer : public Layer
 {
 public:
     // Constructor(s)/Destructor
+    // ----------------------------------------
     ViewerLayer(int width, int height);
+    /// @brief Delete the viewer layer.
     ~ViewerLayer() = default;
+    
     // Layer handlers
+    // ----------------------------------------
     void OnAttach() override;
-    void OnDetach() override;
     void OnUpdate(float deltaTime) override;
     void OnEvent(Event& event) override;
     
 private:
+    // Initialization
+    // ----------------------------------------
     void InitializeViewer();
     
-// Remove the possibility of copying or moving this resource
-public:
-    // Constructors
-    ViewerLayer(const ViewerLayer&) = delete;
-    ViewerLayer(ViewerLayer&&) = delete;
-    // Operators
-    ViewerLayer& operator=(const ViewerLayer&) = delete;
-    ViewerLayer& operator=(ViewerLayer&&) = delete;
-    
+    // Viewer layer variables
+    // ----------------------------------------
 private:
     ///< Size of the viewport.
     int m_ViewportWidth = 0;
@@ -68,4 +66,13 @@ private:
     glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
     glm::mat4 m_ViewMatrix = glm::mat4(1.0f);
     glm::mat4 m_ProjMatrix = glm::mat4(1.0f);
+    
+    // Disable the copying or moving of this resource
+    // ----------------------------------------
+public:
+    ViewerLayer(const ViewerLayer&) = delete;
+    ViewerLayer(ViewerLayer&&) = delete;
+    
+    ViewerLayer& operator=(const ViewerLayer&) = delete;
+    ViewerLayer& operator=(ViewerLayer&&) = delete;
 };

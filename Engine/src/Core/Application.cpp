@@ -1,6 +1,9 @@
 #include "enginepch.h"
 #include "Core/Application.h"
 
+#include "Event/Event.h"
+#include "Event/WindowEvent.h"
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -21,28 +24,6 @@ Application::Application(const std::string& name, const int width,
     m_Window = std::make_unique<Window>(name, width, height);
     // Define the event callback function for the application
     m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
-}
-
-/**
- * Run this current application.
- */
-void Application::Run()
-{
-    // Run until the user quits
-    while (m_Running)
-    {
-        // Per-frame time logic
-        float currentFrame = (float)glfwGetTime();
-        float deltaTime = currentFrame - m_LastFrame;
-        m_LastFrame = currentFrame;
-        
-        // Render layers (from bottom to top)
-        for (std::shared_ptr<Layer>& layer : m_LayerStack)
-            layer->OnUpdate(deltaTime);
-        
-        // Update the window
-        m_Window->OnUpdate();
-    }
 }
 
 /**
@@ -82,6 +63,28 @@ void Application::PopOverlay(const std::shared_ptr<Layer>& overlay)
 }
 
 /**
+ * Run this current application.
+ */
+void Application::Run()
+{
+    // Run until the user quits
+    while (m_Running)
+    {
+        // Per-frame time logic
+        float currentFrame = (float)glfwGetTime();
+        float deltaTime = currentFrame - m_LastFrame;
+        m_LastFrame = currentFrame;
+        
+        // Render layers (from bottom to top)
+        for (std::shared_ptr<Layer>& layer : m_LayerStack)
+            layer->OnUpdate(deltaTime);
+        
+        // Update the window
+        m_Window->OnUpdate();
+    }
+}
+
+/**
  * Callback function definition for event handling on the application.
  *
  * @param e Event to be handled.
@@ -114,7 +117,7 @@ void Application::OnEvent(Event& e)
  */
 bool Application::OnWindowResize(WindowResizeEvent &e)
 {
-    return true;
+    return false;
 }
 
 /**
@@ -127,5 +130,7 @@ bool Application::OnWindowClose(WindowCloseEvent &e)
 {
     // Close the application
     m_Running = false;
+    CORE_TRACE(e);
+    
     return true;
 }

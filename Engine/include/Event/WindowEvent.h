@@ -11,13 +11,23 @@
 class WindowEvent : public Event
 {
 public:
-    // Get(s)
-    const std::string& GetTitle() const;
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Get the title of the window.
+    /// @return The window name.
+    const std::string& GetTitle() const { return m_Title; }
     
 protected:
     // Constructor(s)
-    WindowEvent(const std::string& title);
+    // ----------------------------------------
+    /// @brief Generate a window event.
+    /// @param title The window title.
+    WindowEvent(const std::string& title)
+        : m_Title(title)
+    {}
     
+    // Window event variables
+    // ----------------------------------------
 protected:
     ///< Code of the key pressed.
     std::string m_Title;
@@ -34,16 +44,38 @@ class WindowResizeEvent : public WindowEvent
 {
 public:
     // Constructor(s)
+    // ----------------------------------------
+    /// @brief Generate a window resize event.
+    /// @param title The window title.
+    /// @param width Updated window size (width).
+    /// @param height Updated window size (height).
     WindowResizeEvent(const std::string& title, unsigned int width,
-                      unsigned int height);
-    // Get(s)
-    unsigned int GetWidth() const;
-    unsigned int GetHeight() const;
-    static EventType GetEventTypeStatic();
-    EventType GetEventType() const override;
-    const char* GetName() const override;
-    std::string GetDescription() const override;
+                      unsigned int height)
+        : WindowEvent(title), m_Width(width), m_Height(height)
+    {}
     
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Get the resize event size.
+    /// @return The updated size (width).
+    unsigned int GetWidth() const { return m_Width; }
+    /// @brief Get the resize event size.
+    /// @return The updated size (height).
+    unsigned int GetHeight() const { return m_Height; }
+    /// @brief Get the description of the event.
+    /// @return Event description (updated size).
+    std::string GetDescription() const override
+    {
+        std::stringstream ss;
+        ss << "Window '" << m_Title << "' resized: " << m_Width << " x " << m_Height;
+        return ss.str();
+    }
+    
+    // Define the getter methods for the event type using the macro
+    EVENT_CLASS_TYPE(WindowResize)
+    
+    // Window resize event variables
+    // ----------------------------------------
 private:
     ///< Size.
     unsigned int m_Width, m_Height;
@@ -59,10 +91,24 @@ private:
 class WindowCloseEvent : public WindowEvent {
 public:
     // Constructor(s)
-    WindowCloseEvent(const std::string& title);
-    // Get(s)
-    static EventType GetEventTypeStatic();
-    EventType GetEventType() const override;
-    const char* GetName() const override;
-    std::string GetDescription() const override;
+    // ----------------------------------------
+    /// @brief Generate a window close event.
+    /// @param title The window title.
+    WindowCloseEvent(const std::string& title)
+        : WindowEvent(title)
+    {}
+    
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Get the description of the event.
+    /// @return Event description (closed window).
+    std::string GetDescription() const override
+    {
+        std::stringstream ss;
+        ss << "Window '" << m_Title << "' closed";
+        return ss.str();
+    }
+    
+    // Define the getter methods for the event type using the macro
+    EVENT_CLASS_TYPE(WindowClose)
 };

@@ -2,8 +2,9 @@
 
 #include "Core/Window.h"
 #include "Core/LayerStack.h"
-#include "Event/Event.h"
-#include "Event/WindowEvent.h"
+
+class WindowResizeEvent;
+class WindowCloseEvent;
 
 /**
  * Handles the rendering application.
@@ -20,33 +21,35 @@ class Application
 {
 public:
     // Constructor(s)/Destructor
+    // ----------------------------------------
     Application(const std::string &name = "Basic Renderer", const int width = 800,
                 const int height = 600);
+    /// @brief Delete the application.
     virtual ~Application() = default;
+    
     // Run
+    // ----------------------------------------
     void Run();
+    
+    // Events handler(s)
+    // ----------------------------------------
     void OnEvent(Event& e);
+    
     // Rendering layers
+    // ----------------------------------------
     void PushLayer(const std::shared_ptr<Layer>& layer);
     void PushOverlay(const std::shared_ptr<Layer>& overlay);
     void PopLayer(const std::shared_ptr<Layer>& layer);
     void PopOverlay(const std::shared_ptr<Layer>& overlay);
-   
-// Remove the possibility of copying or moving this resource
+    
 private:
-    // Events handlers
+    // Events handler(s)
+    // ----------------------------------------
     bool OnWindowResize(WindowResizeEvent &e);
     bool OnWindowClose(WindowCloseEvent &e);
     
-// Remove the possibility of copying this resource
-public:
-    // Copy
-    Application(const Application&) = delete;
-    Application(Application&&) = delete;
-    // Operators
-    Application& operator=(const Application&) = delete;
-    Application& operator=(Application&&) = delete;
-    
+    // Application variables
+    // ----------------------------------------
 private:
     ///< Application window.
     std::unique_ptr<Window> m_Window;
@@ -57,4 +60,13 @@ private:
     LayerStack m_LayerStack;
     ///< Rendering time.
     float m_LastFrame = 0.0f;
+    
+    // Disable the copying or moving of this resource
+    // ----------------------------------------
+public:
+    Application(const Application&) = delete;
+    Application(Application&&) = delete;
+
+    Application& operator=(const Application&) = delete;
+    Application& operator=(Application&&) = delete;
 };

@@ -190,20 +190,6 @@ static void MouseMovedCallback(GLFWwindow *window, double x, double y) noexcept
 }
 
 // --------------------------------------------
-// Window Data
-// --------------------------------------------
-/**
- * Define the information of a window.
- *
- * @param title Window name.
- * @param width Size (width) of the window.
- * @param height Size (height) of the window.
- */
-WindowData::WindowData(const std::string& title, const int width, const int height)
-    : Title(title), Width(width), Height(height)
-{}
-
-// --------------------------------------------
 // Window
 // --------------------------------------------
 /**
@@ -240,53 +226,19 @@ void Window::OnUpdate() const
 }
 
 /**
- * Get the title of the window.
+ * Define if the window's buffer swap will be synchronized with the vertical
+ * refresh rate of the monitor.
  *
- * @return The window name.
+ * @param enabled Enable or not the vertical synchronization.
  */
-const std::string& Window::GetTitle() const
+void Window::SetVerticalSync(bool enabled)
 {
-    return m_Data.Title;
-}
+    if (enabled)
+        glfwSwapInterval(1);
+    else
+        glfwSwapInterval(0);
 
-/**
- * Get the size (width) of the window.
- *
- * @return The width of the window.
- */
-unsigned int Window::GetWidth() const
-{
-    return m_Data.Width;
-}
-
-/**
- * Get the size (height) of the window.
- *
- * @return The height of the window.
- */
-unsigned int Window::GetHeight() const
-{
-    return m_Data.Height;
-}
-
-/**
- * Get the GLFW window.
- *
- * @return The native window.
- */
-void* Window::GetNativeWindow() const
-{
-    return m_Window;
-}
-
-/**
- * Set the event callback function for this window.
- *
- * @param callback The event callback function.
- */
-void Window::SetEventCallback(const std::function<void (Event &)>& callback)
-{
-    m_Data.EventCallback = callback;
+    m_Data.VerticalSync = enabled;
 }
 
 /**
@@ -323,6 +275,9 @@ void Window::Init()
     glfwMakeContextCurrent(m_Window);
     ++g_WindowCount;
     
+    // Set a vertical synchronization
+    SetVerticalSync(true);
+    
     // Initialize GLEW
     CORE_ASSERT(glewInit() == GLEW_OK, "Failed to initialize GLEW!");
     
@@ -342,9 +297,6 @@ void Window::Init()
     glfwSetMouseButtonCallback(m_Window, MouseButtonCallback);
     glfwSetScrollCallback(m_Window, MouseScrolledCallback);
     glfwSetCursorPosCallback(m_Window, MouseMovedCallback);
-    
-    // Configure global state
-    glEnable(GL_DEPTH_TEST);
 }
 
 /**

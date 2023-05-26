@@ -17,11 +17,30 @@ class Renderer
 {
 public:
     // Constructor(s)/Destructor
+    // ----------------------------------------
+    /// @brief Generate a renderer.
     Renderer() = default;
+    /// @brief Delete the renderer.
     ~Renderer() = default;
+    
     // Render
+    // ----------------------------------------
     void Clear() const;
     void Clear(const glm::vec4& color) const;
     void Draw(const std::shared_ptr<VertexArray>& vao,
               const std::shared_ptr<Shader>& shader) const;
+    
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Check if depth testing is active.
+    /// @return `true` if the renderer is doing depth testing.
+    bool IsDepthTestActive() const { return m_DepthTest; }
+    
+    // Setter(s)
+    // ----------------------------------------
+    void setDepthTest(bool enabled);
+    
+private:
+    ///< Depth testing.
+    bool m_DepthTest = false;
 };

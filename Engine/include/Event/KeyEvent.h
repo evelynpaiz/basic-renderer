@@ -11,13 +11,23 @@
 class KeyEvent : public Event
 {
 public:
-    // Get(s)
-    int GetKeyCode() const;
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Get the numerical code of the key.
+    /// @return The key code.
+    int GetKeyCode() const { return m_KeyCode; }
     
 protected:
     // Constructor(s)
-    KeyEvent(const int keyCode);
+    // ----------------------------------------
+    /// @brief Generate a keyboard event.
+    /// @param keyCode Numerical value of the key.
+    KeyEvent(const int keyCode)
+        : m_KeyCode(keyCode)
+    {}
     
+    // Key event variables
+    // ----------------------------------------
 protected:
     ///< Code of the key pressed/released.
     int m_KeyCode;
@@ -33,14 +43,33 @@ class KeyPressedEvent : public KeyEvent
 {
 public:
     // Constructor(s)
-    KeyPressedEvent(const int keyCode, const unsigned int repeatCount);
-    // Get(s)
-    unsigned int GetRepeatCount() const;
-    static EventType GetEventTypeStatic();
-    EventType GetEventType() const override;
-    const char* GetName() const override;
-    std::string GetDescription() const override;
+    // ----------------------------------------
+    /// @brief Generate a key pressed event.
+    /// @param keyCode Numerical value of the key.
+    /// @param repeatCount Number of times the key has been pressed.
+    KeyPressedEvent(const int keyCode, const unsigned int repeatCount)
+        : KeyEvent(keyCode), m_RepeatCount(repeatCount)
+    {}
     
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Get the number of times the key has been pressed.
+    /// @return The key repeat count.
+    unsigned int GetRepeatCount() const { return m_RepeatCount; }
+    /// @brief Get the description of the event.
+    /// @return Event description (key currently pressed).
+    std::string GetDescription() const override
+    {
+        std::stringstream ss;
+        ss << "Key '" << m_KeyCode << "' pressed " << m_RepeatCount << " times";
+        return ss.str();
+    }
+    
+    // Define the getter methods for the event type using the macro
+    EVENT_CLASS_TYPE(KeyPressed)
+    
+    // Key pressed event variables
+    // ----------------------------------------
 private:
     ///< Key pressed counter.
     unsigned int m_RepeatCount;
@@ -57,10 +86,24 @@ class KeyReleasedEvent : public KeyEvent
 {
 public:
     // Constructor(s)
-    KeyReleasedEvent(const int keyCode);
-    // Get(s)
-    static EventType GetEventTypeStatic();
-    EventType GetEventType() const override;
-    const char* GetName() const override;
-    std::string GetDescription() const override;
+    // ----------------------------------------
+    /// @brief Generate a key released event.
+    /// @param keyCode Numerical value of the key.
+    KeyReleasedEvent(const int keyCode)
+        : KeyEvent(keyCode)
+    {}
+    
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Get the description of the event.
+    /// @return Event description (key currently released).
+    std::string GetDescription() const override
+    {
+        std::stringstream ss;
+        ss << "Key '" << m_KeyCode << "' released";
+        return ss.str();
+    }
+    
+    // Define the getter methods for the event type using the macro
+    EVENT_CLASS_TYPE(KeyReleased)
 };

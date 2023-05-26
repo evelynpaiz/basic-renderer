@@ -13,6 +13,7 @@ LayerStack::~LayerStack()
 
 /**
  * Add a rendering layer to the stack.
+ *
  * @param layer New rendering layer.
  */
 void LayerStack::PushLayer(const std::shared_ptr<Layer>& layer)
@@ -26,6 +27,7 @@ void LayerStack::PushLayer(const std::shared_ptr<Layer>& layer)
 
 /**
  * Add an overlay layer (rendered on top) to the stack.
+ *
  * @param overlay New overlay layer.
  */
 void LayerStack::PushOverlay(const std::shared_ptr<Layer>& overlay)
@@ -37,6 +39,7 @@ void LayerStack::PushOverlay(const std::shared_ptr<Layer>& overlay)
 
 /**
  * Remove a rendering layer from the stack.
+ *
  * @param layer Rendering layer.
  */
 void LayerStack::PopLayer(const std::shared_ptr<Layer>& layer)
@@ -55,6 +58,7 @@ void LayerStack::PopLayer(const std::shared_ptr<Layer>& layer)
 
 /**
  * Remove an overlay (rendered on top) layer from the stack.
+ *
  * @param overlay Overlay layer.
  */
 void LayerStack::PopOverlay(const std::shared_ptr<Layer>& overlay)
@@ -68,76 +72,4 @@ void LayerStack::PopOverlay(const std::shared_ptr<Layer>& overlay)
         overlay->OnDetach();
         m_Layers.erase(it);
     }
-}
-
-/**
- * Get an iterator pointing to the bottom rendered layer.
- * @return An iterator of the layer stack.
- */
-std::vector<std::shared_ptr<Layer>>::iterator LayerStack::begin()
-{
-    return m_Layers.begin();
-}
-
-/**
- * Get an iterator pointing to the top rendered layer.
- * @return An iterator of the layer stack.
- */
-std::vector<std::shared_ptr<Layer>>::iterator LayerStack::end()
-{
-    return m_Layers.end();
-}
-
-/**
- * Get an iterator pointing to the top rendered layer.
- * @return An iterator of the layer stack.
- */
-std::vector<std::shared_ptr<Layer>>::reverse_iterator LayerStack::rbegin()
-{
-    return m_Layers.rbegin();
-}
-
-/**
- * Get an iterator pointing to the bottom rendered layer.
- * @return An iterator of the layer stack.
- */
-std::vector<std::shared_ptr<Layer>>::reverse_iterator LayerStack::rend()
-{
-    return m_Layers.rend();
-}
-
-/**
- * Get an iterator pointing to the bottom rendered layer.
- * @return An iterator of the layer stack.
- */
-std::vector<std::shared_ptr<Layer>>::const_iterator LayerStack::begin() const
-{
-    return m_Layers.begin();
-}
-
-/**
- * Get an iterator pointing to the top rendered layer.
- * @return An iterator of the layer stack.
- */
-std::vector<std::shared_ptr<Layer>>::const_iterator LayerStack::end() const
-{
-    return m_Layers.end();
-}
-
-/**
- * Get an iterator pointing to the top rendered layer.
- * @return An iterator of the layer stack.
- */
-std::vector<std::shared_ptr<Layer>>::const_reverse_iterator LayerStack::rbegin() const
-{
-    return m_Layers.rbegin();
-}
-
-/**
- * Get an iterator pointing to the bottom rendered layer.
- * @return An iterator of the layer stack.
- */
-std::vector<std::shared_ptr<Layer>>::const_reverse_iterator LayerStack::rend() const
-{
-    return m_Layers.rend();
 }

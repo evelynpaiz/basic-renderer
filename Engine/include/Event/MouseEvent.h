@@ -11,13 +11,23 @@
 class MouseButtonEvent : public Event
 {
 public:
-    // Get(s)
-    int GetMouseButton() const;
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Get the numerical code of the mouse button.
+    /// @return The mouse code.
+    int GetMouseButton() const { return m_Button; }
     
 protected:
     // Constructor(s)
-    MouseButtonEvent(const int button);
+    // ----------------------------------------
+    /// @brief Generate a mouse button event.
+    /// @param button Numerical value of the button.
+    MouseButtonEvent(const int button)
+        : m_Button(button)
+    {}
     
+    // Mouse button event variables
+    // ----------------------------------------
 protected:
     ///< Code of the button pressed/released.
     int m_Button;
@@ -34,12 +44,26 @@ class MouseButtonPressedEvent : public MouseButtonEvent
 {
 public:
     // Constructor(s)
-    MouseButtonPressedEvent(const int button);
-    // Gets
-    static EventType GetEventTypeStatic();
-    EventType GetEventType() const override;
-    const char* GetName() const override;
-    std::string GetDescription() const override;
+    // ----------------------------------------
+    /// @brief Generate a mouse button pressed event.
+    /// @param button Numerical value of the button.
+    MouseButtonPressedEvent(const int button)
+        : MouseButtonEvent(button)
+    {}
+    
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Get the description of the event.
+    /// @return Event description (mouse button currently pressed).
+    std::string GetDescription() const override
+    {
+        std::stringstream ss;
+        ss << "Mouse button '" << m_Button << "' pressed";
+        return ss.str();
+    }
+    
+    // Define the getter methods for the event type using the macro
+    EVENT_CLASS_TYPE(MouseButtonPressed)
 };
 
 /**
@@ -53,12 +77,26 @@ class MouseButtonReleasedEvent : public MouseButtonEvent
 {
 public:
     // Constructor(s)
-    MouseButtonReleasedEvent(const int button);
-    // Get(s)
-    static EventType GetEventTypeStatic();
-    EventType GetEventType() const override;
-    const char* GetName() const override;
-    std::string GetDescription() const override;
+    // ----------------------------------------
+    /// @brief Generate a mouse button released event.
+    /// @param button Numerical value of the button.
+    MouseButtonReleasedEvent(const int button)
+        : MouseButtonEvent(button)
+    {}
+    
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Get the description of the event.
+    /// @return Event description (mouse button currently released).
+    std::string GetDescription() const override
+    {
+        std::stringstream ss;
+        ss << "Mouse button '" << m_Button << "' released";
+        return ss.str();
+    }
+    
+    // Define the getter methods for the event type using the macro
+    EVENT_CLASS_TYPE(MouseButtonReleased)
 };
 
 /**
@@ -71,15 +109,36 @@ class MouseScrolledEvent : public Event
 {
 public:
     // Constructor(s)
-    MouseScrolledEvent(const float xOffset, const float yOffset);
-    // Get(s)
-    float GetXOffset() const;
-    float GetYOffset() const;
-    static EventType GetEventTypeStatic();
-    EventType GetEventType() const override;
-    const char* GetName() const override;
-    std::string GetDescription() const override;
+    // ----------------------------------------
+    /// @brief Generate a mouse scrolled event.
+    /// @param xOffset The scroll offset in the x-axis (horizontally).
+    /// @param yOffset The scroll offset in the y-axis (vertically).
+    MouseScrolledEvent(const float xOffset, const float yOffset)
+        : m_XOffset(xOffset), m_YOffset(yOffset)
+    {}
     
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Get the scroll offset.
+    /// @return The offset in the x-axis.
+    float GetXOffset() const { return m_XOffset; }
+    /// @brief Get the scroll offset.
+    /// @return The offset in the y-axis.
+    float GetYOffset() const { return m_YOffset; }
+    /// @brief Get the description of the event.
+    /// @return Event description (mouse being currently scrolled).
+    std::string GetDescription() const override
+    {
+        std::stringstream ss;
+        ss << "Mouse scrolled (" << m_XOffset << " , " << m_YOffset << ")";
+        return ss.str();
+    }
+    
+    // Define the getter methods for the event type using the macro
+    EVENT_CLASS_TYPE(MouseScrolled)
+    
+    // Mouse scrolled event variables
+    // ----------------------------------------
 private:
     ///< Scroll offsets.
     float m_XOffset, m_YOffset;
@@ -95,15 +154,36 @@ class MouseMovedEvent : public Event
 {
 public:
     // Constructor(s)
-    MouseMovedEvent(const float x, const float y);
-    // Get(s)
-    float GetX() const;
-    float GetY() const;
-    static EventType GetEventTypeStatic();
-    EventType GetEventType() const override;
-    const char* GetName() const override;
-    std::string GetDescription() const override;
+    // ----------------------------------------
+    /// @brief Generate a mouse moved event.
+    /// @param x The mouse position in the x-axis.
+    /// @param y The mouse position in the y-axis.
+    MouseMovedEvent(const float x, const float y)
+        : m_X(x), m_Y(y)
+    {}
     
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Get the mouse position.
+    /// @return The mouse position in the x-axis.
+    float GetX() const { return m_X; }
+    /// @brief Get the mouse position.
+    /// @return The mouse position in the y-axis.
+    float GetY() const { return m_Y; }
+    /// @brief Get the description of the event.
+    /// @return Event description (mouse being currently moved).
+    std::string GetDescription() const override
+    {
+        std::stringstream ss;
+        ss << "Mouse moved (" << m_X << " , " << m_Y << ")";
+        return ss.str();
+    }
+    
+    // Define the getter methods for the event type using the macro
+    EVENT_CLASS_TYPE(MouseMoved)
+    
+    // Mouse moved event variables
+    // ----------------------------------------
 private:
     ///< Mouse position.
     float m_X, m_Y;

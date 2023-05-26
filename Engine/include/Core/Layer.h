@@ -16,26 +16,46 @@ class Layer
 {
 public:
     // Constructor(s)/Destructor
-    Layer(const std::string& name = "Unidentified Layer");
+    // ----------------------------------------
+    /// @brief Define a rendering layer.
+    /// @param name Name of the layer.
+    Layer(const std::string& name = "Unidentified Layer")
+        : m_LayerName(name)
+    {}
+    /// @brief Delete the layer.
     virtual ~Layer() = default;
+    
     // Layer handlers
-    virtual void OnAttach();
-    virtual void OnDetach();
-    virtual void OnUpdate(float deltaTime);
-    virtual void OnEvent(Event& event);
-    // Get(s)
-    const std::string& GetName() const;
+    // ----------------------------------------
+    /// @brief Attach (add) this layer to the rendering engine.
+    virtual void OnAttach() {}
+    /// @brief Detach (remove) this layer to the rendering engine.
+    virtual void OnDetach() {}
+    /// @brief Render this layer.
+    /// @param deltaTime Times passed since the last update.
+    virtual void OnUpdate(float deltaTime) {}
+    /// @brief Handle an event possibly occurred inside the layer.
+    /// @param e Event.
+    virtual void OnEvent(Event& event) {}
     
-// Remove the possibility of copying or moving this resource
-public:
-    // Copy
-    Layer(const Layer&) = delete;
-    Layer(Layer&&) = delete;
-    // Operators
-    Layer& operator=(const Layer&) = delete;
-    Layer& operator=(Layer&&) = delete;
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Get the name of the layer.
+    /// @return Name of the layer.
+    const std::string& GetName() const { return m_LayerName; }
     
+    // Layer variables
+    // ----------------------------------------
 protected:
     ///< Layer name.
     std::string m_LayerName;
+    
+    // Disable the copying or moving of this resource
+    // ----------------------------------------
+public:
+    Layer(const Layer&) = delete;
+    Layer(Layer&&) = delete;
+
+    Layer& operator=(const Layer&) = delete;
+    Layer& operator=(Layer&&) = delete;
 };

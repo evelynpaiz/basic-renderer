@@ -29,16 +29,6 @@ void Log::Init()
     s_CoreLogger->set_level(spdlog::level::trace);
 }
 
-/**
- * Get the engine logger instance.
- *
- * @return Engine logger.
- */
-std::shared_ptr<spdlog::logger> &Log::GetCoreLogger()
-{
-    return s_CoreLogger;
-}
-
 // --------------------------------------------
 // Flag formatter for log symbols
 // --------------------------------------------

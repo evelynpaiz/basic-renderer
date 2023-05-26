@@ -41,13 +41,3 @@ void IndexBuffer::Unbind() const
 {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
-
-/**
- * Get the number of indices.
- *
- * @return The count of indices.
- */
-unsigned int IndexBuffer::GetCount() const
-{
-    return m_Count;
-}

@@ -3,24 +3,6 @@
 
 #include <GL/glew.h>
 
-// --------------------------------------------
-// Shader program source
-// --------------------------------------------
-
-/**
- * Define the shader program source.
- *
- * @param vs Vertex shader source.
- * @param fs Fragment shader source.
- */
-ShaderProgramSource::ShaderProgramSource(const std::string& vs, const std::string& fs)
-    : VertexSource(vs), FragmentSource(fs)
-{}
-
-// --------------------------------------------
-// Shader
-// --------------------------------------------
-
 /**
  * Generate a shader program.
  *

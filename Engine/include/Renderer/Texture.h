@@ -13,26 +13,23 @@
 class Texture {
 public:
     // Constructor(s)/Destructor
+    // ----------------------------------------
     Texture(const std::filesystem::path& filePath, bool flip = true);
     ~Texture();
+    
     // Usage
+    // ----------------------------------------
     void Bind(unsigned int slot = 0) const;
     void Unbind() const;
         
 private:
     // Loading
+    // ----------------------------------------
     void LoadFromFile(const std::filesystem::path& filePath);
     void Generate2DTexture(const void *data);
     
-// Remove the possibility of copying or moving this resource
-public:
-    // Constructors
-    Texture(const Texture&) = delete;
-    Texture(Texture&&) = delete;
-    // Operators
-    Texture& operator=(const Texture&) = delete;
-    Texture& operator=(Texture&&) = delete;
-    
+    // Texture variables
+    // ----------------------------------------
 private:
     ///< Path to the file.
     std::filesystem::path m_FilePath;
@@ -50,4 +47,13 @@ private:
     ///< Format.
     unsigned int m_InternalFormat = 0;
     unsigned int m_DataFormat = 0;
+    
+    // Disable the copying or moving of this resource
+    // ----------------------------------------
+public:
+    Texture(const Texture&) = delete;
+    Texture(Texture&&) = delete;
+
+    Texture& operator=(const Texture&) = delete;
+    Texture& operator=(Texture&&) = delete;
 };

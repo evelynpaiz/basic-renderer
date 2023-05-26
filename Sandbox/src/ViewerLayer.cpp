@@ -16,16 +16,15 @@ void ViewerLayer::OnAttach()
 {
     // Initialize all the elements of the viewer
     InitializeViewer();
+    
+    // Define a depth testing for the renderer
+    m_Renderer.setDepthTest(true);
 }
 
 /**
- * Detach (remove) this layer to the rendering engine.
- */
-void ViewerLayer::OnDetach()
-{}
-
-/**
  * Render this layer.
+ *
+ * @param deltaTime Times passed since the last update.
  */
 void ViewerLayer::OnUpdate(float deltaTime)
 {

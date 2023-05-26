@@ -13,24 +13,72 @@ class LayerStack
 {
 public:
     // Constructor(s)/Destructor
+    // ----------------------------------------
+    /// @brief Generate an empty stack of layers.
     LayerStack() = default;
     ~LayerStack();
+    
     // Stack management
+    // ----------------------------------------
     void PushLayer(const std::shared_ptr<Layer>& layer);
     void PushOverlay(const std::shared_ptr<Layer>& overlay);
     void PopLayer(const std::shared_ptr<Layer>& layer);
     void PopOverlay(const std::shared_ptr<Layer>& overlay);
+    
     // Iterator
-    std::vector<std::shared_ptr<Layer>>::iterator begin();
-    std::vector<std::shared_ptr<Layer>>::iterator end();
-    std::vector<std::shared_ptr<Layer>>::reverse_iterator rbegin();
-    std::vector<std::shared_ptr<Layer>>::reverse_iterator rend();
+    // ----------------------------------------
+    /// @brief Get an iterator pointing to the bottom rendered layer.
+    /// @return An iterator of the layer stack.
+    std::vector<std::shared_ptr<Layer>>::iterator begin()
+    {
+        return m_Layers.begin();
+    }
+    /// @brief Get an iterator pointing to the top rendered layer.
+    /// @return An iterator of the layer stack.
+    std::vector<std::shared_ptr<Layer>>::iterator end()
+    {
+        return m_Layers.end();
+    }
+    /// @brief Get an iterator pointing to the top rendered layer.
+    /// @return An iterator of the layer stack.
+    std::vector<std::shared_ptr<Layer>>::reverse_iterator rbegin()
+    {
+        return m_Layers.rbegin();
+    }
+    /// @brief Get an iterator pointing to the bottom rendered layer.
+    /// @return An iterator of the layer stack.
+    std::vector<std::shared_ptr<Layer>>::reverse_iterator rend()
+    {
+        return m_Layers.rend();
+    }
     
-    std::vector<std::shared_ptr<Layer>>::const_iterator begin() const;
-    std::vector<std::shared_ptr<Layer>>::const_iterator end() const;
-    std::vector<std::shared_ptr<Layer>>::const_reverse_iterator rbegin() const;
-    std::vector<std::shared_ptr<Layer>>::const_reverse_iterator rend() const;
+    /// @brief Get an iterator pointing to the bottom rendered layer.
+    /// @return An iterator of the layer stack.
+    std::vector<std::shared_ptr<Layer>>::const_iterator begin() const
+    {
+        return m_Layers.begin();
+    }
+    /// @brief Get an iterator pointing to the top rendered layer.
+    /// @return An iterator of the layer stack.
+    std::vector<std::shared_ptr<Layer>>::const_iterator end() const
+    {
+        return m_Layers.end();
+    }
+    /// @brief Get an iterator pointing to the top rendered layer.
+    /// @return An iterator of the layer stack.
+    std::vector<std::shared_ptr<Layer>>::const_reverse_iterator rbegin() const
+    {
+        return m_Layers.rbegin();
+    }
+    /// @brief Get an iterator pointing to the bottom rendered layer.
+    /// @return An iterator of the layer stack.
+    std::vector<std::shared_ptr<Layer>>::const_reverse_iterator rend() const
+    {
+        return m_Layers.rend();
+    }
     
+    // Layer stack variables
+    // ----------------------------------------
 private:
     ///< Set of layers in the stack.
     std::vector<std::shared_ptr<Layer>> m_Layers;
