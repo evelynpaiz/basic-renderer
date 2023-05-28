@@ -10,7 +10,7 @@ ViewerLayer::ViewerLayer(int width, int height)
 {}
 
 /**
- * Attach (add) this layer to the rendering engine.
+ * Attach (add) the viewer layer to the rendering engine.
  */
 void ViewerLayer::OnAttach()
 {
@@ -22,7 +22,7 @@ void ViewerLayer::OnAttach()
 }
 
 /**
- * Render this layer.
+ * Render the viewer layer.
  *
  * @param deltaTime Times passed since the last update.
  */
@@ -42,7 +42,7 @@ void ViewerLayer::OnUpdate(float deltaTime)
 }
 
 /**
- * Handle an event possibly occurred inside the layer.
+ * Handle an event that possibly occurred inside the viewer layer.
  * @param e Event.
  */
 void ViewerLayer::OnEvent(Event &e)

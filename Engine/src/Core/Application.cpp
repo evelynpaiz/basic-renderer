@@ -10,6 +10,9 @@
 /// Binding event function definition
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
+// Define static variables
+Application* Application::s_Instance = nullptr;
+
 /**
  * Generate a rendering application.
  *
@@ -20,6 +23,10 @@
 Application::Application(const std::string& name, const int width,
                          const int height)
 {
+    // Define the pointer to the application
+    CORE_ASSERT(!s_Instance, "Application '{0}' already exists!", name);
+    s_Instance = this;
+    
     // Create the application window
     m_Window = std::make_unique<Window>(name, width, height);
     // Define the event callback function for the application
@@ -130,7 +137,7 @@ bool Application::OnWindowClose(WindowCloseEvent &e)
 {
     // Close the application
     m_Running = false;
-    CORE_TRACE(e);
+    CORE_INFO(e);
     
     return true;
 }

@@ -27,6 +27,7 @@ public:
 private:
     ///< 3D viewer (rendering layer).
     std::shared_ptr<ViewerLayer> m_ViewerLayer;
+    std::shared_ptr<GuiLayer> m_GuiLayer;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

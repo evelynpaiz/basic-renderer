@@ -105,7 +105,7 @@ public:
     std::string GetDescription() const override
     {
         std::stringstream ss;
-        ss << "Window '" << m_Title << "' closed";
+        ss << "Closing '" << m_Title << "' window";
         return ss.str();
     }
     

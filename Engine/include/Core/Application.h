@@ -42,6 +42,11 @@ public:
     void PopLayer(const std::shared_ptr<Layer>& layer);
     void PopOverlay(const std::shared_ptr<Layer>& overlay);
     
+    // Getter(s)
+    // ----------------------------------------
+    static Application& Get() { return *s_Instance; }
+    Window& GetWindow() { return *m_Window; }
+    
 private:
     // Events handler(s)
     // ----------------------------------------
@@ -60,6 +65,10 @@ private:
     LayerStack m_LayerStack;
     ///< Rendering time.
     float m_LastFrame = 0.0f;
+    
+private:
+    ///< Pointer to this application.
+    static Application* s_Instance;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

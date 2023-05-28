@@ -15,9 +15,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Third party libraries
-include(Dependencies.cmake)
-
 find_package(OpenGL REQUIRED)
+include(Dependencies.cmake)
 
 # Own libraries and executables
 add_subdirectory(Engine)

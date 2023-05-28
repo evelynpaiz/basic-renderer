@@ -12,7 +12,10 @@ ViewerApp::ViewerApp(const std::string &name, const int width, const int height)
 {
     // Push the viewer layer to the layer stack
     m_ViewerLayer = std::make_shared<ViewerLayer>(width, height);
+    m_GuiLayer = std::make_shared<GuiLayer>();
+    
     PushLayer(m_ViewerLayer);
+    PushOverlay(m_GuiLayer);
 }
 
 /**
@@ -21,4 +24,5 @@ ViewerApp::ViewerApp(const std::string &name, const int width, const int height)
 ViewerApp::~ViewerApp()
 {
     PopLayer(m_ViewerLayer);
+    PopOverlay(m_GuiLayer);
 }

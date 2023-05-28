@@ -34,10 +34,56 @@ add_subdirectory(3rdparty/glm)
 ## STB
 add_library(stb INTERFACE)
 
-target_include_directories(
-    stb
-    INTERFACE 
+target_include_directories(stb
+    INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/stb/
 )
 
 add_library(stb::stb ALIAS stb)
+
+## IMGUI
+set(IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/imgui/)
+add_library(imgui STATIC)
+
+file(
+    GLOB imgui_sources
+    ${IMGUI_DIR}/imgui_demo.cpp
+    ${IMGUI_DIR}/imgui_draw.cpp
+    ${IMGUI_DIR}/imgui_tables.cpp
+    ${IMGUI_DIR}/imgui_widgets.cpp
+    ${IMGUI_DIR}/imgui.cpp
+)
+
+file(
+    GLOB imgui_backends_sources
+    ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
+)
+
+file(GLOB imgui_headers ${IMGUI_DIR}/*.h)
+
+file(GLOB imgui_backend_headers 
+    ${IMGUI_DIR}/backends/imgui_impl_opengl3.h
+    ${IMGUI_DIR}/backends/imgui_impl_glfw.h
+)
+
+target_sources(imgui 
+    PRIVATE ${imgui_sources}
+    PRIVATE ${imgui_backends_sources}
+    PRIVATE ${imgui_headers}
+    PRIVATE ${imgui_backend_headers}
+)
+
+target_include_directories(imgui
+    PUBLIC ${IMGUI_DIR}
+    PUBLIC ${IMGUI_DIR}/backends
+)
+
+target_link_libraries(imgui OpenGL::GL glfw::glfw)
+
+source_group("include" FILES ${imgui_headers})
+source_group("include/backends" FILES ${imgui_backend_headers})
+source_group("src" FILES ${imgui_sources})
+source_group("src/backends" FILES ${imgui_backends_sources})
+
+add_library(imgui::imgui ALIAS imgui)

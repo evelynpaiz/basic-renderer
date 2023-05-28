@@ -29,12 +29,12 @@ public:
     // ----------------------------------------
     /// @brief Attach (add) this layer to the rendering engine.
     virtual void OnAttach() {}
-    /// @brief Detach (remove) this layer to the rendering engine.
+    /// @brief Detach (remove) this layer from the rendering engine.
     virtual void OnDetach() {}
     /// @brief Render this layer.
     /// @param deltaTime Times passed since the last update.
     virtual void OnUpdate(float deltaTime) {}
-    /// @brief Handle an event possibly occurred inside the layer.
+    /// @brief Handle an event that possibly occurred inside the layer.
     /// @param e Event.
     virtual void OnEvent(Event& event) {}
     

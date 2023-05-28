@@ -20,8 +20,6 @@ public:
     // Constructor(s)/Destructor
     // ----------------------------------------
     ViewerLayer(int width, int height);
-    /// @brief Delete the viewer layer.
-    ~ViewerLayer() = default;
     
     // Layer handlers
     // ----------------------------------------

@@ -12,6 +12,7 @@
 #include "Core/Window.h"
 #include "Core/Application.h"
 #include "Core/Layer.h"
+#include "Gui/GuiLayer.h"
 
 // --------------------------------------------
 // Renderer

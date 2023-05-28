@@ -265,7 +265,7 @@ void Window::Init()
 #endif
     
     // Create a windowed mode window and its OpenGL context
-    CORE_INFO("Creating {0} window ({1} x {2})", m_Data.Title,
+    CORE_INFO("Creating '{0}' window ({1} x {2})", m_Data.Title,
               m_Data.Width, m_Data.Height);
     m_Window = glfwCreateWindow(m_Data.Width, m_Data.Height,
                                 m_Data.Title.c_str(), nullptr, nullptr);
