@@ -9,7 +9,7 @@
  * Entry point of the application.
  *
  * The `main` function serves as the entry point of the application. It initializes the logging system,
- * creates an instance of the Viewer application and runs it.
+ * creates an instance of the viewer application and runs it.
  *
  * @return An integer indicating the exit status of the application.
  */

@@ -18,7 +18,7 @@ class ViewerApp : public Application
 public:
     // Constructor(s)/Destructor
     // ----------------------------------------
-    ViewerApp(const std::string &name = "Sandbox Renderer", const int width = 800,
+    ViewerApp(const std::string &name = "Viewer Application", const int width = 800,
                 const int height = 600);
     ~ViewerApp();
     
