@@ -17,6 +17,9 @@ public:
     /// @return The window name.
     const std::string& GetTitle() const { return m_Title; }
     
+    // Define the different categories of the event
+    EVENT_CLASS_CATEGORY(EventCategoryApplication)
+    
 protected:
     // Constructor(s)
     // ----------------------------------------

@@ -45,6 +45,13 @@ add_library(stb::stb ALIAS stb)
 set(IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/imgui/)
 add_library(imgui STATIC)
 
+file(GLOB imgui_headers ${IMGUI_DIR}/*.h)
+
+file(GLOB imgui_backend_headers 
+    ${IMGUI_DIR}/backends/imgui_impl_opengl3.h
+    ${IMGUI_DIR}/backends/imgui_impl_glfw.h
+)
+
 file(
     GLOB imgui_sources
     ${IMGUI_DIR}/imgui_demo.cpp
@@ -58,13 +65,6 @@ file(
     GLOB imgui_backends_sources
     ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
     ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
-)
-
-file(GLOB imgui_headers ${IMGUI_DIR}/*.h)
-
-file(GLOB imgui_backend_headers 
-    ${IMGUI_DIR}/backends/imgui_impl_opengl3.h
-    ${IMGUI_DIR}/backends/imgui_impl_glfw.h
 )
 
 target_sources(imgui 

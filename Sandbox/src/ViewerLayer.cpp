@@ -48,7 +48,7 @@ void ViewerLayer::OnUpdate(float deltaTime)
 void ViewerLayer::OnEvent(Event &e)
 {
     // Print the information of the event (DEGUB)
-    CORE_DEBUG("{0}", e);
+    //CORE_DEBUG("{0}", e);
 }
 
 /**

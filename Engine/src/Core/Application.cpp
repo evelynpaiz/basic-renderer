@@ -35,6 +35,7 @@ Application::Application(const std::string& name, const int width,
 
 /**
  * Add a new rendering layer to the application.
+ *
  * @param layer New rendering layer.
  */
 void Application::PushLayer(const std::shared_ptr<Layer>& layer)
@@ -44,6 +45,7 @@ void Application::PushLayer(const std::shared_ptr<Layer>& layer)
 
 /**
  * Add a new overlay layer (rendered on top) to the application.
+ *
  * @param overlay New overlay layer.
  */
 void Application::PushOverlay(const std::shared_ptr<Layer>& overlay)
@@ -53,6 +55,7 @@ void Application::PushOverlay(const std::shared_ptr<Layer>& overlay)
 
 /**
  * Remove a rendering layer from the application.
+ *
  * @param layer Rendering layer.
  */
 void Application::PopLayer(const std::shared_ptr<Layer>& layer)
@@ -62,6 +65,7 @@ void Application::PopLayer(const std::shared_ptr<Layer>& layer)
 
 /**
  * Remove an overlay layer (rendered on top) from the application.
+ * 
  * @param overlay Overlay layer.
  */
 void Application::PopOverlay(const std::shared_ptr<Layer>& overlay)

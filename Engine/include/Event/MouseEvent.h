@@ -17,6 +17,9 @@ public:
     /// @return The mouse code.
     int GetMouseButton() const { return m_Button; }
     
+    // Define the different categories of the event
+    EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput | EventCategoryMouseButton)
+    
 protected:
     // Constructor(s)
     // ----------------------------------------
@@ -137,6 +140,9 @@ public:
     // Define the getter methods for the event type using the macro
     EVENT_CLASS_TYPE(MouseScrolled)
     
+    // Define the different categories of the event
+    EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
+    
     // Mouse scrolled event variables
     // ----------------------------------------
 private:
@@ -181,6 +187,9 @@ public:
     
     // Define the getter methods for the event type using the macro
     EVENT_CLASS_TYPE(MouseMoved)
+    
+    // Define the different categories of the event
+    EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
     
     // Mouse moved event variables
     // ----------------------------------------

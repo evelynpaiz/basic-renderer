@@ -43,7 +43,7 @@ void Renderer::Draw(const std::shared_ptr<VertexArray>& vao,
 }
 
 /**
- * @brief Define if the depth testing is enable in the renderer.
+ * Define if the depth testing is enable in the renderer.
  *
  * @param enable Enable or not the depth testing.
  */

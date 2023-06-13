@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Window.h"
-#include "Core/LayerStack.h"
+#include "Layer/LayerStack.h"
 
 class WindowResizeEvent;
 class WindowCloseEvent;
@@ -44,6 +44,8 @@ public:
     
     // Getter(s)
     // ----------------------------------------
+    /// @brief Get the application instance.
+    /// @return This application.
     static Application& Get() { return *s_Instance; }
     Window& GetWindow() { return *m_Window; }
     

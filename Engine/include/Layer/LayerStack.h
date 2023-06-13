@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/Layer.h"
+#include "Layer/Layer.h"
 
 /**
  * Manages a stack of layers in the rendering engine.

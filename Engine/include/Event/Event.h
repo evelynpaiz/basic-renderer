@@ -16,6 +16,26 @@ enum class EventType
 };
 
 /**
+ * Enumeration of supported event categories.
+ *
+ * The `EventCategory` enumeration provides a set of values to represent different categories of events.
+ * It is used to categorize and filter events in event-driven systems. Each event can belong to one or
+ * more categories, allowing for efficient event handling and dispatching.
+ *
+ * The supported event categories include application events, input events, keyboard events, mouse events,
+ * and mouse button events. Each category represents a specific aspect of event handling.
+ */
+enum EventCategory
+{
+    None = 0,
+    EventCategoryApplication    = 1 << 0,
+    EventCategoryInput          = 1 << 1,
+    EventCategoryKeyboard       = 1 << 2,
+    EventCategoryMouse          = 1 << 3,
+    EventCategoryMouseButton    = 1 << 4
+};
+
+/**
  * Represents an event on the application.
  *
  * The `Event` class serves as a base class for all types of events that can occur in the application.
@@ -33,12 +53,20 @@ public:
     /// @brief Get the type of the event.
     /// @return An `EventType`.
     virtual EventType GetEventType() const = 0;
+    /// @brief Get the categories of the event.
+    /// @return The`EventCategory` flags.
+    virtual int GetCategoryFlags() const = 0;
     /// @brief Get the name of the event.
     /// @return The event name.
     virtual const char* GetName() const = 0;
     /// @brief Get the description of the event.
     /// @return The event description.
     virtual std::string GetDescription() const { return GetName(); }
+    /// @brief Check if the event is of certain category
+    bool IsInCategory(EventCategory category)
+    {
+        return GetCategoryFlags() & category;
+    }
     
     // Event variables
     // ----------------------------------------
@@ -66,6 +94,9 @@ protected:
     static EventType GetEventTypeStatic() { return EventType::type; }\
     virtual EventType GetEventType() const override { return GetEventTypeStatic(); }\
     virtual const char* GetName() const override { return #type; }
+
+#define EVENT_CLASS_CATEGORY(category)\
+    virtual int GetCategoryFlags() const override { return category; }
 
 /**
  * Represents a dispatcher (of events) inside the application.

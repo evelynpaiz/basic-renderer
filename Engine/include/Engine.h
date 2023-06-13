@@ -11,8 +11,19 @@
 // --------------------------------------------
 #include "Core/Window.h"
 #include "Core/Application.h"
-#include "Core/Layer.h"
-#include "Gui/GuiLayer.h"
+
+// --------------------------------------------
+// Inputs
+// --------------------------------------------
+#include "Input/Input.h"
+#include "Input/KeyCodes.h"
+#include "Input/MouseCodes.h"
+
+// --------------------------------------------
+// Base Layer(s)
+// --------------------------------------------
+#include "Layer/Layer.h"
+#include "Layer/GuiLayer.h"
 
 // --------------------------------------------
 // Renderer

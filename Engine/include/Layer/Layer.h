@@ -36,7 +36,7 @@ public:
     virtual void OnUpdate(float deltaTime) {}
     /// @brief Handle an event that possibly occurred inside the layer.
     /// @param e Event.
-    virtual void OnEvent(Event& event) {}
+    virtual void OnEvent(Event& e) {}
     
     // Getter(s)
     // ----------------------------------------

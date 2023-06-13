@@ -7,9 +7,9 @@
 /**
  * Rendering layer containing a basic 3D viewer.
  *
- * The `ViewerLayer` class is a derived class of the Layer class and represents a rendering layer
+ * The `ViewerLayer` class is a derived class of the `Layer` class and represents a rendering layer
  * specifically designed for a basic 3D viewer. It provides functionality for attaching, detaching, updating,
- * and handling events specific to the viewer layer.
+ * and handling events specific to the layer.
  *
  * Copying or moving `ViewerLayer` objects is disabled to ensure single ownership and prevent
  * unintended layer duplication.
@@ -25,7 +25,7 @@ public:
     // ----------------------------------------
     void OnAttach() override;
     void OnUpdate(float deltaTime) override;
-    void OnEvent(Event& event) override;
+    void OnEvent(Event& e) override;
     
 private:
     // Initialization

@@ -17,6 +17,9 @@ public:
     /// @return The key code.
     int GetKeyCode() const { return m_KeyCode; }
     
+    // Define the different categories of the event
+    EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
+    
 protected:
     // Constructor(s)
     // ----------------------------------------
