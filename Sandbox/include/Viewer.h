@@ -7,19 +7,19 @@
 /**
  * Rendering layer containing a basic 3D viewer.
  *
- * The `ViewerLayer` class is a derived class of the `Layer` class and represents a rendering layer
+ * The `Viewer` class is a derived class of the `Layer` class and represents a rendering layer
  * specifically designed for a basic 3D viewer. It provides functionality for attaching, detaching, updating,
  * and handling events specific to the layer.
  *
- * Copying or moving `ViewerLayer` objects is disabled to ensure single ownership and prevent
+ * Copying or moving `Viewer` objects is disabled to ensure single ownership and prevent
  * unintended layer duplication.
  */
-class ViewerLayer : public Layer
+class Viewer : public Layer
 {
 public:
     // Constructor(s)/Destructor
     // ----------------------------------------
-    ViewerLayer(int width, int height);
+    Viewer(int width, int height);
     
     // Layer handlers
     // ----------------------------------------
@@ -68,9 +68,9 @@ private:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    ViewerLayer(const ViewerLayer&) = delete;
-    ViewerLayer(ViewerLayer&&) = delete;
+    Viewer(const Viewer&) = delete;
+    Viewer(Viewer&&) = delete;
     
-    ViewerLayer& operator=(const ViewerLayer&) = delete;
-    ViewerLayer& operator=(ViewerLayer&&) = delete;
+    Viewer& operator=(const Viewer&) = delete;
+    Viewer& operator=(Viewer&&) = delete;
 };

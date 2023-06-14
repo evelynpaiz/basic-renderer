@@ -12,8 +12,8 @@
 /**
  * Define a GUI layer.
  */
-GuiLayer::GuiLayer()
-    : Layer("GUI Layer")
+GuiLayer::GuiLayer(const std::string& name)
+    : Layer(name)
 {}
 
 /**
@@ -28,10 +28,15 @@ void GuiLayer::OnAttach()
     // Define imgui flags
     ImGuiIO &io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // enable keyboard controls
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // enable docking
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // enable multi-viewport
     
     // Define the current window
     Application &app = Application::Get();
     GLFWwindow *window = static_cast<GLFWwindow *>(app.GetWindow().GetNativeWindow());
+    
+    // Set the style of the graphics interface
+    SetStyle();
     
     // Initialize
     ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -46,20 +51,6 @@ void GuiLayer::OnDetach()
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
-}
-
-/**
- * Render the GUI layer.
- *
- * @param deltaTime Times passed since the last update.
- */
-void GuiLayer::OnUpdate(float deltaTime)
-{
-    Begin();
-    
-    ImGui::ShowDemoWindow();
-    
-    End();
 }
 
 /**
@@ -104,4 +95,30 @@ void GuiLayer::End()
     // Render
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    
+    // Update the context used to rendered
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        GLFWwindow *backupCurrentContext = glfwGetCurrentContext();
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+        glfwMakeContextCurrent(backupCurrentContext);
+    }
+}
+
+/**
+ * Define the style of the GUI.
+ */
+void GuiLayer::SetStyle()
+{
+    ImGuiIO &io = ImGui::GetIO();
+    
+    // When viewports are enabled, tweak window rounding and window background
+    // so platform windows can look identical to regular ones
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        ImGuiStyle &style = ImGui::GetStyle();
+        style.WindowRounding = 0.0f;
+        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+    }
 }

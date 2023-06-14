@@ -1,7 +1,9 @@
 #pragma once
 
 #include "Engine.h"
-#include "ViewerLayer.h"
+
+#include "Viewer.h"
+#include "ViewerGui.h"
 
 /**
  * Handles a 3D viewer application.
@@ -26,8 +28,8 @@ public:
     // ----------------------------------------
 private:
     ///< 3D viewer (rendering layer).
-    std::shared_ptr<ViewerLayer> m_ViewerLayer;
-    std::shared_ptr<GuiLayer> m_GuiLayer;
+    std::shared_ptr<Viewer> m_Viewer;
+    std::shared_ptr<ViewerGui> m_Gui;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

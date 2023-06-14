@@ -19,13 +19,13 @@ class GuiLayer : public Layer
 public:
     // Constructor(s)/Destructor
     // ----------------------------------------
-    GuiLayer();
+    GuiLayer(const std::string& name = "Unidentified GUI Layer");
     
     // Layer handlers
     // ----------------------------------------
     void OnAttach() override;
     void OnDetach() override;
-    void OnUpdate(float deltaTime) override;
+    void OnUpdate(float deltaTime) override {}
     void OnEvent(Event& e) override;
     
     // Layer rendering
@@ -38,6 +38,9 @@ public:
     /// @brief Dispatch the events only to this layer.
     /// @param block Block the dispatching of the events.
     void BlockEvents(bool block) { m_BlockEvents = block; }
+    
+protected:
+    virtual void SetStyle();
     
     // GUI layer variables
     // ----------------------------------------

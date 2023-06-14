@@ -1,18 +1,18 @@
-#include "ViewerLayer.h"
+#include "Viewer.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
 /**
  * Define a layer for a 3D viewer.
  */
-ViewerLayer::ViewerLayer(int width, int height)
+Viewer::Viewer(int width, int height)
     : Layer("Viewer Layer"), m_ViewportWidth(width), m_ViewportHeight(height)
 {}
 
 /**
  * Attach (add) the viewer layer to the rendering engine.
  */
-void ViewerLayer::OnAttach()
+void Viewer::OnAttach()
 {
     // Initialize all the elements of the viewer
     InitializeViewer();
@@ -26,7 +26,7 @@ void ViewerLayer::OnAttach()
  *
  * @param deltaTime Times passed since the last update.
  */
-void ViewerLayer::OnUpdate(float deltaTime)
+void Viewer::OnUpdate(float deltaTime)
 {
     // Render
     m_Shader->Bind();
@@ -45,7 +45,7 @@ void ViewerLayer::OnUpdate(float deltaTime)
  * Handle an event that possibly occurred inside the viewer layer.
  * @param e Event.
  */
-void ViewerLayer::OnEvent(Event &e)
+void Viewer::OnEvent(Event &e)
 {
     // Print the information of the event (DEGUB)
     //CORE_DEBUG("{0}", e);
@@ -54,7 +54,7 @@ void ViewerLayer::OnEvent(Event &e)
 /**
  * Initialize all components inside the viewer layer.
  */
-void ViewerLayer::InitializeViewer()
+void Viewer::InitializeViewer()
 {
     // Define the layout of the data to be defined:
     // position : (x, y)
