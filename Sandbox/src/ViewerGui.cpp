@@ -81,6 +81,4 @@ void ViewerGui::SetStyle()
     style.Colors[ImGuiCol_NavHighlight] = ImVec4(0.78f, 0.35f, 0.60f, 1.00f);         // Navigation highlight color
     style.Colors[ImGuiCol_NavWindowingHighlight] = ImVec4(0.78f, 0.35f, 0.60f, 0.70f);// Navigation window highlight color
     style.Colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);    // Navigation window dim background color
-
-
 }

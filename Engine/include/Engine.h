@@ -35,6 +35,10 @@
 #include "Renderer/Shader.h"
 #include "Renderer/Texture.h"
 
+#include "Material/Material.h"
+
+#include "Renderer/Mesh.h"
+
 #include "Camera/PerspectiveCamera.h"
 
 #include "Renderer/Renderer.h"

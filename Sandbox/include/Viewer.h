@@ -39,31 +39,18 @@ private:
     int m_ViewportWidth = 0;
     int m_ViewportHeight = 0;
     
-    ///< Renderer.
-    Renderer m_Renderer;
     ///< Camera.
     std::shared_ptr<PerspectiveCamera> m_Camera;
     
-    ///< Vertex array.
-    std::shared_ptr<VertexArray> m_VertexArray;
-    ///< Vertex buffer.
-    std::shared_ptr<VertexBuffer> m_VertexBuffer;
-    ///< Index buffer.
-    std::shared_ptr<IndexBuffer> m_IndexBuffer;
-    
-    ///< Layout of the data.
-    BufferLayout m_Layout;
-    
-    ///< Shader.
-    std::shared_ptr<Shader> m_Shader;
-    
-    ///< Texture.
+    ///< Plane geometry.
+    Mesh m_PlaneMesh;
+    ///< Texture for the plane.
     std::shared_ptr<Texture> m_Texture;
+    ///< Plane material.
+    std::shared_ptr<BasicMaterial> m_Material;
     
-    ///< Transformation matrices.
+    ///< Transformation matrix.
     glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
-    glm::mat4 m_ViewMatrix = glm::mat4(1.0f);
-    glm::mat4 m_ProjMatrix = glm::mat4(1.0f);
     
     // Disable the copying or moving of this resource
     // ----------------------------------------
