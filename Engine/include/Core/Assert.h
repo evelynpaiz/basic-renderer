@@ -9,7 +9,7 @@
         #define DEBUGBREAK() __debugbreak()
     // Apple support
     #elif defined(__APPLE__)
-        #define DEBUGBREAK() __asm__("int $3")
+        #define DEBUGBREAK() __builtin_debugtrap()
     // Linux support
     #elif defined(__linux__)
         #include <signal.h>
