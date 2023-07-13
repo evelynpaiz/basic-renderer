@@ -46,8 +46,8 @@ void Viewer::OnUpdate(float deltaTime)
  */
 void Viewer::OnEvent(Event &e)
 {
-    // Print the information of the event (DEGUB)
-    //CORE_DEBUG("{0}", e);
+    // Handle the events on the camera
+    m_Camera->OnEvent(e);
 }
 
 /**

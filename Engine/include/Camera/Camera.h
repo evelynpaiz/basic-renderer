@@ -2,6 +2,10 @@
 
 #include <glm/glm.hpp>
 
+#include "Event/Event.h"
+
+
+
 /**
  * Represents a camera that captures the scene and displays it in a viewport.
  *
@@ -19,6 +23,18 @@ public:
     // ----------------------------------------
     /// @brief Delete the camera.
     virtual ~Camera() = default;
+    
+    // Rendering
+    // ----------------------------------------
+    /// @brief Update the camera information in the current frame.
+    /// @param ts Timestep.
+    virtual void OnUpdate(const float ts) {}
+    
+    // Event handler
+    // ----------------------------------------
+    /// @brief Handle an event on the application related to the camera.
+    /// @param e Event.
+    virtual void OnEvent(Event &e) {}
     
     // Getter(s)
     // ----------------------------------------

@@ -7,9 +7,6 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-/// Binding event function definition
-#define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
-
 // Define static variables
 Application* Application::s_Instance = nullptr;
 

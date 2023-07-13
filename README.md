@@ -16,7 +16,7 @@ and access the directory of the cloned repository `basic-renderer/`.
 
 To clone the necessary submodules, if the repository was cloned non-recursively, use:
 ```
-git submodule update --init
+git submodule update --recursive --init
 ```
 
 <ins>**2. Build the project solution:**</ins>

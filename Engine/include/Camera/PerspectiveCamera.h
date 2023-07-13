@@ -4,6 +4,8 @@
 
 #include "Camera/Camera.h"
 
+class MouseScrolledEvent;
+
 /**
  * Represents a perspective camera that captures the scene and displays it in a viewport.
  *
@@ -23,18 +25,22 @@ public:
     PerspectiveCamera(const int width, const int height, const float fov = 45.0f,
                       const float near = 0.1f, const float far = 100.0f);
     
-    // Update
+    // Rendering
     // ----------------------------------------
-    void OnUpdate(const float ts) const;
+    void OnUpdate(const float ts) override;
+    
+    // Event handler
+    // ----------------------------------------
+    void OnEvent(Event &e) override;
     
     // Getter(s)
     // ----------------------------------------
-    /// @brief Get the camera rotation angle in the y-axis.
-    /// @return Yaw angle (degrees).
-    float GetYaw() const { return m_Rotation.x; }
     /// @brief Get the camera rotation angle in the x-axis.
     /// @return Pitch angle (degrees).
-    float GetPitch() const { return m_Rotation.y; }
+    float GetPitch() const { return m_Rotation.x; }
+    /// @brief Get the camera rotation angle in the y-axis.
+    /// @return Yaw angle (degrees).
+    float GetYaw() const { return m_Rotation.y; }
     /// @brief Get the camera rotation angle in the z-axis.
     /// @return Roll angle (degrees).
     float GetRoll() const { return m_Rotation.z; }
@@ -47,18 +53,18 @@ public:
     
     // Setter(s)
     // ----------------------------------------
-    /// @brief Change the camera rotation in the y-axis.
-    /// @param yaw The camera rotation angle.
-    void SetYaw(const float yaw)
-    {
-        m_Rotation.x = yaw;
-        UpdateViewMatrix();
-    }
     /// @brief Change the camera rotation in the x-axis.
     /// @param pitch The camera rotation angle.
     void SetPitch(const float pitch)
     {
-        m_Rotation.y = pitch;
+        m_Rotation.x = pitch;
+        UpdateViewMatrix();
+    }
+    /// @brief Change the camera rotation in the y-axis.
+    /// @param yaw The camera rotation angle.
+    void SetYaw(const float yaw)
+    {
+        m_Rotation.y = yaw;
         UpdateViewMatrix();
     }
     /// @brief Change the camera rotation in the z-axis.
@@ -83,18 +89,47 @@ public:
         UpdateViewMatrix();
     }
     
+    /// @brief Update the zooming in/out scaling factor.
+    /// @param v Scaling factor value.
+    void SetZoomFactor(const float v) { m_ZoomFactor = v; }
+    /// @brief Update the camera translation scaling factor.
+    /// @param v Scaling factor value.
+    void SetTranslateFactor(const float v) { m_TranslationFactor = v; }
+    /// @brief Update the camera rotation scaling factor.
+    /// @param v Scaling factor value.
+    void SetRotateFactor(const float v) { m_RotationFactor = v; }
+    /// @brief Update the camera oribitin scaling factor.
+    /// @param v Scaling factor value.
+    void SetOrbitFactor(const float v) { m_ZoomFactor = v; }
+    
 protected:
     // Transformation matrices
     // ----------------------------------------
     void UpdateViewMatrix() override;
     void UpdateProjectionMatrix() override;
     
-    // Calculations
+    // Getter(s)
     // ----------------------------------------
     glm::quat GetOrientation() const;
     glm::vec3 GetUpDirection() const;
     glm::vec3 GetRightDirection() const;
     glm::vec3 GetFowardDirection() const;
+    
+    glm::vec3 CalculateDistance(const glm::vec3& p1, const glm::vec3& p2,
+                                const glm::vec3& direction) const;
+    float CalculatePitch() const;
+    float CalculateYaw() const;
+    
+    // Camera movements
+    // ----------------------------------------
+    virtual void Zoom(const float delta);
+    virtual void Translate(const glm::vec3 &delta);
+    virtual void Rotate(const glm::vec2 &delta);
+    virtual void Orbit(const glm::vec2 &delta);
+    
+    // Event handler
+    // ----------------------------------------
+    bool OnMouseScroll(MouseScrolledEvent &e);
     
     // Perspective camera variables
     // ----------------------------------------
@@ -104,8 +139,12 @@ protected:
     
     ///< Camera viewing target (x, y, z).
     glm::vec3 m_Target = glm::vec3(0.0f);
-    ///< World up axis (default: y-axis).
-    glm::vec3 m_WorldUp = { 0.0f, 1.0f, 0.0f };
+    
+    ///< Camera movement scaling factors.
+    float m_ZoomFactor = 0.25f;
+    float m_TranslationFactor = 1.0f;
+    float m_RotationFactor = 5.0f;
+    float m_OrbitFactor = 12.0f;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------
