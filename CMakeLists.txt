@@ -18,6 +18,12 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 find_package(OpenGL REQUIRED)
 include(Dependencies.cmake)
 
+# Define options for the user
+option(RENDERER_BUILD_EXAMPLES "Build the sandbox (example) executable" ON)
+
 # Own libraries and executables
 add_subdirectory(Engine)
-add_subdirectory(Sandbox)
+
+if (RENDERER_BUILD_EXAMPLES)
+    add_subdirectory(Sandbox)
+endif()
