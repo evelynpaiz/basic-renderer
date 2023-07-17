@@ -33,7 +33,7 @@ set_target_properties(Engine PROPERTIES
 )
 
 # Link external libraries
-target_link_libraries(Engine spdlog::spdlog OpenGL::GL glfw::glfw glew::glew glm::glm stb::stb imgui::imgui)
+target_link_libraries(Engine spdlog::spdlog OpenGL::GL glfw::glfw glew::glew glm::glm stb::stb assimp::assimp imgui::imgui)
 
 # Define pre-compiled header
 target_precompile_headers(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/enginepch.h)

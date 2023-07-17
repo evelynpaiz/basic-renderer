@@ -1,7 +1,5 @@
 #pragma once
 
-#include <glm/glm.hpp>
-
 #include "Renderer/VertexArray.h"
 #include "Renderer/VertexBuffer.h"
 #include "Renderer/IndexBuffer.h"
@@ -9,6 +7,8 @@
 #include "Renderer/Material.h"
 
 #include "Renderer/Renderer.h"
+
+#include <glm/glm.hpp>
 
 /**
  * Represents a mesh used for rendering geometry.
