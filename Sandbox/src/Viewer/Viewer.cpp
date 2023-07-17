@@ -32,7 +32,9 @@ void Viewer::OnUpdate(float deltaTime)
 
     // Render
     Renderer::Clear(glm::vec4(0.93f, 0.93f, 0.93f, 1.0f));
-    m_PlaneMesh.DrawMesh(m_ModelMatrix);
+    
+    //m_PlaneMesh.DrawMesh(m_ModelMatrix);
+    m_SphereModel.DrawModel(m_ModelMatrix);
     
     // Update the camera
     m_Camera->OnUpdate(deltaTime);
@@ -56,7 +58,8 @@ void Viewer::OnEvent(Event &e)
 void Viewer::InitializeViewer()
 {
     // Define the texture(s)
-    m_Texture = std::make_shared<Texture>("resources/textures/container.jpg");
+    //m_Texture = std::make_shared<Texture>("resources/textures/container.jpg");
+    m_Texture = std::make_shared<Texture>("resources/models/planet/planet_Quom1200.png");
     
     // Define the material to be used for shading
     m_Material = std::make_shared<BasicMaterial>();
@@ -65,7 +68,7 @@ void Viewer::InitializeViewer()
     
     // Define the rendering camera
     m_Camera = std::make_shared<PerspectiveCamera>(m_ViewportWidth, m_ViewportHeight);
-    m_Camera->SetPosition(glm::vec3(0.0f, 0.0f, 3.0f));
+    m_Camera->SetPosition(glm::vec3(0.0f, 0.0f, 10.0f));
     
     // Define the model matrix for the geometry
     m_ModelMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(-45.0f),
@@ -93,4 +96,8 @@ void Viewer::InitializeViewer()
     // Set the data into the mesh
     m_PlaneMesh.DefineMesh(vertices, indices, layout);
     m_PlaneMesh.SetMaterial(m_Material);
+    
+    // Load the model
+    m_SphereModel.LoadModel("resources/models/planet/planet.obj");
+    m_SphereModel.SetMaterial(m_Material);
 }

@@ -38,6 +38,8 @@
 #include "Renderer/Material.h"
 
 #include "Renderer/Mesh.h"
+#include "Renderer/Model.h"
+#include "Renderer/AssimpModel.h"
 
 #include "Camera/PerspectiveCamera.h"
 

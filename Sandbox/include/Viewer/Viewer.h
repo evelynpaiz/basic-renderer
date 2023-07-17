@@ -53,12 +53,15 @@ private:
     ///< Camera.
     std::shared_ptr<PerspectiveCamera> m_Camera;
     
-    ///< Plane geometry.
-    Mesh<VertexData> m_PlaneMesh;
     ///< Texture for the plane.
     std::shared_ptr<Texture> m_Texture;
     ///< Plane material.
     std::shared_ptr<BasicMaterial> m_Material;
+    
+    ///< Plane geometry.
+    Mesh<VertexData> m_PlaneMesh;
+    ///< Model.
+    AssimpModel m_SphereModel;
     
     ///< Transformation matrix.
     glm::mat4 m_ModelMatrix = glm::mat4(1.0f);

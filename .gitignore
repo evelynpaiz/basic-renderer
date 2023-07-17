@@ -1,6 +1,9 @@
+# OSX
+.DS_Store
+
 # Project solution
 VisualStudio/
 XCode/
 
-# OSX
-.DS_Store
+# Project resources
+resources/models/

@@ -17,6 +17,8 @@
  * It encapsulates the necessary information, such as vertex positions, texture coordinates, normals,
  * etc., required to render a mesh. The class supports operations such as loading mesh data, binding
  * vertex buffers, and rendering the mesh.
+ *
+ * @tparam VertexData The type of vertex data used by the mesh.
  */
 template<typename VertexData>
 class Mesh
@@ -28,9 +30,12 @@ public:
     Mesh(const std::vector<VertexData> &vertices,
          const std::vector<unsigned int> &indices,
          const BufferLayout &layout);
+    
     /// @brief Delete the mesh.
     ~Mesh() = default;
     
+    // Mesh definition
+    // ----------------------------------------
     void DefineMesh(const std::vector<VertexData> &vertices,
                     const std::vector<unsigned int> &indices,
                     const BufferLayout &layout);
@@ -81,6 +86,7 @@ Mesh<VertexData>::Mesh()
  *
  * @param vertices The vertex data of the mesh.
  * @param indices The index data of the mesh.
+ * @param layout The layout of the vertex data in the buffer.
  */
 template<typename VertexData>
 Mesh<VertexData>::Mesh(const std::vector<VertexData> &vertices,
@@ -96,6 +102,7 @@ Mesh<VertexData>::Mesh(const std::vector<VertexData> &vertices,
  *
  * @param vertices The vertex data of the mesh.
  * @param indices The index data of the mesh.
+ * @param layout The layout of the vertex data in the buffer.
  */
 template<typename VertexData>
 void Mesh<VertexData>::DefineMesh(const std::vector<VertexData> &vertices,
@@ -107,10 +114,10 @@ void Mesh<VertexData>::DefineMesh(const std::vector<VertexData> &vertices,
     
     // Copy the vertex data in the buffer and define its layout
     m_VertexBuffer = std::make_shared<VertexBuffer>(vertices.data(),
-        sizeof(vertices) * sizeof(VertexData));
+        vertices.size() * sizeof(VertexData));
     m_VertexBuffer->SetLayout(layout);
     // Copy the index data in the buffer
-    m_IndexBuffer = std::make_shared<IndexBuffer>(indices.data(), sizeof(indices));
+    m_IndexBuffer = std::make_shared<IndexBuffer>(indices.data(), indices.size());
     
     // Add the buffers information to the vertex array
     m_VertexArray->AddVertexBuffer(m_VertexBuffer);
