@@ -3,7 +3,7 @@
 #endif
 
 #include "Engine.h"
-#include "ViewerApp.h"
+#include "Viewer/ViewerApp.h"
 
 /**
  * Entry point of the application.

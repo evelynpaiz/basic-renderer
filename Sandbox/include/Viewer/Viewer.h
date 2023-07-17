@@ -2,7 +2,18 @@
 
 #include "Engine.h"
 
+#include "Material/BasicMaterial.h"
+
 #include <glm/glm.hpp>
+
+/**
+ * Represents the different data that a vertex may contain.
+ */
+struct VertexData
+{
+    glm::vec4 position;         ///< Vertex position.
+    glm::vec2 uv;               ///< Texture coordinate.
+};
 
 /**
  * Rendering layer containing a basic 3D viewer.
@@ -43,7 +54,7 @@ private:
     std::shared_ptr<PerspectiveCamera> m_Camera;
     
     ///< Plane geometry.
-    Mesh m_PlaneMesh;
+    Mesh<VertexData> m_PlaneMesh;
     ///< Texture for the plane.
     std::shared_ptr<Texture> m_Texture;
     ///< Plane material.

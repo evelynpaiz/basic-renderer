@@ -35,7 +35,7 @@
 #include "Renderer/Shader.h"
 #include "Renderer/Texture.h"
 
-#include "Material/Material.h"
+#include "Renderer/Material.h"
 
 #include "Renderer/Mesh.h"
 

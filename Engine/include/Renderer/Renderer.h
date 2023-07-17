@@ -5,7 +5,7 @@
 #include "Renderer/VertexArray.h"
 #include "Renderer/IndexBuffer.h"
 
-#include "Material/Material.h"
+#include "Renderer/Material.h"
 
 #include "Camera/Camera.h"
 

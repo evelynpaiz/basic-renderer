@@ -1,4 +1,4 @@
-#include "Viewer.h"
+#include "Viewer/Viewer.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -84,7 +84,13 @@ void Viewer::InitializeViewer()
         2, 3, 0         // second triangle
     };
     
+    // Define how the data is defined
+    BufferLayout layout = {
+        { "a_Position", DataType::Vec4 },
+        { "a_TextureCoord", DataType::Vec2 }
+    };
+    
     // Set the data into the mesh
-    m_PlaneMesh.DefineMesh(vertices, indices);
+    m_PlaneMesh.DefineMesh(vertices, indices, layout);
     m_PlaneMesh.SetMaterial(m_Material);
 }

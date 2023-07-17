@@ -6,16 +6,9 @@
 #include "Renderer/VertexBuffer.h"
 #include "Renderer/IndexBuffer.h"
 
-#include "Material/Material.h"
+#include "Renderer/Material.h"
 
-/**
- * Represents the different data that a vertex may contain.
- */
-struct VertexData
-{
-    glm::vec4 position;         ///< Vertex position.
-    glm::vec2 uv;               ///< Texture coordinate.
-};
+#include "Renderer/Renderer.h"
 
 /**
  * Represents a mesh used for rendering geometry.
@@ -25,6 +18,7 @@ struct VertexData
  * etc., required to render a mesh. The class supports operations such as loading mesh data, binding
  * vertex buffers, and rendering the mesh.
  */
+template<typename VertexData>
 class Mesh
 {
 public:
@@ -32,12 +26,14 @@ public:
     // ----------------------------------------
     Mesh();
     Mesh(const std::vector<VertexData> &vertices,
-         const std::vector<unsigned int> &indices);
+         const std::vector<unsigned int> &indices,
+         const BufferLayout &layout);
     /// @brief Delete the mesh.
     ~Mesh() = default;
     
     void DefineMesh(const std::vector<VertexData> &vertices,
-               const std::vector<unsigned int> &indices);
+                    const std::vector<unsigned int> &indices,
+                    const BufferLayout &layout);
     
     // Setter(s)
     // ----------------------------------------
@@ -70,3 +66,76 @@ private:
     ///< Mesh material
     std::shared_ptr<Material> m_Material;
 };
+
+/**
+ * Generate an empty mesh.
+ */
+template<typename VertexData>
+Mesh<VertexData>::Mesh()
+{
+    m_VertexArray = std::make_shared<VertexArray>();
+}
+
+/**
+ * Generate a mesh from a set of vertices and incides defined.
+ *
+ * @param vertices The vertex data of the mesh.
+ * @param indices The index data of the mesh.
+ */
+template<typename VertexData>
+Mesh<VertexData>::Mesh(const std::vector<VertexData> &vertices,
+     const std::vector<unsigned int> &indices, const BufferLayout &layout)
+    : Mesh()
+{
+    // Define the mesh information into corresponding buffers
+    DefineMesh(vertices, indices, layout);
+}
+
+/**
+ * @brief Define the mesh using the provided vertex and index data.
+ *
+ * @param vertices The vertex data of the mesh.
+ * @param indices The index data of the mesh.
+ */
+template<typename VertexData>
+void Mesh<VertexData>::DefineMesh(const std::vector<VertexData> &vertices,
+                 const std::vector<unsigned int> &indices, const BufferLayout &layout)
+{
+    // Save the vertex and index information of the mesh
+    m_Vertices = vertices;
+    m_Indices = indices;
+    
+    // Copy the vertex data in the buffer and define its layout
+    m_VertexBuffer = std::make_shared<VertexBuffer>(vertices.data(),
+        sizeof(vertices) * sizeof(VertexData));
+    m_VertexBuffer->SetLayout(layout);
+    // Copy the index data in the buffer
+    m_IndexBuffer = std::make_shared<IndexBuffer>(indices.data(), sizeof(indices));
+    
+    // Add the buffers information to the vertex array
+    m_VertexArray->AddVertexBuffer(m_VertexBuffer);
+    m_VertexArray->SetIndexBuffer(m_IndexBuffer);
+}
+
+/**
+ * Render the mesh.
+ *
+ * @param transform Transformation matrix of the geometry.
+ */
+template<typename VertexData>
+void Mesh<VertexData>::DrawMesh(const glm::mat4& transform)
+{
+    bool init = m_VertexBuffer && m_IndexBuffer;
+    
+    // Verify that the vertex information has been set for the mesh
+    if (!init)
+    {
+        CORE_WARN("Mesh vertex information has not been defined!");
+        return;
+    }
+    
+    if (m_Material)
+        Renderer::Draw(m_VertexArray, m_Material, transform);
+    else
+        Renderer::Draw(m_VertexArray);
+}

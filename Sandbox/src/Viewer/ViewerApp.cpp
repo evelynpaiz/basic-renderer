@@ -1,4 +1,4 @@
-#include "ViewerApp.h"
+#include "Viewer/ViewerApp.h"
 
 /**
  * Generate a (sandbox) rendering application.
