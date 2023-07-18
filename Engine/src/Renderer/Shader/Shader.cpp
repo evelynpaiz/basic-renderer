@@ -1,5 +1,5 @@
 #include "enginepch.h"
-#include "Renderer/Shader.h"
+#include "Renderer/Shader/Shader.h"
 
 #include <GL/glew.h>
 

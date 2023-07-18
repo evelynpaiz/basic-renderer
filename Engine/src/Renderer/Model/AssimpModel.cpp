@@ -1,5 +1,5 @@
 #include "enginepch.h"
-#include "Renderer/AssimpModel.h"
+#include "Renderer/Model/AssimpModel.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -38,6 +38,9 @@ void AssimpModel::LoadModel(const std::filesystem::path &filePath)
     // Process ASSIMP's root node recursively
     ProcessNode(scene->mRootNode, scene);
     importer.FreeScene();
+    
+    // Update the model matrix for the model
+    this->UpdateModelMatrix();
 }
 
 /**
@@ -111,8 +114,10 @@ Mesh<AssimpVertexData> AssimpModel::ProcessMesh(aiMesh *mesh)
             vertex.normal.y = mesh->mNormals[i].y;
             vertex.normal.z = mesh->mNormals[i].z;
         }
-
+        // Define the vertex of the model
         vertices.push_back(vertex);
+        // Update its bounding box
+        this->UpdateBBoxWithVertex(vertex.position);
     }
     
     // Process indices

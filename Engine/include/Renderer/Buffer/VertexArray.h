@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Renderer/VertexBuffer.h"
-#include "Renderer/IndexBuffer.h"
-#include "Renderer/BufferLayout.h"
+#include "Renderer/Buffer/VertexBuffer.h"
+#include "Renderer/Buffer/IndexBuffer.h"
+#include "Renderer/Buffer/BufferLayout.h"
 
 /**
  * Represents a vertex array that describes how vertex attributes are stored in vertex buffer(s).

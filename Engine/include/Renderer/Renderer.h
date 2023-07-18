@@ -2,10 +2,10 @@
 
 #include <glm/glm.hpp>
 
-#include "Renderer/VertexArray.h"
-#include "Renderer/IndexBuffer.h"
+#include "Renderer/Buffer/VertexArray.h"
+#include "Renderer/Buffer/IndexBuffer.h"
 
-#include "Renderer/Material.h"
+#include "Renderer/Material/Material.h"
 
 #include "Camera/Camera.h"
 

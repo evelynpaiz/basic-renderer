@@ -34,7 +34,7 @@ void Viewer::OnUpdate(float deltaTime)
     Renderer::Clear(glm::vec4(0.93f, 0.93f, 0.93f, 1.0f));
     
     //m_PlaneMesh.DrawMesh(m_ModelMatrix);
-    m_SphereModel.DrawModel(m_ModelMatrix);
+    m_SphereModel.DrawModel();
     
     // Update the camera
     m_Camera->OnUpdate(deltaTime);

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Renderer/VertexArray.h"
-#include "Renderer/VertexBuffer.h"
-#include "Renderer/IndexBuffer.h"
+#include "Renderer/Buffer/VertexArray.h"
+#include "Renderer/Buffer/VertexBuffer.h"
+#include "Renderer/Buffer/IndexBuffer.h"
 
-#include "Renderer/Material.h"
+#include "Renderer/Material/Material.h"
 
 #include "Renderer/Renderer.h"
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Renderer/BufferLayout.h"
+#include "Renderer/Buffer/BufferLayout.h"
 
 /**
  * Represents a vertex buffer for storing vertex data.

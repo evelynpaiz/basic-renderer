@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include "Camera/Camera.h"
+#include "Renderer/Camera/Camera.h"
 
 class MouseScrolledEvent;
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Renderer/Shader.h"
-#include "Renderer/Texture.h"
+#include "Renderer/Shader/Shader.h"
+#include "Renderer/Texture/Texture.h"
 
 /**
  * Base class representing a material used for rendering.

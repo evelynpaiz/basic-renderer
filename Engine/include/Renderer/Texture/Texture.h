@@ -21,6 +21,18 @@ public:
     // ----------------------------------------
     void Bind(unsigned int slot = 0) const;
     void Unbind() const;
+    
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Get the file path of the texture.
+    /// @return The path to the file.
+    std::filesystem::path GetPath() const { return m_FilePath; }
+    /// @brief Get the name of the loaded texture (file name).
+    /// @return The texture name.
+    std::string GetName() { return m_FilePath.filename().string(); }
+    /// @brief Get the directory where the texture file is located.
+    /// @return The directory of the texture.
+    std::string GetDirectory() { return m_FilePath.parent_path().string(); }
         
 private:
     // Loading

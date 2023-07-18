@@ -28,19 +28,19 @@
 // --------------------------------------------
 // Renderer
 // --------------------------------------------
-#include "Renderer/VertexBuffer.h"
-#include "Renderer/IndexBuffer.h"
-#include "Renderer/VertexArray.h"
+#include "Renderer/Buffer/VertexBuffer.h"
+#include "Renderer/Buffer/IndexBuffer.h"
+#include "Renderer/Buffer/VertexArray.h"
 
-#include "Renderer/Shader.h"
-#include "Renderer/Texture.h"
+#include "Renderer/Shader/Shader.h"
+#include "Renderer/Texture/Texture.h"
 
-#include "Renderer/Material.h"
+#include "Renderer/Material/Material.h"
 
-#include "Renderer/Mesh.h"
-#include "Renderer/Model.h"
-#include "Renderer/AssimpModel.h"
+#include "Renderer/Mesh/Mesh.h"
+#include "Renderer/Model/Model.h"
+#include "Renderer/Model/AssimpModel.h"
 
-#include "Camera/PerspectiveCamera.h"
+#include "Renderer/Camera/PerspectiveCamera.h"
 
 #include "Renderer/Renderer.h"
