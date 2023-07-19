@@ -38,7 +38,7 @@ PerspectiveCamera::PerspectiveCamera(const int width, const int height,
 void PerspectiveCamera::OnUpdate(const float ts)
 {
     // Translation of the camera
-    glm::vec3 distance;
+    glm::vec3 distance = glm::vec3(0.0f);
     
     if(Input::IsKeyPressed(Key::Q))     // up
         distance.y = ts * m_TranslationFactor;

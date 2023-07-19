@@ -1,5 +1,7 @@
 #pragma once
 
+#include <GL/glew.h>
+
 #include <glm/glm.hpp>
 
 #include "Renderer/Buffer/VertexArray.h"
@@ -8,6 +10,39 @@
 #include "Renderer/Material/Material.h"
 
 #include "Camera/Camera.h"
+
+/**
+ * Enumeration representing different types of primitives for rendering.
+ */
+enum class PrimitiveType
+{
+    Points,         ///< Points, each vertex represents a point.
+    Lines,          ///< Lines, each pair of vertices forms a line segment.
+    LineStrip,      ///< Line strip, consecutive vertices form connected lines.
+    Triangles,      ///< Triangles, each group of three vertices forms a triangle.
+    TriangleStrip   ///< Triangle strip, consecutive vertices form connected triangles.
+};
+
+/**
+ * Convert a PrimitiveType value to the corresponding OpenGL primitive type.
+ *
+ * @param type The PrimitiveType value to be converted.
+ * @return The corresponding OpenGL primitive type as a GLenum.
+ */
+inline GLenum PrimitiveTypeToOpenGLType(PrimitiveType type)
+{
+    switch (type)
+    {
+        case PrimitiveType::Points: return GL_POINTS;
+        case PrimitiveType::Lines: return GL_LINES;
+        case PrimitiveType::LineStrip: return GL_LINE_STRIP;
+        case PrimitiveType::Triangles: return GL_TRIANGLES;
+        case PrimitiveType::TriangleStrip: return GL_TRIANGLE_STRIP;
+    }
+
+    CORE_ASSERT(false, "Unknown primitive type!");
+    return 0;
+}
 
 /**
  * Represents the current information of the rendered scene (useful for the shading process).
@@ -37,10 +72,14 @@ public:
     // ----------------------------------------
     static void Clear();
     static void Clear(const glm::vec4& color);
-    static void Draw(const std::shared_ptr<VertexArray>& vao);
+    static void Draw(const std::shared_ptr<VertexArray>& vao,
+                     const PrimitiveType &primitive = PrimitiveType::Triangles,
+                     bool useIndexBuffer = true);
     static void Draw(const std::shared_ptr<VertexArray>& vao,
               const std::shared_ptr<Material>& material,
-              const glm::mat4& transform = glm::mat4(1.0f));
+              const glm::mat4 &transform = glm::mat4(1.0f),
+              const PrimitiveType &primitive = PrimitiveType::Triangles,
+              bool useIndexBuffer = true);
     
     // Getter(s)
     // ----------------------------------------

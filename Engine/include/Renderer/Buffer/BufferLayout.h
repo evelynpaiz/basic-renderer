@@ -73,6 +73,8 @@ inline unsigned int GetSizeOfType(DataType type)
  * @param type Data type.
  *
  * @return OpenGL data type.
+ *
+ * @note If the input DataType value is not recognized, the function will assert with an error.
  */
 inline GLenum DataTypeToOpenGLType(DataType type)
 {

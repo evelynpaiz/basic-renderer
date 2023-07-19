@@ -59,9 +59,9 @@ private:
     std::shared_ptr<BasicMaterial> m_Material;
     
     ///< Plane geometry.
-    Mesh<VertexData> m_PlaneMesh;
+    Mesh<VertexData> m_Mesh;
     ///< Model.
-    AssimpModel m_SphereModel;
+    AssimpModel m_Model;
     
     ///< Transformation matrix.
     glm::mat4 m_ModelMatrix = glm::mat4(1.0f);

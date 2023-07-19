@@ -9,7 +9,9 @@
  * @param vertices Vertices to be rendered.
  * @param size Size of vertices in bytes.
  */
-VertexBuffer::VertexBuffer(const void *vertices, const unsigned int size)
+VertexBuffer::VertexBuffer(const void *vertices, const unsigned int size,
+                           const unsigned int count)
+    : m_Count(count)
 {
     glGenBuffers(1, &m_ID);
     glBindBuffer(GL_ARRAY_BUFFER, m_ID);

@@ -36,9 +36,20 @@ public:
     
     // Mesh definition
     // ----------------------------------------
-    void DefineMesh(const std::vector<VertexData> &vertices,
-                    const std::vector<unsigned int> &indices,
-                    const BufferLayout &layout);
+    void DefineVertices(const std::vector<VertexData> &vertices, const BufferLayout &layout,
+                        const std::vector<unsigned int>& segments = {});
+    void DefineIndices(const std::vector<unsigned int> &indices);
+    
+    /// @brief Define the mesh using the provided vertex and index data.
+    /// @param vertices The vertex data of the mesh.
+    /// @param indices The index data of the mesh.
+    /// @param layout The layout of the vertex data in the buffer.
+    void DefineMesh(const std::vector<VertexData> &vertices, const std::vector<unsigned int> &indices,
+                    const BufferLayout &layout, const std::vector<unsigned int> &segments = {})
+    {
+        DefineVertices(vertices, layout);
+        DefineIndices(indices);
+    }
     
     // Setter(s)
     // ----------------------------------------
@@ -51,13 +62,14 @@ public:
     
     // Render
     // ----------------------------------------
-    void DrawMesh(const glm::mat4& transform = glm::mat4(1.0f));
+    void DrawMesh(const glm::mat4& transform = glm::mat4(1.0f),
+                  const PrimitiveType &primitive = PrimitiveType::Triangles);
     
     // Mesh variables
     // ----------------------------------------
 private:
     ///< Vertex data of the mesh.
-    std::vector<VertexData> m_Vertices;
+    std::vector<std::vector<VertexData>> m_Vertices;
     ///< Index data of the mesh.
     std::vector<unsigned int> m_Indices;
     
@@ -98,29 +110,43 @@ Mesh<VertexData>::Mesh(const std::vector<VertexData> &vertices,
 }
 
 /**
- * @brief Define the mesh using the provided vertex and index data.
+ * Define vertices that define the mesh.
  *
  * @param vertices The vertex data of the mesh.
- * @param indices The index data of the mesh.
  * @param layout The layout of the vertex data in the buffer.
  */
 template<typename VertexData>
-void Mesh<VertexData>::DefineMesh(const std::vector<VertexData> &vertices,
-                 const std::vector<unsigned int> &indices, const BufferLayout &layout)
+void Mesh<VertexData>::DefineVertices(const std::vector<VertexData> &vertices,
+                    const BufferLayout &layout, const std::vector<unsigned int> &segments)
 {
-    // Save the vertex and index information of the mesh
-    m_Vertices = vertices;
-    m_Indices = indices;
+    // Save the vertex information of the mesh
+    m_Vertices.push_back(vertices);
     
     // Copy the vertex data in the buffer and define its layout
     m_VertexBuffer = std::make_shared<VertexBuffer>(vertices.data(),
-        vertices.size() * sizeof(VertexData));
+        vertices.size() * sizeof(VertexData), vertices.size());
     m_VertexBuffer->SetLayout(layout);
+    m_VertexBuffer->SetSegments(segments);
+    
+    // Add the buffer information to the vertex array
+    m_VertexArray->AddVertexBuffer(m_VertexBuffer);
+}
+
+/**
+ * Define the indices that the mesh should use when it is drawed.
+ *
+ * @param indices The index data of the mesh.
+ */
+template<typename VertexData>
+void Mesh<VertexData>::DefineIndices(const std::vector<unsigned int> &indices)
+{
+    // Save the index information of the mesh
+    m_Indices = indices;
+    
     // Copy the index data in the buffer
     m_IndexBuffer = std::make_shared<IndexBuffer>(indices.data(), indices.size());
     
-    // Add the buffers information to the vertex array
-    m_VertexArray->AddVertexBuffer(m_VertexBuffer);
+    // Add the buffer information to the vertex array
     m_VertexArray->SetIndexBuffer(m_IndexBuffer);
 }
 
@@ -128,21 +154,22 @@ void Mesh<VertexData>::DefineMesh(const std::vector<VertexData> &vertices,
  * Render the mesh.
  *
  * @param transform Transformation matrix of the geometry.
+ * @param primitive The type of primitive to be drawn (e.g., Points, Lines, Triangles).
  */
 template<typename VertexData>
-void Mesh<VertexData>::DrawMesh(const glm::mat4& transform)
+void Mesh<VertexData>::DrawMesh(const glm::mat4 &transform,
+                                const PrimitiveType &primitive)
 {
-    bool init = m_VertexBuffer && m_IndexBuffer;
-    
     // Verify that the vertex information has been set for the mesh
-    if (!init)
+    if (!m_VertexBuffer)
     {
         CORE_WARN("Mesh vertex information has not been defined!");
         return;
     }
     
     if (m_Material)
-        Renderer::Draw(m_VertexArray, m_Material, transform);
+        Renderer::Draw(m_VertexArray, m_Material, transform, primitive,
+                       m_IndexBuffer ? true : false);
     else
-        Renderer::Draw(m_VertexArray);
+        Renderer::Draw(m_VertexArray, primitive, m_IndexBuffer ? true : false);
 }

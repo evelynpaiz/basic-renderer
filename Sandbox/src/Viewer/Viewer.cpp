@@ -33,8 +33,7 @@ void Viewer::OnUpdate(float deltaTime)
     // Render
     Renderer::Clear(glm::vec4(0.93f, 0.93f, 0.93f, 1.0f));
     
-    //m_PlaneMesh.DrawMesh(m_ModelMatrix);
-    m_SphereModel.DrawModel();
+    m_Model.DrawModel();
     
     // Update the camera
     m_Camera->OnUpdate(deltaTime);
@@ -58,8 +57,7 @@ void Viewer::OnEvent(Event &e)
 void Viewer::InitializeViewer()
 {
     // Define the texture(s)
-    //m_Texture = std::make_shared<Texture>("resources/textures/container.jpg");
-    m_Texture = std::make_shared<Texture>("resources/models/planet/planet_Quom1200.png");
+    m_Texture = std::make_shared<Texture>("resources/models/backpack/diffuse.jpg", false);
     
     // Define the material to be used for shading
     m_Material = std::make_shared<BasicMaterial>();
@@ -79,7 +77,7 @@ void Viewer::InitializeViewer()
         { {-0.5f, -0.5f, 0.0f, 1.0f}, {0.0f,  0.0f} },     // bottom left (0)
         { { 0.5f, -0.5f, 0.0f, 1.0f}, {1.0f,  0.0f} },     // bottom right (1)
         { { 0.5f,  0.5f, 0.0f, 1.0f}, {1.0f,  1.0f} },     // top right (2)
-        { {-0.5f,  0.5f, 0.0f, 1.0f}, {0.0f,  1.0f} }     // top left (3)
+        { {-0.5f,  0.5f, 0.0f, 1.0f}, {0.0f,  1.0f} }      // top left (3)
     };
     
     std::vector<unsigned int> indices = {
@@ -94,10 +92,11 @@ void Viewer::InitializeViewer()
     };
     
     // Set the data into the mesh
-    m_PlaneMesh.DefineMesh(vertices, indices, layout);
-    m_PlaneMesh.SetMaterial(m_Material);
+    m_Mesh.DefineMesh(vertices, indices, layout);
+    m_Mesh.SetMaterial(m_Material);
     
     // Load the model
-    m_SphereModel.LoadModel("resources/models/planet/planet.obj");
-    m_SphereModel.SetMaterial(m_Material);
+    m_Model.LoadModel("resources/models/backpack/backpack.obj");
+    m_Model.SetMaterial(m_Material);
+    m_Model.SetScale(glm::vec3(0.75f));
 }

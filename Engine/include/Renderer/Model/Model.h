@@ -44,13 +44,20 @@ public:
     // ----------------------------------------
     /// @brief Draw the model using the specified transformation matrix.
     /// @param transform The transformation matrix for the model.
-    void DrawModelWithTransform(const glm::mat4& transform = glm::mat4(1.0f))
+    /// @param primitive The type of primitive to be drawn (e.g., Points, Lines, Triangles).
+    void DrawModelWithTransform(const glm::mat4 &transform = glm::mat4(1.0f),
+                                const PrimitiveType &primitive = PrimitiveType::Triangles)
     {
         for(unsigned int i = 0; i < m_Meshes.size(); i++)
-            m_Meshes[i].DrawMesh(transform);
+            m_Meshes[i].DrawMesh(transform, primitive);
     }
     /// @brief Draw the model using the model matrix transformation.
-    void DrawModel() { DrawModelWithTransform(GetModelMatrix()); }
+    /// @param primitive The type of primitive to be drawn (e.g., Points, Lines, Triangles).
+    void DrawModel(const PrimitiveType &primitive = PrimitiveType::Triangles)
+    {
+        UpdateModelMatrix();
+        DrawModelWithTransform(m_ModelMatrix, primitive);
+    }
     
     // Getter(s)
     // ----------------------------------------
@@ -99,6 +106,13 @@ public:
     void SetScale(const glm::vec3 &scale)
     {
         m_Scale = scale;
+        UpdateModelMatrix();
+    }
+    /// @brief Set the up axis for the model.
+    /// @param upAxis A vector representing the up axis.
+    void SetUpAxis(const glm::vec3 &upAxis)
+    {
+        m_UpAxis = glm::normalize(upAxis);
         UpdateModelMatrix();
     }
     
@@ -155,6 +169,8 @@ protected:
     
     ///< Model matrix.
     glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
+    ///< Model up axis direction.
+    glm::vec3 m_UpAxis = glm::vec3(0.0f, 1.0f, 0.0f);
 };
 
 /**
@@ -212,6 +228,17 @@ void Model<VertexData>::UpdateModelMatrix()
 
     // 3. Rotate with the selected user angle around the center
     m_ModelMatrix *= glm::toMat4(glm::quat(glm::radians(m_Rotation)));
+    
+    // 4. Rotate the model if the up-axis is defined as other than the Y-axis
+    glm::vec3 referenceAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+    float epsilon = std::numeric_limits<float>::epsilon();
+    
+    if (glm::abs(glm::dot(referenceAxis, m_UpAxis) - 1.0f) > epsilon)
+    {
+        float angle = glm::acos(glm::dot(referenceAxis, m_UpAxis));
+        glm::vec3 axis = glm::normalize(glm::cross(referenceAxis, m_UpAxis));
+        m_ModelMatrix = glm::rotate(m_ModelMatrix, angle, axis);
+    }
 
     // Translate back to the original position
     m_ModelMatrix = glm::translate(m_ModelMatrix, -center);
