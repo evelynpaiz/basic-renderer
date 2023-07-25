@@ -12,6 +12,8 @@ std::unique_ptr<SceneData> Renderer::s_SceneData = std::make_unique<SceneData>()
  */
 void Renderer::BeginScene(const std::shared_ptr<Camera> &camera)
 {
+    s_SceneData->viewPosition = camera->GetPosition();
+    
     s_SceneData->viewMatrix = camera->GetViewMatrix();
     s_SceneData->projectionMatrix = camera->GetProjectionMatrix();
 }
@@ -104,8 +106,12 @@ void Renderer::Draw(const std::shared_ptr<VertexArray>& vao,
     // it for the shading
     material->Bind();
     
-    material->GetShader()->SetMat4("u_Transform", s_SceneData->projectionMatrix *
-                                   s_SceneData->viewMatrix * transform);
+    material->GetShader()->SetMat4("u_Transform.Model", transform);
+    material->GetShader()->SetMat4("u_Transform.View", s_SceneData->viewMatrix);
+    material->GetShader()->SetMat4("u_Transform.Projection", s_SceneData->projectionMatrix);
+    
+    if (material->IsViewDirectionDefined())
+        material->GetShader()->SetVec3("u_View.Position", s_SceneData->viewPosition);
     
     // Render the geometry
     Draw(vao, primitive, useIndexBuffer);

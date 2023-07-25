@@ -22,6 +22,7 @@ include(Dependencies.cmake)
 option(RENDERER_BUILD_EXAMPLES "Build the sandbox (example) executable" ON)
 
 # Own libraries and executables
+add_subdirectory(Resources)
 add_subdirectory(Engine)
 
 if (RENDERER_BUILD_EXAMPLES)

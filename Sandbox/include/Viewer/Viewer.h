@@ -2,18 +2,7 @@
 
 #include "Engine.h"
 
-#include "Material/BasicMaterial.h"
-
 #include <glm/glm.hpp>
-
-/**
- * Represents the different data that a vertex may contain.
- */
-struct VertexData
-{
-    glm::vec4 position;         ///< Vertex position.
-    glm::vec2 uv;               ///< Texture coordinate.
-};
 
 /**
  * Rendering layer containing a basic 3D viewer.
@@ -50,21 +39,26 @@ private:
     int m_ViewportWidth = 0;
     int m_ViewportHeight = 0;
     
-    ///< Camera.
+    ///< Rendering camera.
     std::shared_ptr<PerspectiveCamera> m_Camera;
     
-    ///< Texture for the plane.
-    std::shared_ptr<Texture> m_Texture;
-    ///< Plane material.
-    std::shared_ptr<BasicMaterial> m_Material;
+    ///< Loaded model.
+    Mesh<GeoVertexData<glm::vec4, glm::vec3>> m_Cube;
+    ///< Model material.
+    std::shared_ptr<PhongColorMaterial> m_CubeMaterial;
+    ///< Model texture.
+    std::shared_ptr<Texture> m_CubeTexture;
+    ///< Model transformation matrix.
+    glm::mat4 m_CubeMatrix = glm::mat4(1.0f);
     
-    ///< Plane geometry.
-    Mesh<VertexData> m_Mesh;
-    ///< Model.
-    AssimpModel m_Model;
-    
-    ///< Transformation matrix.
-    glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
+    ///< Light geometry.
+    Mesh<GeoVertexData<glm::vec4>> m_Light;
+    ///< Light material.
+    std::shared_ptr<SimpleColorMaterial> m_LightMaterial;
+    ///< Light type.
+    std::shared_ptr<PointLight> m_LightType;
+    ///< Light transformation matrix.
+    glm::mat4 m_LightMatrix = glm::mat4(1.0f);
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

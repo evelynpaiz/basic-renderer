@@ -16,6 +16,27 @@ file(
     include/*.h
 )
 
+# Find all resources
+file(
+    GLOB_RECURSE resources
+    LIST_DIRECTORIES false
+    RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+    resources/*
+)
+
+set(outputs)
+foreach (resource ${resources})
+    string(REPLACE "/" "_" name ${resource})
+    set(input ${CMAKE_CURRENT_SOURCE_DIR}/${resource})
+    set(output ${CMAKE_BINARY_DIR}/${resource})
+    add_custom_command(
+        OUTPUT ${output}
+        DEPENDS ${input}
+        COMMAND ${CMAKE_COMMAND} -E copy ${input} ${output}
+    )
+    list(APPEND outputs ${output})
+endforeach()
+
 # Define the engine library
 add_library(Engine STATIC ${sources} ${public_headers})
 add_library(Renderer::Engine ALIAS Engine)
@@ -33,7 +54,9 @@ set_target_properties(Engine PROPERTIES
 )
 
 # Link external libraries
-target_link_libraries(Engine spdlog::spdlog OpenGL::GL glfw::glfw glew::glew glm::glm stb::stb assimp::assimp imgui::imgui)
+target_link_libraries(Engine 
+    Renderer::Resources spdlog::spdlog OpenGL::GL glfw::glfw glew::glew glm::glm stb::stb assimp::assimp imgui::imgui
+)
 
 # Define pre-compiled header
 target_precompile_headers(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/enginepch.h)

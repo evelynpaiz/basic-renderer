@@ -35,8 +35,14 @@
 #include "Renderer/Shader/Shader.h"
 #include "Renderer/Texture/Texture.h"
 
-#include "Renderer/Material/Material.h"
+#include "Renderer/Light/Light.h"
+#include "Renderer/Light/PointLight.h"
 
+#include "Renderer/Material/Material.h"
+#include "Renderer/Material/SimpleMaterial.h"
+#include "Renderer/Material/PhongMaterial.h"
+
+#include "Renderer/Mesh/Geometry.h"
 #include "Renderer/Mesh/Mesh.h"
 #include "Renderer/Model/Model.h"
 #include "Renderer/Model/AssimpModel.h"

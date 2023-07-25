@@ -19,13 +19,13 @@ target_include_directories(
 )
 
 # Link external libraries
-target_link_libraries(Sandbox PRIVATE Renderer::Engine)
+target_link_libraries(Sandbox PRIVATE Renderer::Resources Renderer::Engine)
 
 # Define the target properties
 set_target_properties(Sandbox PROPERTIES
-    VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+    VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
     XCODE_GENERATE_SCHEME TRUE
-    XCODE_SCHEME_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+    XCODE_SCHEME_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
 )
 
 # Define solution tree organization

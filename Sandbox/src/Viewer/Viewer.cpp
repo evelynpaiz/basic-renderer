@@ -33,11 +33,11 @@ void Viewer::OnUpdate(float deltaTime)
     // Render
     Renderer::Clear(glm::vec4(0.93f, 0.93f, 0.93f, 1.0f));
     
-    m_Model.DrawModel();
+    m_Light.DrawMesh(m_LightMatrix);
+    m_Cube.DrawMesh(m_CubeMatrix);
     
     // Update the camera
     m_Camera->OnUpdate(deltaTime);
-    
     Renderer::EndScene();
 }
 
@@ -57,46 +57,54 @@ void Viewer::OnEvent(Event &e)
 void Viewer::InitializeViewer()
 {
     // Define the texture(s)
-    m_Texture = std::make_shared<Texture>("resources/models/backpack/diffuse.jpg", false);
+    m_CubeTexture = std::make_shared<Texture>("Resources/models/backpack/diffuse.jpg", false);
     
-    // Define the material to be used for shading
-    m_Material = std::make_shared<BasicMaterial>();
-    m_Material->SetColor(glm::vec4(0.2f, 0.3f, 0.8f, 1.0f));
-    m_Material->SetTexture(m_Texture);
+    // Define the light type
+    m_LightType = std::make_shared<PointLight>(glm::vec3(1.0f),
+                                               glm::vec3(1.2f, 1.0f, 2.0f));
+    
+    // Define the material(s) to be used for shading
+    m_CubeMaterial = std::make_shared<PhongColorMaterial>();
+    
+    m_CubeMaterial->SetColor(glm::vec4(1.0f, 0.5f, 0.31f, 1.0f));
+    m_CubeMaterial->SetSpecularCoefficient(glm::vec3(0.5f));
+    m_CubeMaterial->SetShininess(32.0f);
+    
+    m_CubeMaterial->SetLight(m_LightType);
+    
+    m_LightMaterial = std::make_shared<SimpleColorMaterial>();
+    m_LightMaterial->SetColor(glm::vec4(m_LightType->GetColor(), 1.0f));
     
     // Define the rendering camera
     m_Camera = std::make_shared<PerspectiveCamera>(m_ViewportWidth, m_ViewportHeight);
     m_Camera->SetPosition(glm::vec3(0.0f, 0.0f, 10.0f));
     
-    // Define the model matrix for the geometry
-    m_ModelMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(-45.0f),
-                                glm::vec3(1.0f, 0.0f, 0.0f));
+    // Load the cube model
+    std::vector<GeoVertexData<glm::vec4, glm::vec3>> cubeVertices;
+    std::vector<unsigned int> cubeIndices;
+    Geometry::DefineCubeGeometry(cubeVertices, cubeIndices);
     
-    // Define the data to be drawn (vertices and indices)
-    std::vector<VertexData> vertices= {
-        { {-0.5f, -0.5f, 0.0f, 1.0f}, {0.0f,  0.0f} },     // bottom left (0)
-        { { 0.5f, -0.5f, 0.0f, 1.0f}, {1.0f,  0.0f} },     // bottom right (1)
-        { { 0.5f,  0.5f, 0.0f, 1.0f}, {1.0f,  1.0f} },     // top right (2)
-        { {-0.5f,  0.5f, 0.0f, 1.0f}, {0.0f,  1.0f} }      // top left (3)
-    };
-    
-    std::vector<unsigned int> indices = {
-        0, 1, 2,        // first triangle
-        2, 3, 0         // second triangle
-    };
-    
-    // Define how the data is defined
-    BufferLayout layout = {
+    BufferLayout cubeLayout = {
         { "a_Position", DataType::Vec4 },
-        { "a_TextureCoord", DataType::Vec2 }
+        { "a_Normal", DataType::Vec3 }
     };
     
-    // Set the data into the mesh
-    m_Mesh.DefineMesh(vertices, indices, layout);
-    m_Mesh.SetMaterial(m_Material);
+    m_Cube.DefineMesh(cubeVertices, cubeIndices, cubeLayout);
+    m_Cube.SetMaterial(m_CubeMaterial);
     
-    // Load the model
-    m_Model.LoadModel("resources/models/backpack/backpack.obj");
-    m_Model.SetMaterial(m_Material);
-    m_Model.SetScale(glm::vec3(0.75f));
+    m_CubeMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(2.0f));
+    
+    // Define the light geometry
+    std::vector<GeoVertexData<glm::vec4>> lightVertices;
+    std::vector<unsigned int> lightIndices;
+    Geometry::DefineCubeGeometry(lightVertices, lightIndices);
+    
+    BufferLayout lightLayout = {
+        { "a_Position", DataType::Vec4 }
+    };
+    
+    m_Light.DefineMesh(lightVertices, lightIndices, lightLayout);
+    m_Light.SetMaterial(m_LightMaterial);
+    
+    m_LightMatrix = glm::translate(glm::mat4(1.0f), m_LightType->GetPosition());
 }

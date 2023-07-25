@@ -33,15 +33,20 @@ public:
     /// @brief Unbinds the material's associated shader.
     virtual void Unbind() { m_Shader -> Unbind(); }
     
-    // Setter(s)
-    // ----------------------------------------
-    /// @brief Set the material properties.
-    virtual void SetMaterialProperties() = 0;
-    
     // Getter(s)
     // ----------------------------------------
     /// @brief Return the shader associated with the material.
+    /// @return shader program.
     std::shared_ptr<Shader>& GetShader() { return m_Shader; }
+    /// @brief Defines if the viewing direction should be defined in the shader.
+    /// @return `true` if the view direction should be defined.
+    bool IsViewDirectionDefined() const { return m_ViewDirection; }
+    
+    // Setter(s)
+    // ----------------------------------------
+    /// @brief Defines if the viewing direction should be defined in the shader.
+    /// @param v The view direction is defined or not in the shader.
+    void SetViewDirection(bool v) { m_ViewDirection = v; }
     
 protected:
     // Constructor(s)/Destructor
@@ -52,11 +57,19 @@ protected:
         : m_Shader(std::make_shared<Shader>(filePath))
     {}
     
+    // Properties
+    // ----------------------------------------
+    /// @brief Set the material properties.
+    virtual void SetMaterialProperties() = 0;
+    
     // Material variables
     // ----------------------------------------
 protected:
     ///< The shader used for shading the specific material.
     std::shared_ptr<Shader> m_Shader;
+    
+    ///< View direction should be defined in the shader.
+    bool m_ViewDirection = false;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

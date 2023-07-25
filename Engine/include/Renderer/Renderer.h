@@ -49,6 +49,8 @@ inline GLenum PrimitiveTypeToOpenGLType(PrimitiveType type)
  */
 struct SceneData
 {
+    glm::vec3 viewPosition = glm::vec3(0.0f);
+    
     glm::mat4 viewMatrix = glm::mat4(1.0f);
     glm::mat4 projectionMatrix = glm::mat4(1.0f);
 };
