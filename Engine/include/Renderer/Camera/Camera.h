@@ -122,6 +122,10 @@ public:
         UpdateViewMatrix();
     }
     
+    /// @brief Enable the camera for interaction.
+    /// @param e Enable/disable the camera.
+    void Enable(const bool e) { m_Enabled = e; }
+    
 protected:
     // Constructor(s)
     // ----------------------------------------
@@ -167,6 +171,9 @@ protected:
     glm::mat4 m_ViewMatrix = glm::mat4(1.0f);
     ///< Projection matrix.
     glm::mat4 m_ProjectionMatrix = glm::mat4(1.0f);
+    
+    ///< Camera enabled for interaction.
+    bool m_Enabled = true;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

@@ -20,6 +20,14 @@
 #include "Input/MouseCodes.h"
 
 // --------------------------------------------
+// Events
+// --------------------------------------------
+#include "Event/Event.h"
+#include "Event/KeyEvent.h"
+#include "Event/MouseEvent.h"
+#include "Event/WindowEvent.h"
+
+// --------------------------------------------
 // Base Layer(s)
 // --------------------------------------------
 #include "Layer/Layer.h"

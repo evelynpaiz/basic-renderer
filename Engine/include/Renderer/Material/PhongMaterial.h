@@ -87,7 +87,7 @@ public:
     /// @return The light source.
     std::shared_ptr<Light> GetLight() const { return m_Light; }
     
-private:
+protected:
     // Properties
     // ----------------------------------------
     /// @brief Set the material properties into the uniforms of the shader program.

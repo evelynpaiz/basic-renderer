@@ -37,6 +37,15 @@ PerspectiveCamera::PerspectiveCamera(const int width, const int height,
  */
 void PerspectiveCamera::OnUpdate(const float ts)
 {
+    static glm::vec2 initialMousePosition;
+    
+    // If no interaction is enabled, just update the mouse position
+    if (!m_Enabled)
+    {
+        initialMousePosition = Input::GetMousePosition();
+        return;
+    }
+    
     // Translation of the camera
     glm::vec3 distance = glm::vec3(0.0f);
     
@@ -56,7 +65,6 @@ void PerspectiveCamera::OnUpdate(const float ts)
     Translate(distance);
     
     // Camera rotation and orbit
-    static glm::vec2 initialMousePosition;
     const glm::vec2 &mouse = Input::GetMousePosition();
     glm::vec2 deltaMouse = (mouse - initialMousePosition);
     deltaMouse *= ts;

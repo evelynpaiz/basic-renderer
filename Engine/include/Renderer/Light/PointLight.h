@@ -26,7 +26,7 @@ public:
     // ----------------------------------------
     /// @brief Get the light position (x, y, z).
     /// @return The light position coordinates.
-    const glm::vec3& GetPosition() const { return m_Position; }
+    glm::vec3& GetPosition() { return m_Position; }
     
     // Properties
     // ----------------------------------------
