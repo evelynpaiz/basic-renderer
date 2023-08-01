@@ -41,6 +41,9 @@ public:
     /// @brief Defines if the viewing direction should be defined in the shader.
     /// @return `true` if the view direction should be defined.
     bool IsViewDirectionDefined() const { return m_ViewDirection; }
+    /// @brief Defines if the normal matrix should be defined in the shader.
+    /// @return `true` if the normal matrix should be defined.
+    bool IsNormalMatrixDefined() const { return m_NormalMatrix; }
     
     // Setter(s)
     // ----------------------------------------
@@ -68,6 +71,8 @@ protected:
     ///< The shader used for shading the specific material.
     std::shared_ptr<Shader> m_Shader;
     
+    ///< Normal matrix should be defined in the shader.
+    bool m_NormalMatrix = false;
     ///< View direction should be defined in the shader.
     bool m_ViewDirection = false;
     

@@ -27,6 +27,16 @@ public:
     /// @param color The color of the light source.
     void SetColor(const glm::vec3 &color) { m_Color = color; }
     
+    /// @brief Set the strength of the ambient component of the light source.
+    /// @param s The strength of the ambient component (a value between 0 and 1).
+    void SetAmbientStrength(float s) { m_AmbientStrength = s; }
+    /// @brief Set the strength of the diffuse component of the light source.
+    /// @param s The strength of the diffuse component (a value between 0 and 1).
+    void SetDiffuseStrength(float s) { m_DiffuseStrength = s; }
+    /// @brief Set the strength of the specular component of the light source.
+    /// @param s The strength of the specular component (a value between 0 and 1).
+    void SetSpecularStrength(float s) { m_SpecularStrength = s; }
+    
     // Getter(s)
     // ----------------------------------------
     /// @brief Get the color of the light source.
@@ -40,6 +50,10 @@ public:
     virtual void DefineLightProperties(const std::shared_ptr<Shader> &shader)
     {
         shader->SetVec3("u_Light.Color", m_Color);
+        
+        shader->SetFloat("u_Light.La", m_AmbientStrength);
+        shader->SetFloat("u_Light.Ld", m_DiffuseStrength);
+        shader->SetFloat("u_Light.Ls", m_SpecularStrength);
     }
     
 protected:
@@ -56,6 +70,11 @@ protected:
 protected:
     ///< The light color.
     glm::vec3 m_Color;
+    
+    ///< The intensity for the ambient component.
+    float m_AmbientStrength = 0.4f;
+    float m_DiffuseStrength = 0.6f;
+    float m_SpecularStrength = 1.0f;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

@@ -31,6 +31,7 @@ public:
                        const std::shared_ptr<Light> &light = std::make_shared<PointLight>())
         : SimpleColorMaterial(filePath), m_Light(light)
     {
+        m_NormalMatrix = true;
         m_ViewDirection = true;
     }
     /// @brief Destructor for the basic material.

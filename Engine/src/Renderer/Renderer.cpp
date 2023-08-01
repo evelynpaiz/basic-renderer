@@ -109,6 +109,9 @@ void Renderer::Draw(const std::shared_ptr<VertexArray>& vao,
     material->GetShader()->SetMat4("u_Transform.Model", transform);
     material->GetShader()->SetMat4("u_Transform.View", s_SceneData->viewMatrix);
     material->GetShader()->SetMat4("u_Transform.Projection", s_SceneData->projectionMatrix);
+
+    if (material->IsNormalMatrixDefined())
+        material->GetShader()->SetMat3("u_Transform.Normal", glm::mat3(glm::transpose(glm::inverse(transform))));
     
     if (material->IsViewDirectionDefined())
         material->GetShader()->SetVec3("u_View.Position", s_SceneData->viewPosition);
