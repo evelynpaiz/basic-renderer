@@ -33,13 +33,12 @@ void main()
 #version 330 core
 
 struct Material {
-    vec4 Color;
-    
     vec3 Ka;
     vec3 Kd;
     vec3 Ks;
     
     float Shininess;
+    float Alpha;
 };
 
 struct View {
@@ -77,19 +76,19 @@ void main()
     vec3 reflectionDirection = normalize(2.0 * dot(lightDirection, normal) * normal - lightDirection);
     
     // Ambient component
-    vec3 ambient = u_Light.Color * u_Material.Ka * u_Light.La;
+    vec3 ambient = u_Light.Color * u_Light.La * u_Material.Ka;
     
     // Diffuse component
     float cosineTheta = max(0.0, dot(normal, lightDirection));
-    vec3 diffuse = u_Light.Color * cosineTheta * u_Material.Kd * u_Light.Ld;
+    vec3 diffuse = u_Light.Color * u_Light.Ld * u_Material.Kd * cosineTheta;
     
     // Specular component
     float specularStrength = 0.5;
     
     float cosinePhi = max(0.0, dot(viewDirection, reflectionDirection));
-    vec3 specular = u_Light.Color * pow(cosinePhi, u_Material.Shininess) * u_Material.Ks * u_Light.Ls;
+    vec3 specular = u_Light.Color * u_Light.Ls * u_Material.Ks * pow(cosinePhi, u_Material.Shininess);
     
     // Define fragment color using Phong shading
     vec3 result = (ambient + diffuse + specular);
-    color = vec4(result, u_Material.Color.a);
+    color = vec4(result, u_Material.Alpha);
 }

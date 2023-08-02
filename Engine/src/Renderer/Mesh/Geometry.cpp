@@ -186,6 +186,7 @@ void Geometry::DefineCubeGeometry(std::vector<GeoVertexData<glm::vec4, glm::vec3
 void Geometry::DefineCubeGeometry(std::vector<GeoVertexData<glm::vec4, glm::vec2, glm::vec3>>& vertices,
                         std::vector<unsigned int>& indices)
 {
+    // Define the vertices with positions and normals
     vertices = {
         // Front face
         { {-0.5f, -0.5f,  0.5f, 1.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 1.0f} },     // bottom left (0)
@@ -197,6 +198,26 @@ void Geometry::DefineCubeGeometry(std::vector<GeoVertexData<glm::vec4, glm::vec2
         { { 0.5f, -0.5f, -0.5f, 1.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, -1.0f} },     // bottom right (5)
         { { 0.5f,  0.5f, -0.5f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, -1.0f} },     // top right (6)
         { {-0.5f,  0.5f, -0.5f, 1.0f}, {0.0f, 1.0f}, {0.0f, 0.0f, -1.0f} },     // top left (7)
+        // Right face
+        { { 0.5f, -0.5f,  0.5f, 1.0f}, {0.0f, 0.0f}, {1.0f, 0.0f, 0.0f} },     // bottom left (8)
+        { { 0.5f, -0.5f, -0.5f, 1.0f}, {1.0f, 0.0f}, {1.0f, 0.0f, 0.0f} },     // bottom right (9)
+        { { 0.5f,  0.5f, -0.5f, 1.0f}, {1.0f, 1.0f}, {1.0f, 0.0f, 0.0f} },     // top right (10)
+        { { 0.5f,  0.5f,  0.5f, 1.0f}, {0.0f, 1.0f}, {1.0f, 0.0f, 0.0f} },     // top left (11)
+        // Left face
+        { {-0.5f, -0.5f, -0.5f, 1.0f}, {0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f} },     // bottom left (12)
+        { {-0.5f, -0.5f,  0.5f, 1.0f}, {1.0f, 0.0f}, {-1.0f, 0.0f, 0.0f} },     // bottom right (13)
+        { {-0.5f,  0.5f,  0.5f, 1.0f}, {1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f} },     // top right (14)
+        { {-0.5f,  0.5f, -0.5f, 1.0f}, {0.0f, 1.0f}, {-1.0f, 0.0f, 0.0f} },     // top left (15)
+        // Top face
+        { {-0.5f,  0.5f,  0.5f, 1.0f}, {0.0f, 0.0f}, {0.0f, 1.0f, 0.0f} },     // bottom left (16)
+        { { 0.5f,  0.5f,  0.5f, 1.0f}, {1.0f, 0.0f}, {0.0f, 1.0f, 0.0f} },     // bottom right (17)
+        { { 0.5f,  0.5f, -0.5f, 1.0f}, {1.0f, 1.0f}, {0.0f, 1.0f, 0.0f} },     // top right (18)
+        { {-0.5f,  0.5f, -0.5f, 1.0f}, {0.0f, 1.0f}, {0.0f, 1.0f, 0.0f} },     // top left (19)
+        // Bottom face
+        { {-0.5f, -0.5f, -0.5f, 1.0f}, {0.0f, 0.0f}, {0.0f, -1.0f, 0.0f} },     // bottom left (20)
+        { { 0.5f, -0.5f, -0.5f, 1.0f}, {1.0f, 0.0f}, {0.0f, -1.0f, 0.0f} },     // bottom right (21)
+        { { 0.5f, -0.5f,  0.5f, 1.0f}, {1.0f, 1.0f}, {0.0f, -1.0f, 0.0f} },     // top right (22)
+        { {-0.5f, -0.5f,  0.5f, 1.0f}, {0.0f, 1.0f}, {0.0f, -1.0f, 0.0f} }      // top left (23)
     };
     
     SetCubeIndices(indices);

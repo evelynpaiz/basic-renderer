@@ -25,9 +25,9 @@ struct Material {
 
 layout (location = 0) out vec4 color;
 
-uniform Material u_Material;
+uniform vec4 u_Color;
 
 void main()
 {
-    color = u_Material.Color;
+    color = u_Color;
 }

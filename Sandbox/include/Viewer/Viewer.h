@@ -43,11 +43,12 @@ private:
     std::shared_ptr<PerspectiveCamera> m_Camera;
     
     ///< Loaded model.
-    Mesh<GeoVertexData<glm::vec4, glm::vec3>> m_Cube;
+    Mesh<GeoVertexData<glm::vec4, glm::vec2, glm::vec3>> m_Cube;
     ///< Model material.
-    std::shared_ptr<PhongColorMaterial> m_CubeMaterial;
+    std::shared_ptr<PhongTextureMaterial> m_CubeMaterial;
     ///< Model texture.
-    std::shared_ptr<Texture> m_CubeTexture;
+    std::shared_ptr<Texture> m_CubeDiffuse;
+    std::shared_ptr<Texture> m_CubeSpecular;
     ///< Model transformation matrix.
     glm::mat4 m_CubeMatrix = glm::mat4(1.0f);
     

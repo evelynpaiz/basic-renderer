@@ -57,17 +57,17 @@ void Viewer::OnEvent(Event &e)
 void Viewer::InitializeViewer()
 {
     // Define the texture(s)
-    m_CubeTexture = std::make_shared<Texture>("Resources/models/backpack/diffuse.jpg", false);
+    m_CubeDiffuse = std::make_shared<Texture>("Resources/textures/diffuse.jpeg", false);
+    m_CubeSpecular = std::make_shared<Texture>("Resources/textures/specular.jpeg", false);
     
     // Define the light type
     m_LightType = std::make_shared<PointLight>(glm::vec3(1.0f),
                                                glm::vec3(1.2f, 1.0f, 2.0f));
     
     // Define the material(s) to be used for shading
-    m_CubeMaterial = std::make_shared<PhongColorMaterial>();
-    
-    m_CubeMaterial->SetColor(glm::vec4(1.0f, 0.5f, 0.31f, 1.0f));
-    m_CubeMaterial->SetSpecularCoefficient(glm::vec3(0.5f));
+    m_CubeMaterial = std::make_shared<PhongTextureMaterial>();
+    m_CubeMaterial->SetDiffuseMap(m_CubeDiffuse);
+    m_CubeMaterial->SetSpecularMap(m_CubeSpecular);
     m_CubeMaterial->SetShininess(32.0f);
     
     m_CubeMaterial->SetLight(m_LightType);
@@ -80,12 +80,13 @@ void Viewer::InitializeViewer()
     m_Camera->SetPosition(glm::vec3(0.0f, 0.0f, 10.0f));
     
     // Load the cube model
-    std::vector<GeoVertexData<glm::vec4, glm::vec3>> cubeVertices;
+    std::vector<GeoVertexData<glm::vec4, glm::vec2, glm::vec3>> cubeVertices;
     std::vector<unsigned int> cubeIndices;
     Geometry::DefineCubeGeometry(cubeVertices, cubeIndices);
     
     BufferLayout cubeLayout = {
         { "a_Position", DataType::Vec4 },
+        { "a_TextureCoord", DataType::Vec2 },
         { "a_Normal", DataType::Vec3 }
     };
     
