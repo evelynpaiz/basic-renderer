@@ -27,6 +27,18 @@ public:
     void OnUpdate(float deltaTime) override;
     void OnEvent(Event& e) override;
     
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Get the light source.
+    /// @return The light source.
+    std::shared_ptr<PointLight>& GetLightSource() { return m_LightSource; }
+    
+    // Setters(s)
+    // ----------------------------------------
+    /// @brief Set the interaction state inside this layer.
+    /// @param e Enable/disable the interaction.
+    void EnableInteraction(const bool e) { m_Camera->Enable(e); }
+    
 private:
     // Initialization
     // ----------------------------------------
@@ -43,37 +55,24 @@ private:
     int m_ViewportWidth = 0;
     int m_ViewportHeight = 0;
     
-    ///< Output framebufer.
+    ///< Framebufer.
     std::shared_ptr<FrameBuffer> m_Framebuffer;
     
-    ///< Rendering camera.
+    ///< Camera.
     std::shared_ptr<PerspectiveCamera> m_Camera;
     
-    ///< Loaded model.
-    Mesh<GeoVertexData<glm::vec4, glm::vec2, glm::vec3>> m_Cube;
-    ///< Model material.
-    std::shared_ptr<PhongTextureMaterial> m_CubeMaterial;
-    ///< Model texture.
-    std::shared_ptr<Texture> m_CubeDiffuse;
-    std::shared_ptr<Texture> m_CubeSpecular;
-    ///< Model transformation matrix.
-    glm::mat4 m_CubeMatrix = glm::mat4(1.0f);
-    
-    ///< Light geometry.
-    Mesh<GeoVertexData<glm::vec4>> m_Light;
-    ///< Light material.
-    std::shared_ptr<SimpleColorMaterial> m_LightMaterial;
     ///< Light type.
-    std::shared_ptr<PointLight> m_LightType;
-    ///< Light transformation matrix.
-    glm::mat4 m_LightMatrix = glm::mat4(1.0f);
+    std::shared_ptr<PointLight> m_LightSource;
     
-    ///< Screen geometry.
-    Mesh<GeoVertexData<glm::vec4, glm::vec2>> m_Screen;
-    ///< Screen material.
+    ///< Model(s).
+    Model<GeoVertexData<glm::vec4, glm::vec2, glm::vec3>> m_Cube;
+    Model<GeoVertexData<glm::vec4>> m_Light;
+    Model<GeoVertexData<glm::vec4, glm::vec2>> m_Screen;
+    
+    ///< Material(s).
+    std::shared_ptr<PhongTextureMaterial> m_CubeMaterial;
+    std::shared_ptr<SimpleColorMaterial> m_LightMaterial;
     std::shared_ptr<SimpleTextureMaterial> m_ScreenMaterial;
-    ///< Screen transformation matrix.
-    glm::mat4 m_ScreenMatrix = glm::mat4(1.0f);
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

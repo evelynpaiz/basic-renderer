@@ -134,11 +134,24 @@ void Renderer::Draw(const std::shared_ptr<VertexArray>& vao,
 }
 
 /**
+ * Set the viewport for rendering.
+ *
+ * @param x The x-coordinate of the lower-left corner of the viewport.
+ * @param y The y-coordinate of the lower-left corner of the viewport.
+ * @param width The width of the viewport.
+ * @param height The height of the viewport.
+ */
+void Renderer::SetViewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
+{
+    glViewport(x, y, width, height);
+}
+
+/**
  * Define if the depth testing is enable in the renderer.
  *
  * @param enable Enable or not the depth testing.
  */
-void Renderer::setDepthTest(bool enabled)
+void Renderer::SetDepthTest(bool enabled)
 {
     if (enabled)
         glEnable(GL_DEPTH_TEST);

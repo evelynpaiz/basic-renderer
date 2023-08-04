@@ -28,7 +28,7 @@ FrameBuffer::FrameBuffer(const FrameBufferSpecification& spec)
             spec.Filter = TextureFilter::LINEAR;
         
         // Depth attachment
-        if (utils::IsDepthFormat(spec.Format))
+        if (utils::OpenGL::IsDepthFormat(spec.Format))
             m_DepthAttachmentSpec = spec;
         // Color attachment
         else
@@ -96,7 +96,7 @@ void FrameBuffer::ClearAttachment(const unsigned int index, const int value)
     // TODO: support other types of data. For the moment this is only for RED images.
     auto& spec = m_ColorAttachmentsSpec[index];
     glClearTexImage(m_ColorAttachments[index]->m_ID, 0,
-                    utils::TextureFormatToOpenGLInternalType(spec.Format),
+                    utils::OpenGL::TextureFormatToOpenGLInternalType(spec.Format),
                     GL_INT, &value);
 }
 
@@ -176,7 +176,7 @@ void FrameBuffer::Invalidate()
         {
             m_ColorAttachments[i] = std::make_shared<Texture>(m_ColorAttachmentsSpec[i]);
             TextureFormat &format = m_ColorAttachments[i]->m_Spec.Format;
-            if(format != TextureFormat::None || !utils::IsDepthFormat(format))
+            if(format != TextureFormat::None || !utils::OpenGL::IsDepthFormat(format))
             {
                 m_ColorAttachments[i]->CreateTexture(nullptr);
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, m_ColorAttachments[i]->TextureTarget(),
@@ -187,11 +187,11 @@ void FrameBuffer::Invalidate()
     
     // Depth attachment
     if(m_DepthAttachmentSpec.Format != TextureFormat::None &&
-       utils::IsDepthFormat(m_DepthAttachmentSpec.Format))
+       utils::OpenGL::IsDepthFormat(m_DepthAttachmentSpec.Format))
     {
         m_DepthAttachment = std::make_shared<Texture>(m_DepthAttachmentSpec);
         m_DepthAttachment->CreateTexture(nullptr);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, utils::TextureFormatToOpenGLDepthType(m_DepthAttachment->m_Spec.Format),
+        glFramebufferTexture2D(GL_FRAMEBUFFER, utils::OpenGL::TextureFormatToOpenGLDepthType(m_DepthAttachment->m_Spec.Format),
                                m_DepthAttachment->TextureTarget(), m_DepthAttachment->m_ID, 0);
     }
     

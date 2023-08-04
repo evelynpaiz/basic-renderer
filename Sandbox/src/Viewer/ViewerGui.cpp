@@ -5,8 +5,8 @@
 /**
  * Define a Viewer GUI layer.
  */
-ViewerGui::ViewerGui()
-    : GuiLayer("GUI Layer")
+ViewerGui::ViewerGui(const std::shared_ptr<Viewer>& layer)
+    : GuiLayer("GUI Layer"), m_Viewer(layer)
 {}
 
 /**
@@ -16,9 +16,52 @@ ViewerGui::ViewerGui()
  */
 void ViewerGui::OnUpdate(float deltaTime)
 {
+    // Render GUI
     Begin();
-    ImGui::ShowDemoWindow();
+    GUIMenu();
     End();
+    
+    // If GUI is active, disable the interaction in the rendering layer
+    m_Viewer->EnableInteraction(!IsActive());
+}
+
+/**
+ * Handle an event that possibly occurred inside this layer.
+ * @param e Event.
+ */
+void ViewerGui::OnEvent(Event &e)
+{
+    // Define the event dispatcher
+    EventDispatcher dispatcher(e);
+    
+    // Dispatch the event to the application event callbacks
+    dispatcher.Dispatch<MouseScrolledEvent>(BIND_EVENT_FN(ViewerGui::OnMouseScrolled));
+}
+
+/**
+ * Check if the GUI is currently active or hovered in.
+ *
+ * @return `true` if the GUI is active.
+ */
+bool ViewerGui::IsActive()
+{
+    return ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)
+    || ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)
+    || ImGui::IsItemActive();
+}
+
+/**
+ * The viewer menu GUI.
+ */
+void ViewerGui::GUIMenu()
+{
+    ImGui::Begin("3D Viewer");
+    
+    if (ImGui::CollapsingHeader("Lighting", ImGuiTreeNodeFlags_DefaultOpen)) {
+        utils::Draw::Vec3Control("Position", m_Viewer->GetLightSource()->GetPosition());
+    }
+    
+    ImGui::End();
 }
 
 /**
@@ -81,4 +124,15 @@ void ViewerGui::SetStyle()
     style.Colors[ImGuiCol_NavHighlight] = ImVec4(0.78f, 0.35f, 0.60f, 1.00f);         // Navigation highlight color
     style.Colors[ImGuiCol_NavWindowingHighlight] = ImVec4(0.78f, 0.35f, 0.60f, 0.70f);// Navigation window highlight color
     style.Colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);    // Navigation window dim background color
+}
+
+/**
+ * Function to be called when a mouse scroll event happens.
+ *
+ * @param e Event to be handled.
+ * @return `true` if the event has been handled.
+ */
+bool ViewerGui::OnMouseScrolled(MouseScrolledEvent &e)
+{
+    return IsActive();
 }

@@ -96,27 +96,35 @@ void Texture::CreateTexture(const void *data)
     if (m_Spec.Samples > 1)
     {
         glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Spec.Samples,
-                                utils::TextureFormatToOpenGLInternalType(m_Spec.Format),
+                                utils::OpenGL::TextureFormatToOpenGLInternalType(m_Spec.Format),
                                 m_Spec.Width, m_Spec.Height, GL_FALSE);
         return;
     }
     
     // Set texture wrapping and filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, utils::TextureWrapToOpenGLType(m_Spec.Wrap));
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, utils::TextureWrapToOpenGLType(m_Spec.Wrap));
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, utils::TextureWrapToOpenGLType(m_Spec.Wrap));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R,
+                    utils::OpenGL::TextureWrapToOpenGLType(m_Spec.Wrap));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+                    utils::OpenGL::TextureWrapToOpenGLType(m_Spec.Wrap));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+                    utils::OpenGL::TextureWrapToOpenGLType(m_Spec.Wrap));
     
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, utils::TextureFilterToOpenGLType(m_Spec.Filter, m_Spec.MipMaps));
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, utils::TextureFilterToOpenGLType(m_Spec.Filter, false));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                    utils::OpenGL::TextureFilterToOpenGLType(m_Spec.Filter, m_Spec.MipMaps));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+                    utils::OpenGL::TextureFilterToOpenGLType(m_Spec.Filter, false));
     
     // Create the texture based on the format and data type
-    if (utils::IsDepthFormat(m_Spec.Format))
-        glTexStorage2D(GL_TEXTURE_2D, 1, utils::TextureFormatToOpenGLBaseType(m_Spec.Format), m_Spec.Width, m_Spec.Height);
+    if (utils::OpenGL::IsDepthFormat(m_Spec.Format))
+    {
+        glTexStorage2D(GL_TEXTURE_2D, 1, utils::OpenGL::TextureFormatToOpenGLBaseType(m_Spec.Format),
+                       m_Spec.Width, m_Spec.Height);
+    }
     else
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, utils::TextureFormatToOpenGLInternalType(m_Spec.Format),
-                     m_Spec.Width, m_Spec.Height, 0, utils::TextureFormatToOpenGLBaseType(m_Spec.Format),
-                     utils::TextureFormatToOpenGLDataType(m_Spec.Format), data);
+        glTexImage2D(GL_TEXTURE_2D, 0, utils::OpenGL::TextureFormatToOpenGLInternalType(m_Spec.Format),
+                     m_Spec.Width, m_Spec.Height, 0, utils::OpenGL::TextureFormatToOpenGLBaseType(m_Spec.Format),
+                     utils::OpenGL::TextureFormatToOpenGLDataType(m_Spec.Format), data);
     }
     
     // Generate mipmaps if specified

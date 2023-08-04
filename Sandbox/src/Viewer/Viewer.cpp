@@ -18,7 +18,7 @@ void Viewer::OnAttach()
     InitializeViewer();
     
     // Define a depth testing for the renderer
-    Renderer::setDepthTest(true);
+    Renderer::SetDepthTest(true);
 }
 
 /**
@@ -28,6 +28,9 @@ void Viewer::OnAttach()
  */
 void Viewer::OnUpdate(float deltaTime)
 {
+    // Update the light position
+    m_Light.SetPosition(m_LightSource->GetPosition());
+    
     // First pass
     //--------------------------------
     Renderer::BeginScene(m_Camera);
@@ -36,8 +39,8 @@ void Viewer::OnUpdate(float deltaTime)
     m_Framebuffer->Bind();
     
     Renderer::Clear(glm::vec4(0.93f, 0.93f, 0.93f, 1.0f));
-    m_Light.DrawMesh(m_LightMatrix);
-    m_Cube.DrawMesh(m_CubeMatrix);
+    m_Light.DrawModel();
+    m_Cube.DrawModel();
     
     // Update the camera
     m_Camera->OnUpdate(deltaTime);
@@ -49,7 +52,7 @@ void Viewer::OnUpdate(float deltaTime)
     Renderer::BeginScene();
     // Render to the screen
     Renderer::Clear(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-    m_Screen.DrawMesh(m_ScreenMatrix);
+    m_Screen.DrawModel();
     Renderer::EndScene();
 }
 
@@ -88,71 +91,33 @@ void Viewer::InitializeViewer()
     m_Camera->SetPosition(glm::vec3(0.0f, 0.0f, 10.0f));
     
     // Define the light type
-    m_LightType = std::make_shared<PointLight>(glm::vec3(1.0f),
+    m_LightSource = std::make_shared<PointLight>(glm::vec3(1.0f),
                                                glm::vec3(1.2f, 1.0f, 2.0f));
-    
-    // Define the texture(s)
-    m_CubeDiffuse = std::make_shared<Texture2D>("Resources/textures/diffuse.jpeg", false);
-    m_CubeSpecular = std::make_shared<Texture2D>("Resources/textures/specular.jpeg", false);
     
     // Define the material(s) to be used for shading
     m_CubeMaterial = std::make_shared<PhongTextureMaterial>();
-    m_CubeMaterial->SetDiffuseMap(m_CubeDiffuse);
-    m_CubeMaterial->SetSpecularMap(m_CubeSpecular);
+    m_CubeMaterial->SetDiffuseMap(std::make_shared<Texture2D>("Resources/textures/diffuse.jpeg"));
+    m_CubeMaterial->SetSpecularMap(std::make_shared<Texture2D>("Resources/textures/specular.jpeg"));
     m_CubeMaterial->SetShininess(32.0f);
-
-    m_CubeMaterial->SetLight(m_LightType);
+    m_CubeMaterial->SetLight(m_LightSource);
     
     m_LightMaterial = std::make_shared<SimpleColorMaterial>();
-    m_LightMaterial->SetColor(glm::vec4(m_LightType->GetColor(), 1.0f));
+    m_LightMaterial->SetColor(glm::vec4(m_LightSource->GetColor(), 1.0f));
     
     m_ScreenMaterial = std::make_shared<SimpleTextureMaterial>();
     m_ScreenMaterial->SetTextureMap(m_Framebuffer->GetColorAttachment(0));
     
-    // Load the cube model
-    std::vector<GeoVertexData<glm::vec4, glm::vec2, glm::vec3>> cubeVertices;
-    std::vector<unsigned int> cubeIndices;
-    Geometry::DefineCubeGeometry(cubeVertices, cubeIndices);
+    // Define the cube model
+    m_Cube = utils::Geometry::ModelCube<GeoVertexData<glm::vec4, glm::vec2, glm::vec3>>(m_CubeMaterial);
+    m_Cube.SetScale(glm::vec3(2.0f));
     
-    BufferLayout cubeLayout = {
-        { "a_Position", DataType::Vec4 },
-        { "a_TextureCoord", DataType::Vec2 },
-        { "a_Normal", DataType::Vec3 }
-    };
+    // Define the light model
+    m_Light = utils::Geometry::ModelCube<GeoVertexData<glm::vec4>>(m_LightMaterial);
+    m_Light.SetPosition(m_LightSource->GetPosition());
     
-    m_Cube.DefineMesh(cubeVertices, cubeIndices, cubeLayout);
-    m_Cube.SetMaterial(m_CubeMaterial);
-    
-    m_CubeMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(2.0f));
-    
-    // Define the light geometry
-    std::vector<GeoVertexData<glm::vec4>> lightVertices;
-    std::vector<unsigned int> lightIndices;
-    Geometry::DefineCubeGeometry(lightVertices, lightIndices);
-    
-    BufferLayout lightLayout = {
-        { "a_Position", DataType::Vec4 }
-    };
-    
-    m_Light.DefineMesh(lightVertices, lightIndices, lightLayout);
-    m_Light.SetMaterial(m_LightMaterial);
-    
-    m_LightMatrix = glm::translate(glm::mat4(1.0f), m_LightType->GetPosition());
-    
-    // Define the screen geometry
-    std::vector<GeoVertexData<glm::vec4, glm::vec2>> screenVertices;
-    std::vector<unsigned int> screenIndices;
-    Geometry::DefinePlaneGeometry(screenVertices, screenIndices);
-    
-    BufferLayout screenLayout = {
-        { "a_Position", DataType::Vec4 },
-        { "a_TextureCoord", DataType::Vec2 }
-    };
-    
-    m_Screen.DefineMesh(screenVertices, screenIndices, screenLayout);
-    m_Screen.SetMaterial(m_ScreenMaterial);
-    
-    m_ScreenMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(2.0f));
+    // Define the screen model
+    m_Screen = utils::Geometry::ModelPlane<GeoVertexData<glm::vec4, glm::vec2>>(m_ScreenMaterial);
+    m_Screen.SetScale(glm::vec3(2.0f));
 }
 
 /**

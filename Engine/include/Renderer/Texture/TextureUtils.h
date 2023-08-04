@@ -67,7 +67,7 @@ enum class TextureFilter
     LINEAR,             ///< Linear filtering (interpolate between neighboring pixels).
 };
 
-namespace utils
+namespace utils { namespace OpenGL
 {
 /**
  * Convert the texture format to its corresponding OpenGL (base) format type.
@@ -99,7 +99,7 @@ inline GLenum TextureFormatToOpenGLBaseType(TextureFormat format)
         case TextureFormat::DEPTH24: return GL_DEPTH_COMPONENT24;
         case TextureFormat::DEPTH24STENCIL8: return GL_DEPTH24_STENCIL8;
     }
-
+    
     CORE_ASSERT(false, "Unknown texture format!");
     return 0;
 }
@@ -135,7 +135,7 @@ inline GLenum TextureFormatToOpenGLInternalType(TextureFormat format)
         case TextureFormat::DEPTH24: return GL_DEPTH_COMPONENT;
         case TextureFormat::DEPTH24STENCIL8: return GL_DEPTH_STENCIL;
     }
-
+    
     CORE_ASSERT(false, "Unknown texture format!");
     return 0;
 }
@@ -162,15 +162,15 @@ inline GLenum TextureFormatToOpenGLDataType(TextureFormat format)
         case TextureFormat::RG8UI:
         case TextureFormat::RGB8UI:
         case TextureFormat::RGBA8UI: return GL_UNSIGNED_BYTE;
-
+            
         case TextureFormat::R16F:
         case TextureFormat::RGB16F:
         case TextureFormat::RGBA16F: return GL_HALF_FLOAT;
-
+            
         case TextureFormat::DEPTH24:
         case TextureFormat::DEPTH24STENCIL8: return GL_UNSIGNED_INT;
     }
-
+    
     CORE_ASSERT(false, "Unknown texture format!");
     return 0;
 }
@@ -206,7 +206,7 @@ inline GLenum TextureFormatToOpenGLDepthType(TextureFormat format)
         case TextureFormat::RGB8UI:
         case TextureFormat::RGBA8UI: break;
     }
-
+    
     CORE_ASSERT(false, "Unknown depth texture format!");
     return false;
 }
@@ -242,7 +242,7 @@ inline bool IsDepthFormat(TextureFormat format)
         case TextureFormat::RGB8UI:
         case TextureFormat::RGBA8UI: return false;
     }
-
+    
     CORE_ASSERT(false, "Unknown texture format!");
     return false;
 }
@@ -267,7 +267,7 @@ inline GLenum TextureWrapToOpenGLType(TextureWrap wrap)
         case TextureWrap::CLAMP_TO_EDGE: return GL_CLAMP_TO_EDGE;
         case TextureWrap::CLAMP_TO_BORDER: return GL_CLAMP_TO_BORDER;
     }
-
+    
     CORE_ASSERT(false, "Unknown texture wrap mode!");
     return 0;
 }
@@ -308,4 +308,5 @@ inline GLenum TextureFilterToOpenGLType(TextureFilter filter, bool useMipmaps)
     CORE_ASSERT(false, "Unknown texture filter mode!");
     return 0;
 }
+} // namespace OpenGL
 } // namespace utils

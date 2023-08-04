@@ -26,13 +26,13 @@ struct AssimpVertexData
  *  and processing models. It inherits the ability to load and render meshes from the base class and
  * adds specific processing using ASSIMP, such as parsing nodes and meshes from an ASSIMP scene.
  */
-class AssimpModel : public Model<AssimpVertexData>
+class AssimpModel : public LoadedModel<AssimpVertexData>
 {
 public:
     // Constructor(s)/Destructor
     // ----------------------------------------
     /// @brief Generate a model.
-    AssimpModel() = default;
+    AssimpModel() : LoadedModel<AssimpVertexData>() {}
     AssimpModel(const std::filesystem::path& filePath);
     
     /// @brief Delete the model.

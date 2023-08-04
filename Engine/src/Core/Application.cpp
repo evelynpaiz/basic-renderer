@@ -28,6 +28,9 @@ Application::Application(const std::string& name, const int width,
     m_Window = std::make_unique<Window>(name, width, height);
     // Define the event callback function for the application
     m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
+    
+    // Update the size of the renderer
+    glfwGetFramebufferSize((GLFWwindow*)m_Window->GetNativeWindow(), &m_Width, &m_Height);
 }
 
 /**

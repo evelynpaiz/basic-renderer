@@ -37,8 +37,8 @@ void VertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vbo)
     const auto& layout = vbo->GetLayout();
     for (const auto& element : layout)
     {
-        glVertexAttribPointer(m_Index, GetCompCountOfType(element.Type),
-            DataTypeToOpenGLType(element.Type), element.Normalized,
+        glVertexAttribPointer(m_Index, utils::OpenGL::GetCompCountOfType(element.Type),
+            utils::OpenGL::DataTypeToOpenGLType(element.Type), element.Normalized,
             layout.GetStride(), (const void*)(size_t)element.Offset);
         glEnableVertexAttribArray(m_Index);
         m_Index++;

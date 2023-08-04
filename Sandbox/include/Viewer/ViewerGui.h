@@ -2,6 +2,8 @@
 
 #include "Engine.h"
 
+#include "Viewer/Viewer.h"
+
 /**
  * Rendering layer responsible for the graphics interface using the ImGui library.
  *
@@ -17,16 +19,35 @@ class ViewerGui : public GuiLayer
 public:
     // Constructor(s)/Destructor
     // ----------------------------------------
-    ViewerGui();
+    ViewerGui(const std::shared_ptr<Viewer>& layer);
     
     // Layer handlers
     // ----------------------------------------
     void OnUpdate(float deltaTime) override;
+    void OnEvent(Event& e) override;
     
 private:
+    // GUI
+    // ----------------------------------------
+    void GUIMenu();
+    
+    // Getter(s)
+    // ----------------------------------------
+    bool IsActive();
+    
     // Setter(s)
     // ----------------------------------------
     void SetStyle() override;
+    
+    // Events handler(s)
+    // ----------------------------------------
+    bool OnMouseScrolled(MouseScrolledEvent &e);
+    
+    // GUI layer variables
+    // ----------------------------------------
+private:
+    ///< Rendering layer.
+    std::shared_ptr<Viewer> m_Viewer;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

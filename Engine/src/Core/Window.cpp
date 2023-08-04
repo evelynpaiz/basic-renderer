@@ -289,7 +289,7 @@ void Window::Init()
     glfwSetWindowUserPointer(m_Window, &m_Data);
     
     // Define the event callbacks
-    glfwSetWindowSizeCallback(m_Window, WindowResizeCallback);
+    glfwSetFramebufferSizeCallback(m_Window, WindowResizeCallback);
     glfwSetWindowCloseCallback(m_Window, WindowCloseCallback);
     
     glfwSetKeyCallback(m_Window, KeyCallback);

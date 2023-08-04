@@ -95,7 +95,8 @@ public:
     
     // Setter(s)
     // ----------------------------------------
-    static void setDepthTest(bool enabled);
+    static void SetViewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height);
+    static void SetDepthTest(bool enabled);
     
 private:
     ///< Depth testing.

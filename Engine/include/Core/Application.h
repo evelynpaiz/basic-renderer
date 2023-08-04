@@ -68,6 +68,10 @@ private:
     ///< Rendering time.
     float m_LastFrame = 0.0f;
     
+protected:
+    ///< Window size.
+    int m_Width, m_Height;
+    
 private:
     ///< Pointer to this application.
     static Application* s_Instance;

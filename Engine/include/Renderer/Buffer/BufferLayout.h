@@ -15,6 +15,8 @@ enum class DataType
     Mat2, Mat3, Mat4
 };
 
+namespace utils { namespace OpenGL
+{
 /**
  * Get the component count of a data type.
  *
@@ -36,7 +38,7 @@ inline unsigned int GetCompCountOfType(DataType type)
         case DataType::Mat3: return 3;
         case DataType::Mat4: return 4;
     }
-
+    
     CORE_ASSERT(false, "Unknown vertex data type!");
     return 0;
 }
@@ -90,10 +92,13 @@ inline GLenum DataTypeToOpenGLType(DataType type)
         case DataType::Mat3: return GL_FLOAT;
         case DataType::Mat4: return GL_FLOAT;
     }
-
+    
     CORE_ASSERT(false, "Unknown vertex data type!");
     return 0;
 }
+
+} // namespace OpenGL
+} // namespace utils
 
 /**
  * Represents a vertex attribute (element).
@@ -120,7 +125,7 @@ struct BufferElement
     /// @param type Data type of the element.
     /// @param normalized Normalize the data.
     BufferElement(const std::string& name, DataType type, bool normalized = false)
-        : Name(name), Type(type), Size(GetSizeOfType(type)), Offset(0),
+        : Name(name), Type(type), Size(utils::OpenGL::GetSizeOfType(type)), Offset(0),
         Normalized(normalized)
     {}
     /// @brief Delete the buffer element.

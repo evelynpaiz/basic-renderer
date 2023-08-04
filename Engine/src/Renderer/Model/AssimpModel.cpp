@@ -11,7 +11,7 @@
  * @param filePath The path to the model file.
  */
 AssimpModel::AssimpModel(const std::filesystem::path& filePath)
-    : Model<AssimpVertexData>(filePath)
+    : LoadedModel<AssimpVertexData>(filePath)
 {}
 
 /**

@@ -33,6 +33,8 @@
 #include "Layer/Layer.h"
 #include "Layer/GuiLayer.h"
 
+#include "Layer/DrawUtils.h"
+
 // --------------------------------------------
 // Renderer
 // --------------------------------------------
@@ -51,10 +53,12 @@
 #include "Renderer/Material/SimpleMaterial.h"
 #include "Renderer/Material/PhongMaterial.h"
 
-#include "Renderer/Mesh/Geometry.h"
 #include "Renderer/Mesh/Mesh.h"
 #include "Renderer/Model/Model.h"
 #include "Renderer/Model/AssimpModel.h"
+
+#include "Renderer/Mesh/MeshUtils.h"
+#include "Renderer/Model/ModelUtils.h"
 
 #include "Renderer/Camera/PerspectiveCamera.h"
 

@@ -29,16 +29,14 @@ template<typename VertexData>
 class Model
 {
 public:
-    // Destructor
+    // Constructor(s)/Destructor
     // ----------------------------------------
+    /// @brief Define a model.
+    Model() = default;
+    /// @brief Define with a specific mesh.
+    Model(const Mesh<VertexData>& mesh) { m_Meshes.push_back(mesh); }
     /// @brief Delete the model.
     virtual ~Model() = default;
-    
-    // Loading
-    // ----------------------------------------
-    /// @brief Load the model from the specified file path.
-    /// @param filePath The path to the model file.
-    virtual void LoadModel(const std::filesystem::path& filePath) {};
     
     // Render
     // ----------------------------------------
@@ -61,15 +59,6 @@ public:
     
     // Getter(s)
     // ----------------------------------------
-    /// @brief Get the file path of the model.
-    /// @return The path to the file.
-    std::filesystem::path GetPath() const { return m_FilePath; }
-    /// @brief Get the name of the loaded model (file name).
-    /// @return The model name.
-    std::string GetName() { return m_FilePath.filename().string(); }
-    /// @brief Get the directory where the model file is located.
-    /// @return The directory of the model.
-    std::string GetDirectory() { return m_FilePath.parent_path().string(); }
     /// @brief Get the number of meshes representing the model.
     /// @return The number of meshes.
     int GetMeshNumber() const { return (int)m_Meshes.size(); }
@@ -133,14 +122,6 @@ public:
     }
     
 protected:
-    // Constructor(s)
-    // ----------------------------------------
-    /// @brief Define a model.
-    Model() = default;
-    /// @brief Define a model from a file source.
-    /// @param filePath The path to the model file.
-    Model(const std::filesystem::path& filePath) { LoadModel(filePath); }
-    
     // Bounding box definition
     // ----------------------------------------
     void UpdateBBoxWithVertex(const glm::vec3 &v);
@@ -152,9 +133,6 @@ protected:
     // Model variables
     // ----------------------------------------
 protected:
-    ///< Path to the file.
-    std::filesystem::path m_FilePath;
-    
     ///< Bounding box.
     BBox m_BBox;
     ///< Set of meshes defining the model.
@@ -171,6 +149,55 @@ protected:
     glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
     ///< Model up axis direction.
     glm::vec3 m_UpAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+};
+
+
+template<typename VertexData>
+class LoadedModel : public Model<VertexData>
+{
+public:
+    // Destructor
+    // ----------------------------------------
+    /// @brief Delete the model.
+    ~LoadedModel() override = default;
+    
+    // Loading
+    // ----------------------------------------
+    /// @brief Load the model from the specified file path.
+    /// @param filePath The path to the model file.
+    virtual void LoadModel(const std::filesystem::path& filePath)
+    {
+        m_FilePath = filePath;
+    }
+    
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Get the file path of the model.
+    /// @return The path to the file.
+    std::filesystem::path GetPath() const { return m_FilePath; }
+    /// @brief Get the name of the loaded model (file name).
+    /// @return The model name.
+    std::string GetName() { return m_FilePath.filename().string(); }
+    /// @brief Get the directory where the model file is located.
+    /// @return The directory of the model.
+    std::string GetDirectory() { return m_FilePath.parent_path().string(); }
+    
+protected:
+    /// @brief Define a model.
+    LoadedModel() : Model<VertexData>() {}
+    /// @brief Define a model from a file source.
+    /// @param filePath The path to the model file.
+    LoadedModel(const std::filesystem::path& filePath)
+    : Model<VertexData>()
+    {
+        LoadModel(filePath);
+    }
+    
+    // Model variables
+    // ----------------------------------------
+protected:
+    ///< Path to the file.
+    std::filesystem::path m_FilePath;
 };
 
 /**
