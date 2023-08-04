@@ -39,6 +39,7 @@
 #include "Renderer/Buffer/VertexBuffer.h"
 #include "Renderer/Buffer/IndexBuffer.h"
 #include "Renderer/Buffer/VertexArray.h"
+#include "Renderer/Buffer/FrameBuffer.h"
 
 #include "Renderer/Shader/Shader.h"
 #include "Renderer/Texture/Texture.h"

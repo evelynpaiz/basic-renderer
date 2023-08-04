@@ -32,12 +32,19 @@ private:
     // ----------------------------------------
     void InitializeViewer();
     
+    // Events handler(s)
+    // ----------------------------------------
+    bool OnWindowResize(WindowResizeEvent &e);
+    
     // Viewer layer variables
     // ----------------------------------------
 private:
     ///< Size of the viewport.
     int m_ViewportWidth = 0;
     int m_ViewportHeight = 0;
+    
+    ///< Output framebufer.
+    std::shared_ptr<FrameBuffer> m_Framebuffer;
     
     ///< Rendering camera.
     std::shared_ptr<PerspectiveCamera> m_Camera;
@@ -60,6 +67,13 @@ private:
     std::shared_ptr<PointLight> m_LightType;
     ///< Light transformation matrix.
     glm::mat4 m_LightMatrix = glm::mat4(1.0f);
+    
+    ///< Screen geometry.
+    Mesh<GeoVertexData<glm::vec4, glm::vec2>> m_Screen;
+    ///< Screen material.
+    std::shared_ptr<SimpleTextureMaterial> m_ScreenMaterial;
+    ///< Screen transformation matrix.
+    glm::mat4 m_ScreenMatrix = glm::mat4(1.0f);
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

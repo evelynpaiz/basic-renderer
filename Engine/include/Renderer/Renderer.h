@@ -49,9 +49,12 @@ inline GLenum PrimitiveTypeToOpenGLType(PrimitiveType type)
  */
 struct SceneData
 {
+    ///< View (camera) position.
     glm::vec3 viewPosition = glm::vec3(0.0f);
     
+    ///< View matrix.
     glm::mat4 viewMatrix = glm::mat4(1.0f);
+    ///< Projection matrix.
     glm::mat4 projectionMatrix = glm::mat4(1.0f);
 };
 
@@ -67,6 +70,7 @@ class Renderer
 public:
     // Scene parametrization
     // ----------------------------------------
+    static void BeginScene();
     static void BeginScene(const std::shared_ptr<Camera>& camera);
     static void EndScene();
     

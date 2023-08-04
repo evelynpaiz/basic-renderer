@@ -104,7 +104,7 @@ protected:
         if(!m_Texture)
             return;
         
-        m_Texture->Bind(0);
+        m_Texture->BindToTextureUnit(0);
         shader->SetInt(name, 0);
     }
     

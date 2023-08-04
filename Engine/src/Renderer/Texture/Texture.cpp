@@ -6,16 +6,27 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+// --------------------------------------------
+// Texture
+// --------------------------------------------
+
 /**
- * Generate a texture from the input source file.
- *
- * @param filePath Texture file path.
- * @param flip Fip the texture vertically.
+ * Create a base texture.
  */
-Texture::Texture(const std::filesystem::path& filePath, bool flip)
-    : m_FilePath(filePath), m_Flip(flip)
+Texture::Texture()
 {
-    LoadFromFile(filePath);
+    glGenTextures(1, &m_ID);
+}
+
+/**
+ * Create a base texture with specific properties.
+ * 
+ * @param spec The texture specifications.
+ */
+Texture::Texture(const TextureSpecification& spec)
+    : m_Spec(spec)
+{
+    glGenTextures(1, &m_ID);
 }
 
 /**
@@ -23,18 +34,34 @@ Texture::Texture(const std::filesystem::path& filePath, bool flip)
  */
 Texture::~Texture()
 {
+    ReleaseTexture();
+}
+
+/**
+ * Release the resources of the texture.
+ */
+void Texture::ReleaseTexture()
+{
     glDeleteTextures(1, &m_ID);
 }
 
 /**
  * Bind the texture.
- *
- * @param slot Texture slot position.
  */
-void Texture::Bind(unsigned int slot) const
+void Texture::Bind() const
+{
+    glBindTexture(TextureTarget(), m_ID);
+}
+
+/**
+ * Bind the texture to a specific texture unit.
+ *
+ * @param slot The texture unit slot to which the texture will be bound.
+ */
+void Texture::BindToTextureUnit(const unsigned int slot) const
 {
     glActiveTexture(GL_TEXTURE0 + slot);
-    glBindTexture(GL_TEXTURE_2D, m_ID);
+    Bind();
 }
 
 /**
@@ -46,11 +73,80 @@ void Texture::Unbind() const
 }
 
 /**
+ * Get the texture target based on the texture specification.
+ *
+ * @return The OpenGL texture target.
+ */
+GLenum Texture::TextureTarget() const
+{
+    return (GLenum)(m_Spec.Samples > 1 ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D);
+}
+
+/**
+ * Create and configure the texture based on the texture specification and provided data.
+ *
+ * @param data The texture data. This can be nullptr if the texture is to be written.
+ */
+void Texture::CreateTexture(const void *data)
+{
+    // Bind the texture
+    Bind();
+    
+    // For multisample textures, use glTexImage2DMultisample to create the texture
+    if (m_Spec.Samples > 1)
+    {
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Spec.Samples,
+                                utils::TextureFormatToOpenGLInternalType(m_Spec.Format),
+                                m_Spec.Width, m_Spec.Height, GL_FALSE);
+        return;
+    }
+    
+    // Set texture wrapping and filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, utils::TextureWrapToOpenGLType(m_Spec.Wrap));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, utils::TextureWrapToOpenGLType(m_Spec.Wrap));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, utils::TextureWrapToOpenGLType(m_Spec.Wrap));
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, utils::TextureFilterToOpenGLType(m_Spec.Filter, m_Spec.MipMaps));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, utils::TextureFilterToOpenGLType(m_Spec.Filter, false));
+    
+    // Create the texture based on the format and data type
+    if (utils::IsDepthFormat(m_Spec.Format))
+        glTexStorage2D(GL_TEXTURE_2D, 1, utils::TextureFormatToOpenGLBaseType(m_Spec.Format), m_Spec.Width, m_Spec.Height);
+    else
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, utils::TextureFormatToOpenGLInternalType(m_Spec.Format),
+                     m_Spec.Width, m_Spec.Height, 0, utils::TextureFormatToOpenGLBaseType(m_Spec.Format),
+                     utils::TextureFormatToOpenGLDataType(m_Spec.Format), data);
+    }
+    
+    // Generate mipmaps if specified
+    if (m_Spec.MipMaps)
+        glGenerateMipmap(GL_TEXTURE_2D);
+    
+}
+
+// --------------------------------------------
+// Texture 2D
+// --------------------------------------------
+
+/**
+ * Generate a texture from the input source file.
+ *
+ * @param filePath Texture file path.
+ * @param flip Fip the texture vertically.
+ */
+Texture2D::Texture2D(const std::filesystem::path& filePath, bool flip)
+    : Texture(), m_FilePath(filePath), m_Flip(flip)
+{
+    LoadFromFile(filePath);
+}
+
+/**
  * Load the texture from an input (image) source file.
  *
  * @param filePath Texture file path.
  */
-void Texture::LoadFromFile(const std::filesystem::path& filePath)
+void Texture2D::LoadFromFile(const std::filesystem::path& filePath)
 {
     // Flip vertically the image (if needed)
     stbi_set_flip_vertically_on_load(m_Flip);
@@ -68,12 +164,12 @@ void Texture::LoadFromFile(const std::filesystem::path& filePath)
     }
     
     // Save the corresponding image information
-    m_Width = width;
-    m_Height = height;
+    m_Spec.Width = width;
+    m_Spec.Height = height;
     m_Channels = channels;
     
     // Generate the 2D texture
-    Generate2DTexture(data);
+    GenerateTexture2D(data);
     
     // Free memory
     stbi_image_free(data);
@@ -84,37 +180,27 @@ void Texture::LoadFromFile(const std::filesystem::path& filePath)
  *
  * @param data Texture data.
  */
-void Texture::Generate2DTexture(const void *data)
+void Texture2D::GenerateTexture2D(const void *data)
 {
     // Define the format of the data to be used
     if (m_Channels == 4)
-    {
-        m_InternalFormat = GL_RGBA8;
-        m_DataFormat = GL_RGBA;
-    }
+        m_Spec.Format = TextureFormat::RGBA8;
     else if (m_Channels == 3)
-    {
-        m_InternalFormat = GL_RGB8;
-        m_DataFormat = GL_RGB;
-    }
+        m_Spec.Format = TextureFormat::RGB8;
     
-    CORE_ASSERT(m_InternalFormat & m_DataFormat,
-                "Data format of " + m_FilePath.filename().string() + " not supported!");
+    if (m_Spec.Wrap == TextureWrap::None)
+        m_Spec.Wrap = TextureWrap::REPEAT;
+    if (m_Spec.Filter == TextureFilter::None)
+        m_Spec.Filter = TextureFilter::LINEAR;
+    
+    m_Spec.MipMaps = true;
+    
+    CORE_ASSERT((unsigned int)m_Spec.Format, "Data format of " + m_FilePath.filename().string() + " not supported!");
     
     // Generate a 2D texture
-    glGenTextures(1, &m_ID);
-    glBindTexture(GL_TEXTURE_2D, m_ID);
+    Bind();
+    CreateTexture(data);
     
-    // Set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    // Set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    
-    // Create the texture from the local buffer
-    glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Width, m_Height, 0, m_DataFormat, GL_UNSIGNED_BYTE, data);
-
     // Unbind the texture
-    glBindTexture(GL_TEXTURE_2D, 0);
+    Unbind();
 }

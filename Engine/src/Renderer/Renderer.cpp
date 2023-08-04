@@ -10,6 +10,19 @@ std::unique_ptr<SceneData> Renderer::s_SceneData = std::make_unique<SceneData>()
  *
  * @param camera Rendering camera.
  */
+void Renderer::BeginScene()
+{
+    s_SceneData->viewPosition = glm::vec3(0.0);
+    
+    s_SceneData->viewMatrix = glm::mat4(1.0f);
+    s_SceneData->projectionMatrix = glm::mat4(1.0f);
+}
+
+/**
+ * Start the rendering of a scene by defining its general parameters.
+ *
+ * @param camera Rendering camera.
+ */
 void Renderer::BeginScene(const std::shared_ptr<Camera> &camera)
 {
     s_SceneData->viewPosition = camera->GetPosition();

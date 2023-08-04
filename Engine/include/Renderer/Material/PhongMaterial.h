@@ -232,7 +232,7 @@ private:
         if(!texture)
             return;
 
-        texture->Bind(slot);
+        texture->BindToTextureUnit(slot);
         shader->SetInt(name, slot);
     }
     

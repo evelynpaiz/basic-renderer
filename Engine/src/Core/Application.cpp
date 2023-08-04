@@ -121,7 +121,7 @@ void Application::OnEvent(Event& e)
  * Function to be called when a window resize event happens.
  *
  * @param e Event to be handled.
- * @return True if the event has been handled.
+ * @return `true` if the event has been handled.
  */
 bool Application::OnWindowResize(WindowResizeEvent &e)
 {
@@ -132,7 +132,7 @@ bool Application::OnWindowResize(WindowResizeEvent &e)
  * Function to be called when a window close event happens.
  *
  * @param e Event to be handled.
- * @return True if the event has been handled.
+ * @return `true` if the event has been handled.
  */
 bool Application::OnWindowClose(WindowCloseEvent &e)
 {
