@@ -1,10 +1,31 @@
 #pragma once
 
-#include <glm/glm.hpp>
-
 #include "Event/Event.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
+namespace utils { namespace matrix
+{
+
+/**
+ * Calculate a look-at matrix.
+ *
+ * This utility function calculates a view matrix to position the camera at the specified
+ * position, looking towards the given target point.
+ *
+ * @param position The camera position in world coordinates.
+ * @param target The target point the camera is looking at.
+ *
+ * @return The calculated look-at matrix.
+ */
+inline glm::mat4 CalculateLookAtMatrix(glm::vec3 position, glm::vec3 target)
+{
+    return glm::lookAt(position, target, glm::vec3(0.0f, 1.0f, 0.0f));
+}
+
+} // namespace matrix
+} // namespace utils
 
 /**
  * Represents a camera that captures the scene and displays it in a viewport.
@@ -71,6 +92,10 @@ public:
     /// @return The projection matrix.
     const glm::mat4& GetProjectionMatrix() const { return m_ProjectionMatrix; }
     
+    /// @brief Get the camera target coordinates (x, y, z).
+    /// @return Camera target.
+    const glm::vec3& GetTarget() const { return m_Target; }
+    
     // Setter(s)
     // ----------------------------------------
     /// @brief Change the camera resolution.
@@ -119,6 +144,14 @@ public:
     void SetRotation(const glm::vec3& rotation)
     {
         m_Rotation = rotation;
+        UpdateViewMatrix();
+    }
+    
+    /// @brief Change the camera target coordinates.
+    /// @param target The camera target (x, y, z).
+    void SetTarget(const glm::vec3& target)
+    {
+        m_Target = target;
         UpdateViewMatrix();
     }
     
@@ -171,6 +204,9 @@ protected:
     glm::mat4 m_ViewMatrix = glm::mat4(1.0f);
     ///< Projection matrix.
     glm::mat4 m_ProjectionMatrix = glm::mat4(1.0f);
+    
+    ///< Camera viewing target (x, y, z).
+    glm::vec3 m_Target = glm::vec3(0.0f);
     
     ///< Camera enabled for interaction.
     bool m_Enabled = true;

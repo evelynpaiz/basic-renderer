@@ -31,7 +31,7 @@ public:
     // ----------------------------------------
     /// @brief Get the light source.
     /// @return The light source.
-    std::shared_ptr<PointLight>& GetLightSource() { return m_LightSource; }
+    const std::shared_ptr<PointLight>& GetLightSource() { return m_LightSource; }
     
     // Setters(s)
     // ----------------------------------------
@@ -55,23 +55,23 @@ private:
     int m_ViewportWidth = 0;
     int m_ViewportHeight = 0;
     
-    ///< Framebufer.
+    ///< Framebufer(s).
     std::shared_ptr<FrameBuffer> m_Framebuffer;
     
     ///< Camera.
     std::shared_ptr<PerspectiveCamera> m_Camera;
     
-    ///< Light type.
+    ///< Light source.
     std::shared_ptr<PointLight> m_LightSource;
     
     ///< Model(s).
     Model<GeoVertexData<glm::vec4, glm::vec2, glm::vec3>> m_Cube;
-    Model<GeoVertexData<glm::vec4>> m_Light;
+    Model<GeoVertexData<glm::vec4, glm::vec2, glm::vec3>> m_Plane;
     Model<GeoVertexData<glm::vec4, glm::vec2>> m_Screen;
     
     ///< Material(s).
+    std::shared_ptr<Material> m_ShadowMaterial;
     std::shared_ptr<PhongTextureMaterial> m_CubeMaterial;
-    std::shared_ptr<SimpleColorMaterial> m_LightMaterial;
     std::shared_ptr<SimpleTextureMaterial> m_ScreenMaterial;
     
     // Disable the copying or moving of this resource

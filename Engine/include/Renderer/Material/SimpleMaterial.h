@@ -99,13 +99,13 @@ protected:
     /// @param shader The shader program to set the properties for.
     /// @param name The uniform name.
     void SetProperties(const std::shared_ptr<Shader>& shader,
-                       const std::string& name)
+                       const std::string& name, unsigned int slot = 0)
     {
         if(!m_Texture)
             return;
         
-        m_Texture->BindToTextureUnit(0);
-        shader->SetInt(name, 0);
+        m_Texture->BindToTextureUnit(slot);
+        shader->SetInt(name, slot);
     }
     
     // Flat texture variables
@@ -238,7 +238,7 @@ protected:
     void SetMaterialProperties() override
     {
         FlatColor::SetProperties(m_Shader, "u_Color");
-        FlatTexture::SetProperties(m_Shader, "u_Color");
+        FlatTexture::SetProperties(m_Shader, "u_Texture");
     }
     
     

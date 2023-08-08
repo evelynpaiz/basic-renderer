@@ -1,8 +1,11 @@
 #include "enginepch.h"
 #include "Renderer/Renderer.h"
 
+#include <GL/glew.h>
+
 // Define the renderer variable(s)
-bool Renderer::s_DepthTest = false;
+bool Renderer::s_ColorBuffer = true;
+bool Renderer::s_DepthBuffer = false;
 std::unique_ptr<SceneData> Renderer::s_SceneData = std::make_unique<SceneData>();
 
 /**
@@ -42,9 +45,10 @@ void Renderer::EndScene()
  */
 void Renderer::Clear()
 {
-    glClear(GL_COLOR_BUFFER_BIT);
+    if (s_ColorBuffer)
+        glClear(GL_COLOR_BUFFER_BIT);
     
-    if (s_DepthTest)
+    if (s_DepthBuffer)
         glClear(GL_DEPTH_BUFFER_BIT);
 }
 
@@ -79,14 +83,14 @@ void Renderer::Draw(const std::shared_ptr<VertexArray>& vao,
             std::vector<unsigned int> segments = vbo->GetSegments();
             // If no segments, draw the whole buffer
             if (segments.empty())
-                glDrawArrays(PrimitiveTypeToOpenGLType(primitive), 0, vbo->GetCount());
+                glDrawArrays(utils::OpenGL::PrimitiveTypeToOpenGLType(primitive), 0, vbo->GetCount());
             // Draw segments of the buffer separately
             else
             {
                 int point = 0;
                 for(unsigned int s : segments)
                 {
-                    glDrawArrays(PrimitiveTypeToOpenGLType(primitive), point, s + 1);
+                    glDrawArrays(utils::OpenGL::PrimitiveTypeToOpenGLType(primitive), point, s + 1);
                     point += s + 1;
                 }
             }
@@ -96,7 +100,7 @@ void Renderer::Draw(const std::shared_ptr<VertexArray>& vao,
     else
     {
         vao->GetIndexBuffer()->Bind();
-        glDrawElements(PrimitiveTypeToOpenGLType(primitive),
+        glDrawElements(utils::OpenGL::PrimitiveTypeToOpenGLType(primitive),
                        vao->GetIndexBuffer()->GetCount(),
                        GL_UNSIGNED_INT, nullptr);
     }
@@ -147,16 +151,29 @@ void Renderer::SetViewport(unsigned int x, unsigned int y, unsigned int width, u
 }
 
 /**
- * Define if the depth testing is enable in the renderer.
+ * Set the depth buffer flag when rendering. If enabled, depth testing is enabled too.
  *
  * @param enable Enable or not the depth testing.
  */
-void Renderer::SetDepthTest(bool enabled)
+void Renderer::SetDepthBuffer(bool enabled)
 {
     if (enabled)
         glEnable(GL_DEPTH_TEST);
     else
         glDisable(GL_DEPTH_TEST);
 
-    s_DepthTest = enabled;
+    s_DepthBuffer = enabled;
+}
+
+/**
+ * @brief Set the face culling mode for rendering.
+ *
+ * Face culling is a technique used to improve rendering performance by discarding
+ * the rendering of faces that are not visible, such as the back faces of 3D objects.
+ *
+ * @param culling The face culling mode to be set.
+ */
+void Renderer::SetFaceCulling(const FaceCulling culling)
+{
+    glCullFace(utils::OpenGL::CullingToOpenGLType(culling));
 }

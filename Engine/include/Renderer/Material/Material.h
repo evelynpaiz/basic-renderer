@@ -17,8 +17,13 @@
 class Material
 {
 public:
-    // Destructor
+    // Constructor(s)/Destructor
     // ----------------------------------------
+    /// @brief Generate a material with the specified shader file path.
+    /// @param filePath The file path to the shader used by the material.
+    Material(const std::filesystem::path& filePath)
+        : m_Shader(std::make_shared<Shader>(filePath))
+    {}
     /// @brief Destructor for the material.
     virtual ~Material() = default;
     
@@ -51,19 +56,10 @@ public:
     /// @param v The view direction is defined or not in the shader.
     void SetViewDirection(bool v) { m_ViewDirection = v; }
     
-protected:
-    // Constructor(s)/Destructor
-    // ----------------------------------------
-    /// @brief Generate a material with the specified shader file path.
-    /// @param filePath The file path to the shader used by the material.
-    Material(const std::filesystem::path& filePath)
-        : m_Shader(std::make_shared<Shader>(filePath))
-    {}
-    
     // Properties
     // ----------------------------------------
     /// @brief Set the material properties.
-    virtual void SetMaterialProperties() = 0;
+    virtual void SetMaterialProperties() {}
     
     // Material variables
     // ----------------------------------------

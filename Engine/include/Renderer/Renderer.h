@@ -1,8 +1,6 @@
 #pragma once
 
-#include <GL/glew.h>
-
-#include <glm/glm.hpp>
+#include "Renderer/RendererUtils.h"
 
 #include "Renderer/Buffer/VertexArray.h"
 #include "Renderer/Buffer/IndexBuffer.h"
@@ -10,46 +8,16 @@
 #include "Renderer/Material/Material.h"
 
 #include "Camera/Camera.h"
+#include "Light/Light.h"
 
-/**
- * Enumeration representing different types of primitives for rendering.
- */
-enum class PrimitiveType
-{
-    Points,         ///< Points, each vertex represents a point.
-    Lines,          ///< Lines, each pair of vertices forms a line segment.
-    LineStrip,      ///< Line strip, consecutive vertices form connected lines.
-    Triangles,      ///< Triangles, each group of three vertices forms a triangle.
-    TriangleStrip   ///< Triangle strip, consecutive vertices form connected triangles.
-};
-
-/**
- * Convert a PrimitiveType value to the corresponding OpenGL primitive type.
- *
- * @param type The PrimitiveType value to be converted.
- * @return The corresponding OpenGL primitive type as a GLenum.
- */
-inline GLenum PrimitiveTypeToOpenGLType(PrimitiveType type)
-{
-    switch (type)
-    {
-        case PrimitiveType::Points: return GL_POINTS;
-        case PrimitiveType::Lines: return GL_LINES;
-        case PrimitiveType::LineStrip: return GL_LINE_STRIP;
-        case PrimitiveType::Triangles: return GL_TRIANGLES;
-        case PrimitiveType::TriangleStrip: return GL_TRIANGLE_STRIP;
-    }
-
-    CORE_ASSERT(false, "Unknown primitive type!");
-    return 0;
-}
+#include <glm/glm.hpp>
 
 /**
  * Represents the current information of the rendered scene (useful for the shading process).
  */
 struct SceneData
 {
-    ///< View (camera) position.
+    ///< View position.
     glm::vec3 viewPosition = glm::vec3(0.0f);
     
     ///< View matrix.
@@ -91,16 +59,24 @@ public:
     // ----------------------------------------
     /// @brief Check if depth testing is active.
     /// @return `true` if the renderer is doing depth testing.
-    static bool IsDepthTestActive() { return s_DepthTest; }
+    static bool IsDepthTestActive() { return s_DepthBuffer; }
     
     // Setter(s)
     // ----------------------------------------
     static void SetViewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height);
-    static void SetDepthTest(bool enabled);
+    
+    static void SetDepthBuffer(bool enabled);
+    /// @brief Set the color buffer flag when rendering.
+    /// @param enabled Enable or not the color buffer.
+    static void SetColorBuffer(bool enabled) { s_ColorBuffer = enabled; }
+    
+    static void SetFaceCulling(const FaceCulling culling);
     
 private:
-    ///< Depth testing.
-    static bool s_DepthTest;
+    ///< Color buffer flag.
+    static bool s_ColorBuffer;
+    ///< Depth buffer flag.
+    static bool s_DepthBuffer;
     ///< Scene current general information.
     static std::unique_ptr<SceneData> s_SceneData;
 };

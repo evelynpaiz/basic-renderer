@@ -50,12 +50,13 @@ protected:
     // ----------------------------------------
     /// @brief Set the material properties into the uniforms of the shader program.
     /// @param shader The shader program to set the properties for.
-    void SetProperties(const std::shared_ptr<Shader>& shader)
+    void SetProperties(const std::shared_ptr<Shader>& shader,
+                       unsigned int slot = 0)
     {
         shader->SetFloat("u_Material.Shininess", m_Shininess);
         
         // Set the light properties
-        m_Light->DefineLightProperties(shader);
+        m_Light->DefineLightProperties(shader, slot);
     }
     
     // Flat color variables
@@ -214,10 +215,10 @@ protected:
     /// @param shader The shader program to set the properties for.
     void SetProperties(const std::shared_ptr<Shader>& shader)
     {
-        SetTextureMap(shader, "u_Material.Td", m_DiffuseTexture, 0);
-        SetTextureMap(shader, "u_Material.Ts", m_SpecularTexture, 1);
+        SetTextureMap(shader, "u_Material.DiffuseMap", m_DiffuseTexture, 0);
+        SetTextureMap(shader, "u_Material.SpecularMap", m_SpecularTexture, 1);
         
-        Phong::SetProperties(shader);
+        Phong::SetProperties(shader, 2);
     }
     
 private:

@@ -55,13 +55,20 @@ bool ViewerGui::IsActive()
  */
 void ViewerGui::GUIMenu()
 {
+    // Define the variables
+    glm::vec3 lightPosition = m_Viewer->GetLightSource()->GetPosition();
+    
+    // Render the menu
     ImGui::Begin("3D Viewer");
     
     if (ImGui::CollapsingHeader("Lighting", ImGuiTreeNodeFlags_DefaultOpen)) {
-        utils::Draw::Vec3Control("Position", m_Viewer->GetLightSource()->GetPosition());
+        utils::Draw::Vec3Control("Position", lightPosition);
     }
     
     ImGui::End();
+    
+    // Update
+    m_Viewer->GetLightSource()->SetPosition(lightPosition);
 }
 
 /**

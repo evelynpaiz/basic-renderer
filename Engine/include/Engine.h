@@ -61,5 +61,6 @@
 #include "Renderer/Model/ModelUtils.h"
 
 #include "Renderer/Camera/PerspectiveCamera.h"
+#include "Renderer/Camera/OrthographicCamera.h"
 
 #include "Renderer/Renderer.h"

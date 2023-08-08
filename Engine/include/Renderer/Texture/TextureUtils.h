@@ -46,10 +46,10 @@ enum class TextureFormat
 enum class TextureWrap
 {
     None = 0,
-    REPEAT,             ///< Repeat the texture.
-    MIRRORED_REPEAT,    ///< Repeat the texture with mirroring.
-    CLAMP_TO_EDGE,      ///< Clamp the texture coordinates to the edge of the texture.
-    CLAMP_TO_BORDER,    ///< Clamp the texture coordinates to a border color.
+    Repeat,             ///< Repeat the texture.
+    MirroredRepeat,     ///< Repeat the texture with mirroring.
+    ClampToEdge,        ///< Clamp the texture coordinates to the edge of the texture.
+    ClampToBorder,      ///< Clamp the texture coordinates to a border color.
 };
 
 /**
@@ -63,8 +63,8 @@ enum class TextureWrap
 enum class TextureFilter
 {
     None = 0,
-    NEAREST,            ///< Nearest-neighbor filtering (nearest pixel).
-    LINEAR,             ///< Linear filtering (interpolate between neighboring pixels).
+    Nearest,            ///< Nearest-neighbor filtering (nearest pixel).
+    Linear,             ///< Linear filtering (interpolate between neighboring pixels).
 };
 
 namespace utils { namespace OpenGL
@@ -247,7 +247,6 @@ inline bool IsDepthFormat(TextureFormat format)
     return false;
 }
 
-
 /**
  * Convert the texture wrap mode to its corresponding OpenGL type.
  *
@@ -262,10 +261,10 @@ inline GLenum TextureWrapToOpenGLType(TextureWrap wrap)
     switch (wrap)
     {
         case TextureWrap::None: return 0;
-        case TextureWrap::REPEAT: return GL_REPEAT;
-        case TextureWrap::MIRRORED_REPEAT: return GL_MIRRORED_REPEAT;
-        case TextureWrap::CLAMP_TO_EDGE: return GL_CLAMP_TO_EDGE;
-        case TextureWrap::CLAMP_TO_BORDER: return GL_CLAMP_TO_BORDER;
+        case TextureWrap::Repeat: return GL_REPEAT;
+        case TextureWrap::MirroredRepeat: return GL_MIRRORED_REPEAT;
+        case TextureWrap::ClampToEdge: return GL_CLAMP_TO_EDGE;
+        case TextureWrap::ClampToBorder: return GL_CLAMP_TO_BORDER;
     }
     
     CORE_ASSERT(false, "Unknown texture wrap mode!");
@@ -290,8 +289,8 @@ inline GLenum TextureFilterToOpenGLType(TextureFilter filter, bool useMipmaps)
         switch (filter)
         {
             case TextureFilter::None: return 0;
-            case TextureFilter::NEAREST: return GL_NEAREST_MIPMAP_NEAREST;
-            case TextureFilter::LINEAR: return GL_LINEAR_MIPMAP_LINEAR;
+            case TextureFilter::Nearest: return GL_NEAREST_MIPMAP_NEAREST;
+            case TextureFilter::Linear: return GL_LINEAR_MIPMAP_LINEAR;
         }
     }
     // If no mipmaps are used, return a normal filtering
@@ -300,8 +299,8 @@ inline GLenum TextureFilterToOpenGLType(TextureFilter filter, bool useMipmaps)
         switch (filter)
         {
             case TextureFilter::None: return 0;
-            case TextureFilter::NEAREST: return GL_NEAREST;
-            case TextureFilter::LINEAR: return GL_LINEAR;
+            case TextureFilter::Nearest: return GL_NEAREST;
+            case TextureFilter::Linear: return GL_LINEAR;
         }
     }
     

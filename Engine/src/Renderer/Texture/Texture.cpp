@@ -42,7 +42,8 @@ Texture::~Texture()
  */
 void Texture::ReleaseTexture()
 {
-    glDeleteTextures(1, &m_ID);
+    if (this)
+        glDeleteTextures(1, &m_ID);
 }
 
 /**
@@ -119,6 +120,9 @@ void Texture::CreateTexture(const void *data)
     {
         glTexStorage2D(GL_TEXTURE_2D, 1, utils::OpenGL::TextureFormatToOpenGLBaseType(m_Spec.Format),
                        m_Spec.Width, m_Spec.Height);
+        
+        float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
     }
     else
     {
@@ -197,9 +201,9 @@ void Texture2D::GenerateTexture2D(const void *data)
         m_Spec.Format = TextureFormat::RGB8;
     
     if (m_Spec.Wrap == TextureWrap::None)
-        m_Spec.Wrap = TextureWrap::REPEAT;
+        m_Spec.Wrap = TextureWrap::Repeat;
     if (m_Spec.Filter == TextureFilter::None)
-        m_Spec.Filter = TextureFilter::LINEAR;
+        m_Spec.Filter = TextureFilter::Linear;
     
     m_Spec.MipMaps = true;
     

@@ -47,9 +47,6 @@ public:
     /// @brief Get the camera field of view.
     /// @return Field of view angle (degrees).
     float GetFieldOfView() const { return m_FieldOfView; }
-    /// @brief Get the camera target coordinates (x, y, z).
-    /// @return Camera target.
-    const glm::vec3& GetTarget() const { return m_Target; }
     
     // Setter(s)
     // ----------------------------------------
@@ -80,13 +77,6 @@ public:
     {
         m_FieldOfView = fov;
         UpdateProjectionMatrix();
-    }
-    /// @brief Change the camera target coordinates.
-    /// @param target The camera target (x, y, z).
-    void SetTarget(const glm::vec3& target)
-    {
-        m_Target = target;
-        UpdateViewMatrix();
     }
     
     /// @brief Update the zooming in/out scaling factor.
@@ -136,9 +126,6 @@ protected:
 protected:
     ///< Camera field of view (angle in degrees).
     float m_FieldOfView;
-    
-    ///< Camera viewing target (x, y, z).
-    glm::vec3 m_Target = glm::vec3(0.0f);
     
     ///< Camera movement scaling factors.
     float m_ZoomFactor = 0.25f;
