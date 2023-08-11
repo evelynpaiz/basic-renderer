@@ -31,7 +31,7 @@ public:
     /// `CalculateLookAtMatrix` utility function.
     virtual void UpdateViewMatrix()
     {
-        m_ViewMatrix = utils::matrix::CalculateLookAtMatrix(m_Position, m_Target);
+        m_ViewMatrix = utils::CameraSpace::CalculateLookAtMatrix(m_Position, m_Target);
     }
     
     // Disable the copying or moving of this resource
@@ -68,7 +68,7 @@ public:
     /// `CalculateLookAtMatrix` utility function.
     virtual void UpdateViewMatrix()
     {
-        m_ViewMatrix = utils::matrix::CalculateLookAtMatrix(m_Position, m_Target);
+        m_ViewMatrix = utils::CameraSpace::CalculateLookAtMatrix(m_Position, m_Target);
     }
     
     // Disable the copying or moving of this resource
@@ -132,7 +132,7 @@ public:
         m_Framebuffer->Resize(width, height);
         
         // Update the light viewpoint resolution
-        m_Viewpoint->SetViewportSize(width, height);
+        m_ShadowCamera->SetViewportSize(width, height);
     }
     /// @brief Set whether shadow mapping should be active.
     /// @param map Enable or disable shadow mapping
@@ -150,7 +150,7 @@ public:
     
     /// @brief Get the camera used for shadow mapping to generate depth maps for shadow calculations.
     /// @return The viewpoint of the light source.
-    const std::shared_ptr<Camera>& GetViewPoint() { return m_Viewpoint; }
+    const std::shared_ptr<Camera>& GetShadowCamera() { return m_ShadowCamera; }
     /// @brief Defines if shadow mapping is currently applied.
     /// @return Whether shadow mapping is enabled or not.
     bool IsShadowMapActive() { return m_ShadowMapping; }
@@ -172,8 +172,8 @@ public:
         if (!m_ShadowMapping)
             return;
         
-        shader->SetMat4("u_Transform.Light", m_Viewpoint->GetProjectionMatrix()
-                        * m_Viewpoint->GetViewMatrix());
+        shader->SetMat4("u_Transform.Light", m_ShadowCamera->GetProjectionMatrix()
+                        * m_ShadowCamera->GetViewMatrix());
 
         m_Framebuffer->GetDepthAttachment()->BindToTextureUnit(slot);
         shader->SetInt("u_Light.ShadowMap", slot);
@@ -209,7 +209,7 @@ protected:
     bool m_ShadowMapping = false;
     
     ///< The light viewpoint (used for rendering shadows).
-    std::shared_ptr<Camera> m_Viewpoint;
+    std::shared_ptr<Camera> m_ShadowCamera;
     ///< The light framebuffer (rendering from the light point of view).
     std::shared_ptr<FrameBuffer> m_Framebuffer;
     

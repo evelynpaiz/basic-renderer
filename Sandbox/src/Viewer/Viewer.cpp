@@ -27,9 +27,8 @@ void Viewer::OnUpdate(float deltaTime)
 {
     // Shadow mapping: light source
     //--------------------------------
-    Renderer::BeginScene(m_LightSource->GetViewPoint());
-    
-    //Renderer::SetFaceCulling(FaceCulling::Front);
+    Renderer::BeginScene(m_LightSource->GetShadowCamera());
+    Renderer::SetFaceCulling(FaceCulling::Front);
     
     Renderer::SetDepthBuffer(true);
     Renderer::SetColorBuffer(false);
@@ -47,7 +46,7 @@ void Viewer::OnUpdate(float deltaTime)
     
     m_LightSource->GetFramebuffer()->Unbind();
     
-    //Renderer::SetFaceCulling(FaceCulling::Back);
+    Renderer::SetFaceCulling(FaceCulling::Back);
     Renderer::EndScene();
     
     // First pass: scene
@@ -122,8 +121,9 @@ void Viewer::InitializeViewer()
     
     // Define the light source and its framebuffer for shadow mapping
     m_LightSource = std::make_shared<PointLight>(glm::vec3(1.0f), glm::vec3(2.0f, 2.5f, 6.0f));
-    m_LightSource->SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+    
     m_LightSource->SetShadowMap(true);
+    m_LightSource->SetViewportSize(m_ViewportWidth, m_ViewportHeight);
     
     // Define the material(s) to be used for shading
     m_ShadowMaterial = std::make_shared<SimpleColorMaterial>("Resources/shaders/base/SimpleDepth.glsl");
@@ -135,7 +135,7 @@ void Viewer::InitializeViewer()
     m_CubeMaterial->SetLight(m_LightSource);
     
     //m_ScreenMaterial = std::make_shared<SimpleTextureMaterial>("Resources/shaders/base/SimpleDepthTexture.glsl");
-    //m_ScreenMaterial->SetTextureMap(m_LightFramebuffer->GetDepthAttachment());
+    //m_ScreenMaterial->SetTextureMap(m_LightSource->GetFramebuffer()->GetDepthAttachment());
     
     m_ScreenMaterial = std::make_shared<SimpleTextureMaterial>();
     m_ScreenMaterial->SetTextureMap(m_Framebuffer->GetColorAttachment(0));

@@ -23,8 +23,8 @@ public:
         : Light(color), m_Position(position)
     {
         // Set the viewpoint
-        m_Viewpoint = std::make_shared<PerspectiveShadow>();
-        m_Viewpoint->SetPosition(position);
+        m_ShadowCamera = std::make_shared<PerspectiveShadow>();
+        m_ShadowCamera->SetPosition(position);
         
         // Set the light 3D model
         std::shared_ptr<SimpleColorMaterial> material = std::make_shared<SimpleColorMaterial>();
@@ -42,7 +42,7 @@ public:
     /// @param position The light center position.
     void SetPosition(const glm::vec3& position) {
         m_Position = position;
-        m_Viewpoint->SetPosition(position);
+        m_ShadowCamera->SetPosition(position);
         m_Model.SetPosition(position);
     }
     

@@ -5,14 +5,13 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-namespace utils { namespace matrix
+namespace utils { namespace CameraSpace
 {
-
 /**
  * Calculate a look-at matrix.
  *
- * This utility function calculates a view matrix to position the camera at the specified
- * position, looking towards the given target point.
+ * This utility function calculates a view matrix to position the camera at the specified position,
+ * looking towards the given target point.
  *
  * @param position The camera position in world coordinates.
  * @param target The target point the camera is looking at.
@@ -21,7 +20,62 @@ namespace utils { namespace matrix
  */
 inline glm::mat4 CalculateLookAtMatrix(glm::vec3 position, glm::vec3 target)
 {
+    // Calculate the direction from the camera position to the target point
+    glm::vec3 direction = glm::normalize(target - position);
+
+    // Handle the case where the camera is looking directly up or down
+    // by determining an appropriate "up" vector
+    glm::vec3 up = glm::abs(glm::dot(direction, glm::vec3(0.0f, 1.0f, 0.0f))) < 0.99f
+                   ? glm::vec3(0.0f, 1.0f, 0.0f)    // Camera is not looking straight up or down
+                   : glm::vec3(0.0f, 0.0f, 1.0f);   // Camera is looking straight up or down
+
+    // Generate a view matrix that represents the camera's orientation and position
+    return glm::lookAt(position, target, up);
+}
+
+/*
+inline glm::mat4 CalculateLookAtMatrix(glm::vec3 position, glm::vec3 target)
+{
     return glm::lookAt(position, target, glm::vec3(0.0f, 1.0f, 0.0f));
+}
+ */
+
+/**
+ * @brief Calculate the world-space positions of the frustum corners given the projection and
+ * view matrices.
+ *
+ * @param projection The projection matrix.
+ * @param view The view matrix.
+ *
+ * @return A vector containing the world-space positions of the frustum corners.
+ */
+inline std::vector<glm::vec4> GetFrustumCorners(const glm::mat4& view,
+                                                const glm::mat4& projection)
+{
+    // Calculate the inverse of the combined projection and view matrices
+    const glm::mat4 inv = glm::inverse(projection * view);
+    
+    std::vector<glm::vec4> corners;
+    for (unsigned int x = 0; x < 2; ++x)
+    {
+        for (unsigned int y = 0; y < 2; ++y)
+        {
+            for (unsigned int z = 0; z < 2; ++z)
+            {
+                // Transform the normalized device coordinates to clip space
+                const glm::vec4 pt =
+                    inv * glm::vec4(
+                        2.0f * x - 1.0f,
+                        2.0f * y - 1.0f,
+                        2.0f * z - 1.0f,
+                        1.0f);
+                // Divide by the homogeneous coordinate to get world-space position
+                corners.push_back(pt / pt.w);
+            }
+        }
+    }
+    
+    return corners;
 }
 
 } // namespace matrix
