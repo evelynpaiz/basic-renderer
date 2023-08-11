@@ -147,7 +147,7 @@ protected:
     /// @brief Set the material properties into the uniforms of the shader program.
     void SetMaterialProperties() override
     {
-        FlatColor::SetProperties(m_Shader, "u_Color");
+        FlatColor::SetProperties(m_Shader, "u_Material.Color");
     }
     
     // Disable the copying or moving of this resource
@@ -192,7 +192,7 @@ protected:
     /// @brief Set the material properties into the uniforms of the shader program.
     void SetMaterialProperties() override
     {
-        FlatTexture::SetProperties(m_Shader, "u_Texture");
+        FlatTexture::SetProperties(m_Shader, "u_Material.TextureMap");
     }
     
     // Disable the copying or moving of this resource
@@ -237,8 +237,8 @@ protected:
     /// @brief Set the material properties into the uniforms of the shader program.
     void SetMaterialProperties() override
     {
-        FlatColor::SetProperties(m_Shader, "u_Color");
-        FlatTexture::SetProperties(m_Shader, "u_Texture");
+        FlatColor::SetProperties(m_Shader, "u_Material.Color");
+        FlatTexture::SetProperties(m_Shader, "u_Material.TextureMap");
     }
     
     

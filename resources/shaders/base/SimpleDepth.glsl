@@ -1,23 +1,15 @@
 #shader vertex
 #version 330 core
 
-struct Transform {
-    mat4 Model;
-    mat4 View;
-    mat4 Projection;
-};
+// Include transformation matrices
+#include "Resources/shaders/common/matrix/SimpleMatrix.glsl"
 
-layout (location = 0) in vec4 a_Position;
-
-uniform Transform u_Transform;
-
-void main()
-{
-    gl_Position = u_Transform.Projection * u_Transform.View * u_Transform.Model * a_Position;
-}
+// Include vertex shader
+#include "Resources/shaders/common/vertex/P.vs.glsl"
 
 #shader fragment
 #version 330 core
 
+// Entry point of the fragment shader
 void main()
 {}

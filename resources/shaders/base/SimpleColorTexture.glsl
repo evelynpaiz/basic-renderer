@@ -1,39 +1,27 @@
 #shader vertex
 #version 330 core
 
-layout (location = 0) in vec4 a_Position;
-layout (location = 1) in vec2 a_TextureCoord;
+// Include transformation matrices
+#include "Resources/shaders/common/matrix/SimpleMatrix.glsl"
 
-struct Transform {
-    mat4 Model;
-    mat4 View;
-    mat4 Projection;
-};
-
-uniform Transform u_Transform;
-
-out vec2 v_TextureCoord;
-
-void main()
-{
-    v_TextureCoord = a_TextureCoord;
-    
-    gl_Position = u_Transform.Projection * u_Transform.View * u_Transform.Model * a_Position;
-}
+// Include vertex shader
+#include "Resources/shaders/common/vertex/PT.vs.glsl"
 
 #shader fragment
 #version 330 core
 
-layout (location = 0) out vec4 color;
+// Include material properties
+#include "Resources/shaders/common/material/ColorTextureMaterial.glsl"
 
-in vec2 v_TextureCoord;
+// Include fragment inputs
+#include "Resources/shaders/common/fragment/T.fs.glsl"
 
-uniform vec4 u_Color;
-uniform sampler2D u_Texture;
-
+// Entry point of the fragment shader
 void main()
 {
-    vec4 textureColor = texture(u_Texture, v_TextureCoord);
-    
-    color = textureColor * u_Color;
+    // Sample the color from the texture using the provided texture coordinates
+    vec4 textureColor = texture(u_Material.TextureMap, v_TextureCoord);
+
+    // Combine the sampled texture color with the material color
+    color = textureColor * u_Material.Color;
 }

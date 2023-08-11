@@ -1,33 +1,24 @@
 #shader vertex
 #version 330 core
 
-struct Transform {
-    mat4 Model;
-    mat4 View;
-    mat4 Projection;
-};
+// Include transformation matrices
+#include "Resources/shaders/common/matrix/SimpleMatrix.glsl"
 
-layout (location = 0) in vec4 a_Position;
-
-uniform Transform u_Transform;
-
-void main()
-{
-    gl_Position = u_Transform.Projection * u_Transform.View * u_Transform.Model * a_Position;
-}
+// Include vertex shader
+#include "Resources/shaders/common/vertex/P.vs.glsl"
 
 #shader fragment
 #version 330 core
 
-struct Material {
-    vec4 Color;
-};
+// Include material properties
+#include "Resources/shaders/common/material/ColorMaterial.glsl"
 
-layout (location = 0) out vec4 color;
+// Include fragment inputs
+#include "Resources/shaders/common/fragment/P.fs.glsl"
 
-uniform vec4 u_Color;
-
+// Entry point of the fragment shader
 void main()
 {
-    color = u_Color;
+    // Set the output color of the fragment shader to the material color
+    color = u_Material.Color;
 }

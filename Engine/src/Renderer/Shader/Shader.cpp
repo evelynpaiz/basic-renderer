@@ -262,10 +262,36 @@ ShaderProgramSource Shader::ParseShader(const std::filesystem::path& filepath)
         }
         else
         {
-            ss[(int)type] << line << '\n';
+            // Include statement handling
+            if (line.find("#include") != std::string::npos)
+            {
+                std::string includePath = line.substr(line.find_first_of('"') + 1,
+                                                      line.find_last_of('"') - line.find_first_of('"') - 1);
+                std::string includedSource = ReadFile(includePath);
+                ss[(int)type] << includedSource << '\n';
+            }
+            else
+                ss[(int)type] << line << '\n';
         }
     }
     
     // Return the shader sources
     return ShaderProgramSource(ss[0].str(), ss[1].str());
+}
+
+/**
+ * @brief Reads the contents of a file and returns it as a string.
+ *
+ * @param filePath The path to the file to be read.
+ *
+ * @return The contents of the file as a string.
+ */
+std::string Shader::ReadFile(const std::filesystem::path& filePath)
+{
+    std::ifstream fileStream(filePath);
+    CORE_ASSERT(fileStream.is_open(), "Failed to open file: " + filePath.string());
+
+    std::stringstream buffer;
+    buffer << fileStream.rdbuf();
+    return buffer.str();
 }

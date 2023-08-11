@@ -76,6 +76,7 @@ private:
     // Parsing
     // ----------------------------------------
     ShaderProgramSource ParseShader(const std::filesystem::path& filepath);
+    std::string ReadFile(const std::filesystem::path& filePath);
     
     // Shader variables
     // ----------------------------------------
