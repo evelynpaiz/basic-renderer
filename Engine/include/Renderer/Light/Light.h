@@ -29,9 +29,13 @@ public:
     /// @brief Update the camera view matrix.
     /// This method updates the camera's view matrix based on its position and target, using the
     /// `CalculateLookAtMatrix` utility function.
-    virtual void UpdateViewMatrix()
+    void UpdateViewMatrix() override
     {
-        m_ViewMatrix = utils::CameraSpace::CalculateLookAtMatrix(m_Position, m_Target);
+        // Set the new rotation angles
+        m_Rotation.x = Camera::CalculatePitch();
+        m_Rotation.y = Camera::CalculateYaw();
+        
+        Camera::UpdateViewMatrix();
     }
     
     // Disable the copying or moving of this resource
@@ -66,9 +70,13 @@ public:
     /// @brief Update the camera view matrix.
     /// This method updates the camera's view matrix based on its position and target, using the
     /// `CalculateLookAtMatrix` utility function.
-    virtual void UpdateViewMatrix()
+    void UpdateViewMatrix() override
     {
-        m_ViewMatrix = utils::CameraSpace::CalculateLookAtMatrix(m_Position, m_Target);
+        // Set the new rotation angles
+        m_Rotation.x = Camera::CalculatePitch();
+        m_Rotation.y = Camera::CalculateYaw();
+        
+        Camera::UpdateViewMatrix();
     }
     
     // Disable the copying or moving of this resource

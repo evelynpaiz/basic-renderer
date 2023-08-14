@@ -95,20 +95,12 @@ public:
 protected:
     // Transformation matrices
     // ----------------------------------------
-    void UpdateViewMatrix() override;
     void UpdateProjectionMatrix() override;
     
     // Getter(s)
     // ----------------------------------------
-    glm::quat GetOrientation() const;
-    glm::vec3 GetUpDirection() const;
-    glm::vec3 GetRightDirection() const;
-    glm::vec3 GetFowardDirection() const;
-    
     glm::vec3 CalculateDistance(const glm::vec3& p1, const glm::vec3& p2,
                                 const glm::vec3& direction) const;
-    float CalculatePitch() const;
-    float CalculateYaw() const;
     
     // Camera movements
     // ----------------------------------------

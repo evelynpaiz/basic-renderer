@@ -90,66 +90,12 @@ void PerspectiveCamera::OnEvent(Event &e)
 }
 
 /**
- * Update the camera view matrix.
- */
-void PerspectiveCamera::UpdateViewMatrix()
-{
-    // Get the camera current orientation
-    glm::quat orientation = GetOrientation();
-    // Compute the view matrix
-    glm::mat4 view = glm::translate(glm::mat4(1.0f), m_Position)
-        * glm::toMat4(orientation);
-    m_ViewMatrix = glm::inverse(view);
-}
-
-/**
  * Update the camera projection matrix (perspective projection).
  */
 void PerspectiveCamera::UpdateProjectionMatrix()
 {
-    m_ProjectionMatrix = glm::perspective(glm::radians(m_FieldOfView),
-    GetAspectRatio(), m_NearPlane, m_FarPlane);
-}
-
-/**
- * Get the camera orientation defined as a quaternion.
- *
- * @return The camera orientation.
- */
-glm::quat PerspectiveCamera::GetOrientation() const
-{
-    return glm::quat(glm::radians(glm::vec3(-m_Rotation.x, -m_Rotation.y,
-                                            -m_Rotation.z)));
-}
-
-/**
- * Get the camera's up direction vector.
- *
- * @return The up vector.
- */
-glm::vec3 PerspectiveCamera::GetUpDirection() const
-{
-    return glm::rotate(GetOrientation(), glm::vec3(0.0f, 1.0f, 0.0f));
-}
-
-/**
- * Get the camera's right direction vector.
- *
- * @return The right vector.
- */
-glm::vec3 PerspectiveCamera::GetRightDirection() const
-{
-    return glm::rotate(GetOrientation(), glm::vec3(1.0f, 0.0f, 0.0f));
-}
-
-/**
- * Get the camera's forward direction vector.
- *
- * @return The forward vector.
- */
-glm::vec3 PerspectiveCamera::GetFowardDirection() const
-{
-    return glm::rotate(GetOrientation(), glm::vec3(0.0f, 0.0f, -1.0f));
+    m_ProjectionMatrix = glm::perspective(glm::radians(m_FieldOfView), GetAspectRatio(),
+                                          m_NearPlane, m_FarPlane);
 }
 
 /**
@@ -165,29 +111,6 @@ glm::vec3 PerspectiveCamera::CalculateDistance(const glm::vec3& p1, const glm::v
                                                const glm::vec3& direction) const
 {
     return p1 - direction * glm::length(p1 - p2);
-}
-
-/**
- * @brief Calculate the pitch angle of the camera (x-axis).
- *
- * @return The pitch angle in degrees.
- */
-float PerspectiveCamera::CalculatePitch() const
-{
-    glm::vec3 direction = glm::normalize(m_Position - m_Target);
-    return glm::degrees(acos(direction.y));
-}
-
-/**
- * @brief Calculate the yaw angle of the camera (y-axis).
- *
- * @return The yaw angle in degrees.
- */
-float PerspectiveCamera::CalculateYaw() const
-{
-    glm::vec3 direction = glm::normalize(m_Position - m_Target);
-    float yaw = glm::degrees(atan2(direction.z, direction.x));
-    return yaw + 90.0f;
 }
 
 /**
