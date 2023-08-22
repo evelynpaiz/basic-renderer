@@ -2,6 +2,7 @@
 
 #include "Renderer/Shader/Shader.h"
 #include "Renderer/Texture/Texture.h"
+#include "Renderer/Light/Light.h"
 
 /**
  * Base class representing a material used for rendering.

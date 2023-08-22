@@ -38,10 +38,10 @@ void Viewer::OnUpdate(float deltaTime)
     
     Renderer::Clear();
     
-    m_Cube.SetMaterial(m_ShadowMaterial);
+    m_Cube.SetMaterial(m_DepthMaterial);
     m_Cube.DrawModel();
     
-    m_Plane.SetMaterial(m_ShadowMaterial);
+    m_Plane.SetMaterial(m_DepthMaterial);
     m_Plane.DrawModel();
     
     m_LightSource->GetFramebuffer()->Unbind();
@@ -126,7 +126,7 @@ void Viewer::InitializeViewer()
     m_LightSource->SetViewportSize(m_ViewportWidth, m_ViewportHeight);
     
     // Define the material(s) to be used for shading
-    m_ShadowMaterial = std::make_shared<SimpleColorMaterial>("Resources/shaders/base/SimpleDepth.glsl");
+    m_DepthMaterial = std::make_shared<Material>("Resources/shaders/depth/DepthMap.glsl");
     
     m_CubeMaterial = std::make_shared<PhongTextureMaterial>("Resources/shaders/phong/PhongTextureShadow.glsl");
     m_CubeMaterial->SetDiffuseMap(std::make_shared<Texture2D>("Resources/textures/diffuse.jpeg"));
@@ -134,7 +134,7 @@ void Viewer::InitializeViewer()
     m_CubeMaterial->SetShininess(32.0f);
     m_CubeMaterial->SetLight(m_LightSource);
     
-    //m_ScreenMaterial = std::make_shared<SimpleTextureMaterial>("Resources/shaders/base/SimpleDepthTexture.glsl");
+    //m_ScreenMaterial = std::make_shared<SimpleTextureMaterial>("Resources/shaders/depth/SimpleDepthTexture.glsl");
     //m_ScreenMaterial->SetTextureMap(m_LightSource->GetFramebuffer()->GetDepthAttachment());
     
     m_ScreenMaterial = std::make_shared<SimpleTextureMaterial>();

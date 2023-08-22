@@ -1,9 +1,6 @@
 #pragma once
 
-#include "Renderer/Material/Material.h"
-
-#include "Renderer/Light/Light.h"
-#include "Renderer/Light/PointLight.h"
+#include "Renderer/Material/LightedMaterial.h"
 
 /**
  * A base class for implementing Phong shading properties.
@@ -11,7 +8,7 @@
  * The `Phong` class provides a base class for defining material properties used in Phong
  * shading. It is intended to be inherited by specific material classes to add Phong support.
  */
-class Phong
+class Phong : public SimpleLighted
 {
 public:
     // Destructor
@@ -25,25 +22,17 @@ public:
     /// @param shininess The shininess value.
     void SetShininess(float shininess) { m_Shininess = shininess; }
     
-    /// @brief Set the light source used for shading.
-    /// @param texture The light source.
-    void SetLight(const std::shared_ptr<Light>& light) { m_Light = light; }
-    
     // Getter(s)
     // ----------------------------------------
     /// @brief Get the shininess (exponent value).
     /// @return The shininess value.
     float GetShininess() const { return m_Shininess; }
     
-    /// @brief Get the light source used for shading.
-    /// @return The light source.
-    std::shared_ptr<Light> GetLight() const { return m_Light; }
-    
 protected:
     // Constructor(s)
     // ----------------------------------------
     /// @brief Generate a phong base.
-    Phong() = default;
+    Phong() : SimpleLighted() {}
     
 protected:
     // Properties
@@ -56,7 +45,7 @@ protected:
         shader->SetFloat("u_Material.Shininess", m_Shininess);
         
         // Set the light properties
-        m_Light->DefineLightProperties(shader, slot);
+        SimpleLighted::SetProperties(shader, slot);
     }
     
     // Flat color variables
@@ -64,9 +53,6 @@ protected:
 protected:
     ///< Material shininess.
     float m_Shininess = 32.0f;
-    
-    ///< Light source.
-    std::shared_ptr<Light> m_Light;
 };
 
 /**

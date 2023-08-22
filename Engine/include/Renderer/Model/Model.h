@@ -117,7 +117,7 @@ public:
     /// @param material The material defining the surface of the mesh.
     void SetMaterialForMesh(unsigned int index, const std::shared_ptr<Material>& material)
     {
-        if (index > 0 && index < m_Meshes.size())
+        if (index >= 0 && index < m_Meshes.size())
             m_Meshes[index].SetMaterial(material);
     }
     

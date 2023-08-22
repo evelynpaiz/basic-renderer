@@ -26,6 +26,14 @@ public:
     
     // Setter(s)
     // ----------------------------------------
+    /// @brief Change the camera orthographic size.
+    /// @param size The orthographic size of the camera.
+    void SetOrthographicSize(const float size)
+    {
+        m_OrthoSize = size;
+        UpdateProjectionMatrix();
+    }
+    
     /// @brief Change the camera rotation in the z-axis.
     /// @param roll The camera rotation angle.
     void SetRotationAngle(const float roll)

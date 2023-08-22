@@ -20,8 +20,8 @@
 
 // Include additional functions
 #include "Resources/shaders/common/utils/Saturate.glsl"
-#include "Resources/shaders/common/shading/PhongSpecular.glsl"
-#include "Resources/shaders/common/shading/Phong.glsl"
+#include "Resources/shaders/phong/chunks/PhongSpecular.glsl"
+#include "Resources/shaders/phong/chunks/Phong.glsl"
 
 // Entry point of the fragment shader
 void main()

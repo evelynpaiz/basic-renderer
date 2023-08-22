@@ -9,15 +9,16 @@
  *
  * @return The shadow value for the fragment.
  */
-float PCF(vec3 projectionCoord, float bias, vec2 texelSize, int kernelSize, float sigma)
+float PCF(sampler2D shadowMap, vec3 projectionCoord, float bias, vec2 texelSize, int kernelSize, float sigma)
 {
     // Get depth of current fragment from light's perspective
     float currentDepth = projectionCoord.z;
-    // Initialize shadow value
-    float shadow = 0.0f;
     
     // Calculate half of the kernel size
     int halfKernel = kernelSize / 2;
+    
+    // Initialize shadow value
+    float shadow = 0.0f;
     
     // Loop over the PCF kernel
     for(int x = -halfKernel; x <= halfKernel; ++x)
@@ -28,7 +29,7 @@ float PCF(vec3 projectionCoord, float bias, vec2 texelSize, int kernelSize, floa
            vec2 sampleOffset = vec2(x, y) * texelSize;
            
            // Sample the shadow map at the offset position
-           float pcfDepth = texture(u_Light.ShadowMap, projectionCoord.xy + sampleOffset).r;
+           float pcfDepth = texture(shadowMap, projectionCoord.xy + sampleOffset).r;
            
            // Calculate the squared distance from the center of the kernel
            float squaredDistance = float(x * x + y * y);
@@ -37,7 +38,7 @@ float PCF(vec3 projectionCoord, float bias, vec2 texelSize, int kernelSize, floa
            float weight = exp(-0.5 * (squaredDistance / (sigma * sigma)));
            
            // Update the shadow value using the sampled depth and weight
-           shadow += currentDepth - bias > pcfDepth ? weight : 0.0;
+           shadow += currentDepth - bias > pcfDepth ? weight : 0.0f;
        }
     }
     

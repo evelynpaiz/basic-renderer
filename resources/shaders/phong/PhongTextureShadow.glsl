@@ -2,7 +2,7 @@
 #version 330 core
 
 // Include transformation matrices
-#include "Resources/shaders/common/matrix/LightMatrix.glsl"
+#include "Resources/shaders/common/matrix/CompleteMatrix.glsl"
 
 // Include vertex shader
 #include "Resources/shaders/common/vertex/PTN-S.vs.glsl"
@@ -21,11 +21,12 @@
 
 // Include additional functions
 #include "Resources/shaders/common/utils/Saturate.glsl"
-#include "Resources/shaders/common/shading/PhongSpecular.glsl"
-#include "Resources/shaders/common/shading/Phong.glsl"
+#include "Resources/shaders/phong/chunks/PhongSpecular.glsl"
+#include "Resources/shaders/phong/chunks/Phong.glsl"
 
-#include "Resources/shaders/common/shadow/PCF.glsl"
-#include "Resources/shaders/common/shadow/SimpleSM.glsl"
+#include "Resources/shaders/depth/chunks/PCF.glsl"
+#include "Resources/shaders/depth/chunks/BiasAngle.glsl"
+#include "Resources/shaders/depth/chunks/ShadowMap.glsl"
 
 // Entry point of the fragment shader
 void main()
@@ -42,9 +43,9 @@ void main()
     // Get the specular color (ks) from the SpecularMap texture
     vec3 ks = vec3(texture(u_Material.SpecularMap, v_TextureCoord));
     
-    // Calculate the shadow factor using the shadow map
-    // Parameters: Normal, Light direction, Light space position
-    float shadow = calculateShadow(normal, lightDirection, v_LightSpacePosition);
+    // Calculate shadow factor
+    float bias = calculateBias(normal, lightDirection, 0.005f, 0.01f);
+    float shadow = calculateShadow(u_Light.ShadowMap, v_LightSpacePosition, bias, 3, 1.0f);
     
     // Define fragment color using Phong shading
     // Parameters: Diffuse color (kd), Diffuse color (kd), Specular color (ks), Shadow factor

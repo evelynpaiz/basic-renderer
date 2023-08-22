@@ -70,7 +70,7 @@ private:
     Model<GeoVertexData<glm::vec4, glm::vec2>> m_Screen;
     
     ///< Material(s).
-    std::shared_ptr<Material> m_ShadowMaterial;
+    std::shared_ptr<Material> m_DepthMaterial;
     std::shared_ptr<PhongTextureMaterial> m_CubeMaterial;
     std::shared_ptr<SimpleTextureMaterial> m_ScreenMaterial;
     

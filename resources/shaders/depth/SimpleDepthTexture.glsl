@@ -17,7 +17,7 @@
 #include "Resources/shaders/common/fragment/T.fs.glsl"
 
 // Include linearization function for pespective projections
-#include "Resources/shaders/common/utils/LinearizeDepth.glsl"
+#include "Resources/shaders/depth/chunks/LinearizeDepth.glsl"
 
 // Entry point of the fragment shader
 void main()
@@ -34,5 +34,5 @@ void main()
     // For orthographic projection: Use "color = vec4(vec3(depthValue), 1.0);" instead
     // For perspective projection: Use the linearizeDepth function to linearize the depth
     // "color = vec4(vec3(linearizeDepth(depthValue, nearPlane, farPlane) / farPlane), 1.0);"
-    color = vec4(vec3(linearizeDepth(depthValue, nearPlane, farPlane) / farPlane), 1.0);
+    color = vec4(vec3(depthValue), 1.0);
 }

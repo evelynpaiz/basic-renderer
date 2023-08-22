@@ -19,12 +19,19 @@ public:
     /// @brief Generate a point of light.
     /// @param color The color of the light source.
     PointLight(const glm::vec3 &color = glm::vec3(1.0f),
-               const glm::vec3 &position = glm::vec3(0.0f))
+               const glm::vec3 &position = glm::vec3(0.0f),
+               const float& orthoSize = 10.0f)
         : Light(color), m_Position(position)
     {
         // Set the viewpoint
-        m_ShadowCamera = std::make_shared<PerspectiveShadow>();
+        m_ShadowCamera = std::make_shared<OrthographicShadow>();
         m_ShadowCamera->SetPosition(position);
+        
+        // Check if m_ShadowCamera is actually of type OrthographicShadow before casting
+        OrthographicShadow* orthoShadowCamera = dynamic_cast<OrthographicShadow*>(m_ShadowCamera.get());
+        if (orthoShadowCamera) {
+            orthoShadowCamera->SetOrthographicSize(orthoSize);
+        }
         
         // Set the light 3D model
         std::shared_ptr<SimpleColorMaterial> material = std::make_shared<SimpleColorMaterial>();

@@ -35,4 +35,3 @@ void main()
     // Calculate the final position of the vertex in clip space
     gl_Position = u_Transform.Projection * u_Transform.View * worldPosition;
 }
-

@@ -30,6 +30,7 @@ enum class TextureFormat
     
     // Depth/stencil formats
     DEPTH24,            ///< 24-bit depth (depth buffer)
+    DEPTH32F,           ///< 32-bit float depth (depth buffer)
     DEPTH24STENCIL8,    ///< 24-bit depth, 8-bit stencil (depth and stencil attachments)
     
     // Defaults
@@ -97,6 +98,7 @@ inline GLenum TextureFormatToOpenGLBaseType(TextureFormat format)
         case TextureFormat::RGBA8UI: return GL_RGBA8UI;
             
         case TextureFormat::DEPTH24: return GL_DEPTH_COMPONENT24;
+        case TextureFormat::DEPTH32F: return GL_DEPTH_COMPONENT32F;
         case TextureFormat::DEPTH24STENCIL8: return GL_DEPTH24_STENCIL8;
     }
     
@@ -121,7 +123,7 @@ inline GLenum TextureFormatToOpenGLInternalType(TextureFormat format)
         case TextureFormat::R8: return GL_R8;
         case TextureFormat::RG8: return GL_RG8;
         case TextureFormat::RGB8: return GL_RGB8;
-        case TextureFormat::RGBA8: return GL_RGBA8;
+        case TextureFormat::RGBA8: return GL_RGBA16;
             
         case TextureFormat::R16F: return GL_R16F;
         case TextureFormat::RGB16F: return GL_RGB16F;
@@ -133,6 +135,7 @@ inline GLenum TextureFormatToOpenGLInternalType(TextureFormat format)
         case TextureFormat::RGBA8UI: return GL_RGBA_INTEGER;
             
         case TextureFormat::DEPTH24: return GL_DEPTH_COMPONENT;
+        case TextureFormat::DEPTH32F: return GL_DEPTH_COMPONENT;
         case TextureFormat::DEPTH24STENCIL8: return GL_DEPTH_STENCIL;
     }
     
@@ -169,6 +172,8 @@ inline GLenum TextureFormatToOpenGLDataType(TextureFormat format)
             
         case TextureFormat::DEPTH24:
         case TextureFormat::DEPTH24STENCIL8: return GL_UNSIGNED_INT;
+            
+        case TextureFormat::DEPTH32F: return GL_FLOAT;
     }
     
     CORE_ASSERT(false, "Unknown texture format!");
@@ -188,7 +193,8 @@ inline GLenum TextureFormatToOpenGLDepthType(TextureFormat format)
 {
     switch (format)
     {
-        case TextureFormat::DEPTH24: return GL_DEPTH_ATTACHMENT;
+        case TextureFormat::DEPTH24:
+        case TextureFormat::DEPTH32F: return GL_DEPTH_ATTACHMENT;
         case TextureFormat::DEPTH24STENCIL8: return GL_DEPTH_STENCIL_ATTACHMENT;
             
         case TextureFormat::None:
@@ -225,6 +231,7 @@ inline bool IsDepthFormat(TextureFormat format)
     switch (format)
     {
         case TextureFormat::DEPTH24STENCIL8:
+        case TextureFormat::DEPTH32F:
         case TextureFormat::DEPTH24: return true;
             
         case TextureFormat::None:

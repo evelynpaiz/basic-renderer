@@ -11,7 +11,7 @@
 vec3 calculateColor(vec3 ka, vec3 kd, vec3 ks, float shadow)
 {
     // Calculate the normalized surface normal
-        vec3 normal = normalize(v_Normal);
+    vec3 normal = normalize(v_Normal);
         
     // Calculate the direction from the surface point to the light source
     vec3 lightDirection = normalize(u_Light.Position - v_Position);
