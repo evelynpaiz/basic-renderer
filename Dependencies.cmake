@@ -47,7 +47,6 @@ set(ASSIMP_INSTALL OFF CACHE BOOL "" FORCE)
 set(ASSIMP_WARNINGS_AS_ERRORS OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(3rdparty/assimp)
-add_library(assimp::assimp ALIAS assimp)
 
 ## IMGUI
 set(IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/imgui/)

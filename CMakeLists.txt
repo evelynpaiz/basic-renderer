@@ -1,9 +1,8 @@
 # CMake C++ features
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.25)
 
 set(CMAKE_SUPPRESS_REGENERATION true)
 set(CMAKE_CXX_STANDARD 20)
-
 # Definition of the solution
 project(basic-renderer)
 
