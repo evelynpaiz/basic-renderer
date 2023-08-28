@@ -124,68 +124,55 @@ public:
     /// @param s The strength of the specular component (a value between 0 and 1).
     void SetSpecularStrength(float s) { m_SpecularStrength = s; }
     
-    /// @brief Change the light framebuffer resolution.
-    /// @param width Viewport size (width).
-    /// @param height Viewport size (height).
-    void SetViewportSize(const int width, const int height)
-    {
-        // Check input values
-        if (width <= 0 || height <= 0)
-        {
-            CORE_WARN("Attempted to rezize light resolution to {0}, {1}", width, height);
-            return;
-        }
-
-        // Define the new resolution value for light framebuffer
-        m_Framebuffer->Resize(width, height);
-        
-        // Update the light viewpoint resolution
-        m_ShadowCamera->SetViewportSize(width, height);
-    }
-    /// @brief Set whether shadow mapping should be active.
-    /// @param map Enable or disable shadow mapping
-    void SetShadowMap(const bool map) { m_ShadowMapping = map; }
-    
     // Getter(s)
     // ----------------------------------------
     /// @brief Get the color of the light source.
     /// @return The color of the light source.
     glm::vec3 GetColor() const { return m_Color; }
-    
-    /// @brief Get the framebuffer containing the scene renderered from the light viewpoint.
-    /// @return The light framebuffer.
-    const std::shared_ptr<FrameBuffer>& GetFramebuffer() { return m_Framebuffer; }
-    
+
+    /// @brief Get the ambient strength of the light source.
+    /// @return The ambient strength of the light source.
+    float GetAmbientStrength() const { return m_AmbientStrength; }
+    /// @brief Get the diffuse strength of the light source.
+    /// @return The diffuse strength of the light source.
+    float GetDiffuseStrength() const { return m_DiffuseStrength; }
+    /// @brief Get the specular strength of the light source.
+    /// @return The specular strength of the light source.
+    float GetSpecularStrength() const { return m_SpecularStrength; }
+
     /// @brief Get the camera used for shadow mapping to generate depth maps for shadow calculations.
     /// @return The viewpoint of the light source.
     const std::shared_ptr<Camera>& GetShadowCamera() { return m_ShadowCamera; }
-    /// @brief Defines if shadow mapping is currently applied.
-    /// @return Whether shadow mapping is enabled or not.
-    bool IsShadowMapActive() { return m_ShadowMapping; }
     
     // Properties
     // ----------------------------------------
-    /// @brief Define light properties into the uniforms of the shader program.
-    /// @param shader The shader program.
-    /// @param slot Next texture slot available.
-    virtual void DefineLightProperties(const std::shared_ptr<Shader> &shader,
-                                       unsigned int slot = 0)
+    /// @brief Define the color properties (from the light) into the uniforms of the shader program.
+    /// @param shader Shader program to be used.
+    void DefineColorProperties(const std::shared_ptr<Shader> &shader)
     {
         shader->SetVec3("u_Light.Color", m_Color);
-        
+    }
+    /// @brief Define the strength properties (from the light) into the uniforms of the shader program.
+    /// @param shader Shader program to be used.
+    void DefineStrenghtProperties(const std::shared_ptr<Shader> &shader)
+    {
         shader->SetFloat("u_Light.La", m_AmbientStrength);
         shader->SetFloat("u_Light.Ld", m_DiffuseStrength);
         shader->SetFloat("u_Light.Ls", m_SpecularStrength);
-        
-        if (!m_ShadowMapping)
-            return;
-        
-        shader->SetMat4("u_Transform.Light", m_ShadowCamera->GetProjectionMatrix()
-                        * m_ShadowCamera->GetViewMatrix());
-
-        m_Framebuffer->GetDepthAttachment()->BindToTextureUnit(slot);
-        shader->SetInt("u_Light.ShadowMap", slot);
     }
+    /// @brief Define the transformation properties (from the light) into the uniforms of the shader program.
+    /// @param shader Shader program to be used.
+    void DefineTranformProperties(const std::shared_ptr<Shader> &shader)
+    {
+        shader->SetMat4("u_Transform.Light",
+                        m_ShadowCamera->GetProjectionMatrix() *
+                        m_ShadowCamera->GetViewMatrix());
+    }
+    /// @brief Define light properties into the uniforms of the shader program.
+    /// @param shader The shader program.
+    /// @param slot Next texture slot available.
+    virtual void DefineLightProperties(const std::shared_ptr<Shader> &shader)
+    {}
     
 protected:
     // Constructor(s)
@@ -194,13 +181,7 @@ protected:
     /// @param color The color of the light source.
     Light(const glm::vec3 &color = glm::vec3(1.0f))
     : m_Color(color)
-    {
-        FrameBufferSpecification spec(1, 1);
-        spec.AttachmentsSpec = {
-            TextureFormat::DEPTH24
-        };
-        m_Framebuffer = std::make_shared<FrameBuffer>(spec);
-    }
+    {}
     
     // Light variables
     // ----------------------------------------
@@ -213,13 +194,8 @@ protected:
     float m_DiffuseStrength = 0.6f;
     float m_SpecularStrength = 1.0f;
     
-    ///< Defines if the variables for shadow mapping should be set.
-    bool m_ShadowMapping = false;
-    
     ///< The light viewpoint (used for rendering shadows).
     std::shared_ptr<Camera> m_ShadowCamera;
-    ///< The light framebuffer (rendering from the light point of view).
-    std::shared_ptr<FrameBuffer> m_Framebuffer;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

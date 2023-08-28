@@ -8,7 +8,7 @@
  * The `Phong` class provides a base class for defining material properties used in Phong
  * shading. It is intended to be inherited by specific material classes to add Phong support.
  */
-class Phong : public SimpleLighted
+class Phong
 {
 public:
     // Destructor
@@ -32,20 +32,16 @@ protected:
     // Constructor(s)
     // ----------------------------------------
     /// @brief Generate a phong base.
-    Phong() : SimpleLighted() {}
+    Phong() = default;
     
 protected:
     // Properties
     // ----------------------------------------
     /// @brief Set the material properties into the uniforms of the shader program.
     /// @param shader The shader program to set the properties for.
-    void SetProperties(const std::shared_ptr<Shader>& shader,
-                       unsigned int slot = 0)
+    void SetProperties(const std::shared_ptr<Shader>& shader)
     {
         shader->SetFloat("u_Material.Shininess", m_Shininess);
-        
-        // Set the light properties
-        SimpleLighted::SetProperties(shader, slot);
     }
     
     // Flat color variables
@@ -199,28 +195,12 @@ protected:
     // ----------------------------------------
     /// @brief Set the material properties into the uniforms of the shader program.
     /// @param shader The shader program to set the properties for.
-    void SetProperties(const std::shared_ptr<Shader>& shader)
+    void SetProperties(const std::shared_ptr<Shader>& shader, unsigned int& slot)
     {
-        SetTextureMap(shader, "u_Material.DiffuseMap", m_DiffuseTexture, 0);
-        SetTextureMap(shader, "u_Material.SpecularMap", m_SpecularTexture, 1);
+        utils::Texturing::SetTextureMap(shader, "u_Material.DiffuseMap", m_DiffuseTexture, slot++);
+        utils::Texturing::SetTextureMap(shader, "u_Material.SpecularMap", m_SpecularTexture, slot++);
         
-        Phong::SetProperties(shader, 2);
-    }
-    
-private:
-    /// @brief Set a texture map in the shader program.
-    /// @param shader The shader program to set the properties for.
-    /// @param texture The texture map.
-    /// @param name The uniform name.
-    /// @param slot The texture slot.
-    void SetTextureMap(const std::shared_ptr<Shader>& shader, const std::string& name,
-                       const std::shared_ptr<Texture>& texture, unsigned int slot)
-    {
-        if(!texture)
-            return;
-
-        texture->BindToTextureUnit(slot);
-        shader->SetInt(name, slot);
+        Phong::SetProperties(shader);
     }
     
     // Phong color variables
@@ -236,28 +216,25 @@ protected:
 /**
  * A material class for Phong shading with color-based lighting.
  *
- * The `PhongColorMaterial` class is a subclass of `Material` and `PhongColor`,
+ * The `PhongColorMaterial` class is a subclass of `LightedMaterial` and `PhongColor`,
  * providing a material definition for shading 3D models using Phong lighting with color-based
  * illumination. It uses a shader specified by the given file path to apply the shading to the model.
  *
  * Copying or moving `PhongColorMaterial` objects is disabled to ensure single ownership
  * and prevent unintended duplication of material resources.
  */
-class PhongColorMaterial : public Material, public PhongColor
+class PhongColorMaterial : public LightedMaterial, public PhongColor
 {
 public:
     // Constructor(s)/Destructor
     // ----------------------------------------
     /// @brief Generate a phong material object with the specified shader file path.
+    /// @param light The light source to be used for shading.
     /// @param filePath The file path to the shader used by the material.
-    /// @param light The light type to use for shading.
-    PhongColorMaterial(const std::filesystem::path& filePath =
-                       std::filesystem::path("Resources/shaders/phong/PhongColor.glsl"),
-                       const std::shared_ptr<Light> &light = std::make_shared<PointLight>())
-        : Material(filePath), PhongColor()
+    PhongColorMaterial(const std::shared_ptr<Light>& light, const std::filesystem::path& filePath =
+                       std::filesystem::path("Resources/shaders/phong/PhongColor.glsl"))
+        : LightedMaterial(light, filePath), PhongColor()
     {
-        Phong::SetLight(light);
-        
         m_NormalMatrix = true;
         m_ViewDirection = true;
     }
@@ -270,8 +247,13 @@ protected:
     /// @brief Set the material properties into the uniforms of the shader program.
     void SetMaterialProperties() override
     {
-        // Set the phong material properties
+        LightedMaterial::SetMaterialProperties();
         PhongColor::SetProperties(m_Shader);
+        
+        m_Light->DefineColorProperties(m_Shader);
+        m_Light->DefineStrenghtProperties(m_Shader);
+        if (m_ShadowMap)
+            m_Light->DefineTranformProperties(m_Shader);
     }
     
     // Disable the copying or moving of this resource
@@ -287,27 +269,26 @@ public:
 /**
  * A material class for Phong shading with texture-based lighting.
  *
- * The `PhongTextureMaterial` class is a subclass of `Material` and `PhongTexture`,
+ * The `PhongTextureMaterial` class is a subclass of `LightedMaterial` and `PhongTexture`,
  * providing a material definition for shading 3D models using Phong lighting with texture-based
  * illumination. It uses a shader specified by the given file path to apply the shading to the model.
  *
  * Copying or moving `PhongTextureMaterial` objects is disabled to ensure single ownership
  * and prevent unintended duplication of material resources.
  */
-class PhongTextureMaterial : public Material, public PhongTexture
+class PhongTextureMaterial : public LightedMaterial, public PhongTexture
 {
 public:
     // Constructor(s)/Destructor
     // ----------------------------------------
     /// @brief Generate a phong material object with the specified shader file path.
+    /// @param light The light source to be used for shading.
     /// @param filePath The file path to the shader used by the material.
-    /// @param light The light type to use for shading.
-    PhongTextureMaterial(const std::filesystem::path& filePath =
-                       std::filesystem::path("Resources/shaders/phong/PhongTexture.glsl"),
-                       const std::shared_ptr<Light> &light = std::make_shared<PointLight>())
-        : Material(filePath), PhongTexture()
+    PhongTextureMaterial(const std::shared_ptr<Light>& light, const std::filesystem::path& filePath =
+                         std::filesystem::path("Resources/shaders/phong/PhongTexture.glsl"))
+        : LightedMaterial(light, filePath), PhongTexture()
     {
-        PhongTexture::SetLight(light);
+        LightedMaterial::SetLight(light);
         m_NormalMatrix = true;
         m_ViewDirection = true;
     }
@@ -320,8 +301,13 @@ protected:
     /// @brief Set the material properties into the uniforms of the shader program.
     void SetMaterialProperties() override
     {
-        // Set the phong material properties
-        PhongTexture::SetProperties(m_Shader);
+        LightedMaterial::SetMaterialProperties();
+        PhongTexture::SetProperties(m_Shader, m_Slot);
+        
+        m_Light->DefineColorProperties(m_Shader);
+        m_Light->DefineStrenghtProperties(m_Shader);
+        if (m_ShadowMap)
+            m_Light->DefineTranformProperties(m_Shader);
     }
     
     // Disable the copying or moving of this resource

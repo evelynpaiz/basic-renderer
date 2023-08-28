@@ -10,7 +10,16 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-
+/**
+ * Represents a point light source in 3D space.
+ *
+ * The `PointLight` class is a type of `Light` that represents a point light source with color,
+ * position, and associated properties. It also includes a 3D model to visualize the point of light.
+ * Derived from `Light`, it provides methods to set and retrieve position and interact with shaders.
+ *
+ * Copying or moving `PointLight` objects is disabled to ensure single ownership
+ * and prevent unintended duplication of light resources.
+ */
 class PointLight : public Light
 {
 public:
@@ -18,6 +27,8 @@ public:
     // ----------------------------------------
     /// @brief Generate a point of light.
     /// @param color The color of the light source.
+    /// @param position The position of the light source.
+    /// @param orthoSize The orthographic size for shadow calculations (for directional shadows).
     PointLight(const glm::vec3 &color = glm::vec3(1.0f),
                const glm::vec3 &position = glm::vec3(0.0f),
                const float& orthoSize = 10.0f)
@@ -67,11 +78,10 @@ public:
     // ----------------------------------------
     /// @brief Define light properties into the uniforms of the shader program.
     /// @param shader The shader program.
-    void DefineLightProperties(const std::shared_ptr<Shader> &shader,
-                               unsigned int slot = 0) override
+    void DefineLightProperties(const std::shared_ptr<Shader> &shader) override
     {
         // Define basic light properties
-        Light::DefineLightProperties(shader, slot);
+        Light::DefineLightProperties(shader);
         // Define the point of light properties
         shader->SetVec3("u_Light.Position", m_Position);
     }

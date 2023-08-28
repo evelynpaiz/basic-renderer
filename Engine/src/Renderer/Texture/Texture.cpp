@@ -19,6 +19,17 @@ Texture::Texture()
 }
 
 /**
+ * Create a texture from input data.
+ *
+ * @param data The texture data.
+ */
+Texture::Texture(const void *data)
+    : Texture()
+{
+    CreateTexture(data);
+}
+
+/**
  * Create a base texture with specific properties.
  * 
  * @param spec The texture specifications.
@@ -27,6 +38,18 @@ Texture::Texture(const TextureSpecification& spec)
     : m_Spec(spec)
 {
     glGenTextures(1, &m_ID);
+}
+
+/**
+ * Create a texture from input data and with specific properties.
+ *
+ * @param data The texture data.
+ * @param spec The texture specifications.
+ */
+Texture::Texture(const void *data, const TextureSpecification& spec)
+    : Texture(spec)
+{
+    CreateTexture(data);
 }
 
 /**

@@ -22,6 +22,9 @@ enum class TextureFormat
     RGB16F,             ///< 16-bit half-float per channel, 48-bit total (HDR, no alpha)
     RGBA16F,            ///< 16-bit half-float per channel, 64-bit total (HDR color texture)
     
+    RGB32F,             ///< 32-bit float per channel, 96-bit total (HDR, no alpha)
+    RGBA32F,            ///< 32-bit float per channel, 128-bit total (HDR color texture)
+    
     // Integer formats
     R8UI,               ///< 8-bit unsigned integer (usually used for IDs)
     RG8UI,              ///< 8-bit unsigned integer per channel (two channels, IDs)
@@ -88,14 +91,16 @@ inline GLenum TextureFormatToOpenGLBaseType(TextureFormat format)
         case TextureFormat::R16F: return GL_RED;
         case TextureFormat::RG8: return GL_RG;
         case TextureFormat::RGB8:
-        case TextureFormat::RGB16F: return GL_RGB;
+        case TextureFormat::RGB16F:
+        case TextureFormat::RGB32F: return GL_RGB;
         case TextureFormat::RGBA8:
-        case TextureFormat::RGBA16F: return GL_RGBA;
+        case TextureFormat::RGBA16F:
+        case TextureFormat::RGBA32F: return GL_RGBA;
             
-        case TextureFormat::R8UI: return GL_R8UI;
-        case TextureFormat::RG8UI: return GL_RG8UI;
-        case TextureFormat::RGB8UI: return GL_RGB8UI;
-        case TextureFormat::RGBA8UI: return GL_RGBA8UI;
+        case TextureFormat::R8UI: return GL_RED_INTEGER;
+        case TextureFormat::RG8UI: return GL_RG_INTEGER;
+        case TextureFormat::RGB8UI: return GL_RGB_INTEGER;
+        case TextureFormat::RGBA8UI: return GL_RGBA_INTEGER;
             
         case TextureFormat::DEPTH24: return GL_DEPTH_COMPONENT24;
         case TextureFormat::DEPTH32F: return GL_DEPTH_COMPONENT32F;
@@ -129,10 +134,13 @@ inline GLenum TextureFormatToOpenGLInternalType(TextureFormat format)
         case TextureFormat::RGB16F: return GL_RGB16F;
         case TextureFormat::RGBA16F: return GL_RGBA16F;
             
-        case TextureFormat::R8UI: return GL_RED_INTEGER;
-        case TextureFormat::RG8UI: return GL_RG_INTEGER;
-        case TextureFormat::RGB8UI: return GL_RGB_INTEGER;
-        case TextureFormat::RGBA8UI: return GL_RGBA_INTEGER;
+        case TextureFormat::RGB32F: return GL_RGB32F;
+        case TextureFormat::RGBA32F: return GL_RGBA32F;
+            
+        case TextureFormat::R8UI: return GL_R8UI;
+        case TextureFormat::RG8UI: return GL_RG8UI;
+        case TextureFormat::RGB8UI: return GL_RGB8UI;
+        case TextureFormat::RGBA8UI: return GL_RGBA8UI;
             
         case TextureFormat::DEPTH24: return GL_DEPTH_COMPONENT;
         case TextureFormat::DEPTH32F: return GL_DEPTH_COMPONENT;
@@ -172,7 +180,9 @@ inline GLenum TextureFormatToOpenGLDataType(TextureFormat format)
             
         case TextureFormat::DEPTH24:
         case TextureFormat::DEPTH24STENCIL8: return GL_UNSIGNED_INT;
-            
+        
+        case TextureFormat::RGB32F:
+        case TextureFormat::RGBA32F:
         case TextureFormat::DEPTH32F: return GL_FLOAT;
     }
     
@@ -206,6 +216,9 @@ inline GLenum TextureFormatToOpenGLDepthType(TextureFormat format)
         case TextureFormat::R16F:
         case TextureFormat::RGB16F:
         case TextureFormat::RGBA16F:
+            
+        case TextureFormat::RGB32F:
+        case TextureFormat::RGBA32F:
             
         case TextureFormat::R8UI:
         case TextureFormat::RG8UI:
@@ -243,6 +256,9 @@ inline bool IsDepthFormat(TextureFormat format)
         case TextureFormat::R16F:
         case TextureFormat::RGB16F:
         case TextureFormat::RGBA16F:
+            
+        case TextureFormat::RGB32F:
+        case TextureFormat::RGBA32F:
             
         case TextureFormat::R8UI:
         case TextureFormat::RG8UI:

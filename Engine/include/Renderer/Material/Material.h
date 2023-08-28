@@ -4,6 +4,29 @@
 #include "Renderer/Texture/Texture.h"
 #include "Renderer/Light/Light.h"
 
+namespace utils { namespace Texturing {
+
+/**
+ * Set a texture map in the shader program.
+ * 
+ * @param shader The shader program to set the properties for.
+ * @param texture The texture map.
+ * @param name The uniform name.
+ * @param slot The texture slot.
+ */
+inline void SetTextureMap(const std::shared_ptr<Shader>& shader, const std::string& name,
+                          const std::shared_ptr<Texture>& texture, unsigned int slot)
+{
+    if(!texture)
+        return;
+
+    texture->BindToTextureUnit(slot);
+    shader->SetInt(name, slot);
+}
+
+} // namespace Texturing
+} // namespace
+
 /**
  * Base class representing a material used for rendering.
  *
@@ -56,11 +79,17 @@ public:
     /// @brief Defines if the viewing direction should be defined in the shader.
     /// @param v The view direction is defined or not in the shader.
     void SetViewDirection(bool v) { m_ViewDirection = v; }
+    /// @brief Defines if the normal matrix should be defined in the shader.
+    /// @param n The normal matrix is defined or not in the shader.
+    void SetNormalMatrix(bool n) { m_NormalMatrix = n; }
     
     // Properties
     // ----------------------------------------
     /// @brief Set the material properties.
-    virtual void SetMaterialProperties() {}
+    virtual void SetMaterialProperties()
+    {
+        m_Slot = 0;
+    }
     
     // Material variables
     // ----------------------------------------
@@ -68,6 +97,8 @@ protected:
     ///< The shader used for shading the specific material.
     std::shared_ptr<Shader> m_Shader;
     
+    ///< Texture unit index.
+    unsigned int m_Slot = 0;
     ///< Normal matrix should be defined in the shader.
     bool m_NormalMatrix = false;
     ///< View direction should be defined in the shader.

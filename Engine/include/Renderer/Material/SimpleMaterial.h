@@ -99,13 +99,9 @@ protected:
     /// @param shader The shader program to set the properties for.
     /// @param name The uniform name.
     void SetProperties(const std::shared_ptr<Shader>& shader,
-                       const std::string& name, unsigned int slot = 0)
+                       const std::string& name, unsigned int slot)
     {
-        if(!m_Texture)
-            return;
-        
-        m_Texture->BindToTextureUnit(slot);
-        shader->SetInt(name, slot);
+        utils::Texturing::SetTextureMap(shader, name, m_Texture, slot);
     }
     
     // Flat texture variables
@@ -192,7 +188,8 @@ protected:
     /// @brief Set the material properties into the uniforms of the shader program.
     void SetMaterialProperties() override
     {
-        FlatTexture::SetProperties(m_Shader, "u_Material.TextureMap");
+        Material::SetMaterialProperties();
+        FlatTexture::SetProperties(m_Shader, "u_Material.TextureMap", m_Slot++);
     }
     
     // Disable the copying or moving of this resource
@@ -237,8 +234,9 @@ protected:
     /// @brief Set the material properties into the uniforms of the shader program.
     void SetMaterialProperties() override
     {
+        Material::SetMaterialProperties();
         FlatColor::SetProperties(m_Shader, "u_Material.Color");
-        FlatTexture::SetProperties(m_Shader, "u_Material.TextureMap");
+        FlatTexture::SetProperties(m_Shader, "u_Material.TextureMap", m_Slot++);
     }
     
     

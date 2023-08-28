@@ -72,7 +72,9 @@ public:
     // Constructor(s)/Destructor
     // ----------------------------------------
     Texture();
+    Texture(const void *data);
     Texture(const TextureSpecification& spec);
+    Texture(const void *data, const TextureSpecification& spec);
     virtual ~Texture();
     
     // Usage

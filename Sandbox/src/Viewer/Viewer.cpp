@@ -34,17 +34,17 @@ void Viewer::OnUpdate(float deltaTime)
     Renderer::SetColorBuffer(false);
     
     // Render into the lights framebuffer
-    m_LightSource->GetFramebuffer()->Bind();
+    m_Framebuffers["Shadow"]->Bind();
     
     Renderer::Clear();
     
-    m_Cube.SetMaterial(m_DepthMaterial);
+    m_Cube.SetMaterial(m_Materials["Depth"]);
     m_Cube.DrawModel();
     
-    m_Plane.SetMaterial(m_DepthMaterial);
+    m_Plane.SetMaterial(m_Materials["Depth"]);
     m_Plane.DrawModel();
     
-    m_LightSource->GetFramebuffer()->Unbind();
+    m_Framebuffers["Shadow"]->Unbind();
     
     Renderer::SetFaceCulling(FaceCulling::Back);
     Renderer::EndScene();
@@ -56,21 +56,21 @@ void Viewer::OnUpdate(float deltaTime)
     Renderer::SetColorBuffer(true);
     
     // Render into the framebuffer
-    m_Framebuffer->Bind();
+    m_Framebuffers["Viewport"]->Bind();
     
     Renderer::Clear(glm::vec4(0.93f, 0.93f, 0.93f, 1.0f));
     
     m_LightSource->GetModel().DrawModel();
     
-    m_Cube.SetMaterial(m_CubeMaterial);
+    m_Cube.SetMaterial(m_Materials["PhongTexture"]);
     m_Cube.DrawModel();
-    m_Plane.SetMaterial(m_CubeMaterial);
+    m_Plane.SetMaterial(m_Materials["PhongColor"]);
     m_Plane.DrawModel();
     
     // Update the camera
     m_Camera->OnUpdate(deltaTime);
     
-    m_Framebuffer->Unbind();
+    m_Framebuffers["Viewport"]->Unbind();
     Renderer::EndScene();
     
     // Second pass: scene
@@ -107,50 +107,62 @@ void Viewer::OnEvent(Event &e)
  */
 void Viewer::InitializeViewer()
 {
-    // Define the output framebuffer
-    FrameBufferSpecification framebufferSpec(m_ViewportWidth, m_ViewportHeight);
-    framebufferSpec.AttachmentsSpec = {
-        TextureFormat::RGB8,
-        TextureFormat::DEPTH24
-    };
-    m_Framebuffer = std::make_shared<FrameBuffer>(framebufferSpec);
+    // Define light source
+    m_LightSource = std::make_shared<PointLight>(glm::vec3(1.0f), glm::vec3(2.0f, 2.5f, 6.0f));
+    m_LightSource->GetShadowCamera()->SetViewportSize(m_ViewportWidth, m_ViewportHeight);
     
     // Define the rendering camera
     m_Camera = std::make_shared<PerspectiveCamera>(m_ViewportWidth, m_ViewportHeight);
     m_Camera->SetPosition(glm::vec3(0.0f, 0.0f, 10.0f));
     
-    // Define the light source and its framebuffer for shadow mapping
-    m_LightSource = std::make_shared<PointLight>(glm::vec3(1.0f), glm::vec3(2.0f, 2.5f, 6.0f));
+    // Define the framebuffer(s)
+    FrameBufferSpecification framebufferSpec(m_ViewportWidth, m_ViewportHeight);
     
-    m_LightSource->SetShadowMap(true);
-    m_LightSource->SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+    framebufferSpec.AttachmentsSpec = {
+        TextureFormat::DEPTH24
+    };
+    m_Framebuffers["Shadow"] = std::make_shared<FrameBuffer>(framebufferSpec);
+    
+    framebufferSpec.AttachmentsSpec = {
+        TextureFormat::RGB8,
+        TextureFormat::DEPTH24
+    };
+    m_Framebuffers["Viewport"] = std::make_shared<FrameBuffer>(framebufferSpec);
     
     // Define the material(s) to be used for shading
-    m_DepthMaterial = std::make_shared<Material>("Resources/shaders/depth/DepthMap.glsl");
+    auto depthMaterial = std::make_shared<Material>("Resources/shaders/depth/DepthMap.glsl");
+    m_Materials["Depth"] = depthMaterial;
     
-    m_CubeMaterial = std::make_shared<PhongTextureMaterial>("Resources/shaders/phong/PhongTextureShadow.glsl");
-    m_CubeMaterial->SetDiffuseMap(std::make_shared<Texture2D>("Resources/textures/diffuse.jpeg"));
-    m_CubeMaterial->SetSpecularMap(std::make_shared<Texture2D>("Resources/textures/specular.jpeg"));
-    m_CubeMaterial->SetShininess(32.0f);
-    m_CubeMaterial->SetLight(m_LightSource);
+    auto cubeMaterial = std::make_shared<PhongTextureMaterial>(m_LightSource, "Resources/shaders/phong/PhongTextureShadow.glsl");
+    cubeMaterial->SetDiffuseMap(std::make_shared<Texture2D>("Resources/textures/diffuse.jpeg"));
+    cubeMaterial->SetSpecularMap(std::make_shared<Texture2D>("Resources/textures/specular.jpeg"));
+    cubeMaterial->SetShadowMap(m_Framebuffers["Shadow"]->GetDepthAttachment());
+    cubeMaterial->SetShininess(32.0f);
+    m_Materials["PhongTexture"] = cubeMaterial;
     
-    //m_ScreenMaterial = std::make_shared<SimpleTextureMaterial>("Resources/shaders/depth/SimpleDepthTexture.glsl");
-    //m_ScreenMaterial->SetTextureMap(m_LightSource->GetFramebuffer()->GetDepthAttachment());
+    auto planeMaterial = std::make_shared<PhongColorMaterial>(m_LightSource, "Resources/shaders/phong/PhongColorShadow.glsl");
+    planeMaterial->SetAmbientColor(glm::vec3(0.8f, 0.2f, 0.4f));
+    planeMaterial->SetDiffuseColor(glm::vec3(0.8f, 0.2f, 0.4f));
+    planeMaterial->SetSpecularColor(glm::vec3(1.0f));
+    planeMaterial->SetShadowMap(m_Framebuffers["Shadow"]->GetDepthAttachment());
+    planeMaterial->SetShininess(100.0f);
+    m_Materials["PhongColor"] = planeMaterial;
     
-    m_ScreenMaterial = std::make_shared<SimpleTextureMaterial>();
-    m_ScreenMaterial->SetTextureMap(m_Framebuffer->GetColorAttachment(0));
+    auto viewportMaterial = std::make_shared<SimpleTextureMaterial>();
+    viewportMaterial->SetTextureMap(m_Framebuffers["Viewport"]->GetColorAttachment(0));
+    m_Materials["Viewport"] = viewportMaterial;
     
     // Define the cube and plane model
-    m_Cube = utils::Geometry::ModelCube<GeoVertexData<glm::vec4, glm::vec2, glm::vec3>>(m_CubeMaterial);
+    m_Cube = utils::Geometry::ModelCube<GeoVertexData<glm::vec4, glm::vec2, glm::vec3>>(cubeMaterial);
     m_Cube.SetScale(glm::vec3(2.0f));
     
-    m_Plane = utils::Geometry::ModelPlane<GeoVertexData<glm::vec4, glm::vec2, glm::vec3>>(m_CubeMaterial);
+    m_Plane = utils::Geometry::ModelPlane<GeoVertexData<glm::vec4, glm::vec3>>(planeMaterial);
     m_Plane.SetPosition(glm::vec3(0.0f, -1.5f, 0.0f));
     m_Plane.SetScale(glm::vec3(10.0f));
     m_Plane.SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
     
     // Define the screen model
-    m_Screen = utils::Geometry::ModelPlane<GeoVertexData<glm::vec4, glm::vec2>>(m_ScreenMaterial);
+    m_Screen = utils::Geometry::ModelPlane<GeoVertexData<glm::vec4, glm::vec2>>(m_Materials["Viewport"]);
     m_Screen.SetScale(glm::vec3(2.0f));
 }
 
@@ -170,8 +182,7 @@ bool Viewer::OnWindowResize(WindowResizeEvent &e)
     m_Camera->SetViewportSize(e.GetWidth(), e.GetHeight());
     
     // Update the screen and the framebuffer
-    m_ScreenMaterial->SetTextureMap(nullptr);
-    m_Framebuffer->Resize(e.GetWidth(), e.GetHeight());
-    m_ScreenMaterial->SetTextureMap(m_Framebuffer->GetColorAttachment(0));
+    m_Framebuffers["Viewport"]->Resize(e.GetWidth(), e.GetHeight());
+    m_Framebuffers["Shadow"]->Resize(e.GetWidth(), e.GetHeight());
     return true;
 }

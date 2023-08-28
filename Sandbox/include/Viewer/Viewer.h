@@ -55,8 +55,8 @@ private:
     int m_ViewportWidth = 0;
     int m_ViewportHeight = 0;
     
-    ///< Framebufer(s).
-    std::shared_ptr<FrameBuffer> m_Framebuffer;
+    ///< Framebufer(s) library.
+    std::unordered_map<std::string, std::shared_ptr<FrameBuffer>> m_Framebuffers;
     
     ///< Camera.
     std::shared_ptr<PerspectiveCamera> m_Camera;
@@ -66,13 +66,11 @@ private:
     
     ///< Model(s).
     Model<GeoVertexData<glm::vec4, glm::vec2, glm::vec3>> m_Cube;
-    Model<GeoVertexData<glm::vec4, glm::vec2, glm::vec3>> m_Plane;
+    Model<GeoVertexData<glm::vec4, glm::vec3>> m_Plane;
     Model<GeoVertexData<glm::vec4, glm::vec2>> m_Screen;
     
-    ///< Material(s).
-    std::shared_ptr<Material> m_DepthMaterial;
-    std::shared_ptr<PhongTextureMaterial> m_CubeMaterial;
-    std::shared_ptr<SimpleTextureMaterial> m_ScreenMaterial;
+    ///< Material(s) library.
+    std::unordered_map<std::string, std::shared_ptr<Material>> m_Materials;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

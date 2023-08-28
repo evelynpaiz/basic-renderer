@@ -2,7 +2,7 @@
 #include "Renderer/Camera/OrthographicCamera.h"
 
 #include "Input/Input.h"
-#include "Input/Keycodes.h"
+#include "Input/KeyCodes.h"
 #include "Input/MouseCodes.h"
 
 #include "Event/MouseEvent.h"
