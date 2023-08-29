@@ -25,7 +25,7 @@ public:
     // ----------------------------------------
     void OnAttach() override;
     void OnDetach() override;
-    void OnUpdate(float deltaTime) override {}
+    void OnUpdate(Timestep ts) override {}
     void OnEvent(Event& e) override;
     
     // Layer rendering
@@ -33,13 +33,19 @@ public:
     void Begin();
     void End();
     
-    // Setter(s)
+    // Event handler
     // ----------------------------------------
     /// @brief Dispatch the events only to this layer.
     /// @param block Block the dispatching of the events.
     void BlockEvents(bool block) { m_BlockEvents = block; }
     
 protected:
+    // GUI
+    // ----------------------------------------
+    void GUIStats(Timestep ts);
+    
+    // Setter(s)
+    // ----------------------------------------
     virtual void SetStyle();
     
     // GUI layer variables

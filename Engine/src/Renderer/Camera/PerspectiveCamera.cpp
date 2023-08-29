@@ -35,7 +35,7 @@ PerspectiveCamera::PerspectiveCamera(const int width, const int height,
  *
  * @param ts Timestep.
  */
-void PerspectiveCamera::OnUpdate(const float ts)
+void PerspectiveCamera::OnUpdate(Timestep ts)
 {
     static glm::vec2 initialMousePosition;
     

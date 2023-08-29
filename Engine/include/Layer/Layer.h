@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core/Timestep.h"
+
 #include "Event/Event.h"
 
 /**
@@ -33,7 +35,7 @@ public:
     virtual void OnDetach() {}
     /// @brief Render this layer.
     /// @param deltaTime Times passed since the last update.
-    virtual void OnUpdate(float deltaTime) {}
+    virtual void OnUpdate(Timestep ts) {}
     /// @brief Handle an event that possibly occurred inside the layer.
     /// @param e Event.
     virtual void OnEvent(Event& e) {}

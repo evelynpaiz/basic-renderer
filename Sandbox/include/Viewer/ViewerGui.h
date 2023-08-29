@@ -23,7 +23,7 @@ public:
     
     // Layer handlers
     // ----------------------------------------
-    void OnUpdate(float deltaTime) override;
+    void OnUpdate(Timestep ts) override;
     void OnEvent(Event& e) override;
     
 private:

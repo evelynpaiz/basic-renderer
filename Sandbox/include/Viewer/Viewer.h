@@ -24,7 +24,7 @@ public:
     // Layer handlers
     // ----------------------------------------
     void OnAttach() override;
-    void OnUpdate(float deltaTime) override;
+    void OnUpdate(Timestep ts) override;
     void OnEvent(Event& e) override;
     
     // Getter(s)

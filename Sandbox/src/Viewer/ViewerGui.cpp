@@ -14,10 +14,11 @@ ViewerGui::ViewerGui(const std::shared_ptr<Viewer>& layer)
  *
  * @param deltaTime Times passed since the last update.
  */
-void ViewerGui::OnUpdate(float deltaTime)
+void ViewerGui::OnUpdate(Timestep ts)
 {
     // Render GUI
     Begin();
+    GUIStats(ts);
     GUIMenu();
     End();
     

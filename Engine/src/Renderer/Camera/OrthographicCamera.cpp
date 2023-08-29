@@ -34,7 +34,7 @@ OrthographicCamera::OrthographicCamera(const int width, const int height,
  *
  * @param ts Timestep.
  */
-void OrthographicCamera::OnUpdate(const float ts)
+void OrthographicCamera::OnUpdate(Timestep ts)
 {
     static glm::vec2 initialMousePosition;
     

@@ -4,6 +4,8 @@
 #include "Event/Event.h"
 #include "Event/WindowEvent.h"
 
+#include "Core/Timestep.h"
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -78,13 +80,15 @@ void Application::PopOverlay(const std::shared_ptr<Layer>& overlay)
  */
 void Application::Run()
 {
+    static float lastFrame = glfwGetTime();
+    
     // Run until the user quits
     while (m_Running)
     {
         // Per-frame time logic
-        float currentFrame = (float)glfwGetTime();
-        float deltaTime = currentFrame - m_LastFrame;
-        m_LastFrame = currentFrame;
+        float currentFrame = glfwGetTime();
+        Timestep deltaTime = (float)(currentFrame - lastFrame);
+        lastFrame = currentFrame;
         
         // Render layers (from bottom to top)
         for (std::shared_ptr<Layer>& layer : m_LayerStack)

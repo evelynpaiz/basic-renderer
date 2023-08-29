@@ -23,8 +23,11 @@ void Viewer::OnAttach()
  *
  * @param deltaTime Times passed since the last update.
  */
-void Viewer::OnUpdate(float deltaTime)
+void Viewer::OnUpdate(Timestep ts)
 {
+    // Reset rendering statistics
+    Renderer::ResetStats();
+    
     // Shadow mapping: light source
     //--------------------------------
     Renderer::BeginScene(m_LightSource->GetShadowCamera());
@@ -68,7 +71,7 @@ void Viewer::OnUpdate(float deltaTime)
     m_Plane.DrawModel();
     
     // Update the camera
-    m_Camera->OnUpdate(deltaTime);
+    m_Camera->OnUpdate(ts);
     
     m_Framebuffers["Viewport"]->Unbind();
     Renderer::EndScene();

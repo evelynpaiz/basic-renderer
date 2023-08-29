@@ -27,6 +27,17 @@ struct SceneData
 };
 
 /**
+ * Represents the information related to the statistics of the rendering.
+ */
+struct RenderingStatistics
+{
+    ///< Number or rendering passes.
+    unsigned int renderPasses = 0;
+    ///< Number of times the draw function is called.
+    unsigned int drawCalls = 0;
+};
+
+/**
  * Responsible for rendering geometry using a specified shader program.
  *
  * The `Renderer` class serves as the central component for performing rendering operations. It
@@ -71,6 +82,11 @@ public:
     static void SetColorBuffer(bool enabled) { s_ColorBuffer = enabled; }
     
     static void SetFaceCulling(const FaceCulling culling);
+    
+    // Statistics
+    // ----------------------------------------
+    static void ResetStats();
+    static RenderingStatistics GetStats();
     
 private:
     ///< Color buffer flag.

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Event/Event.h"
+#include "Core/Timestep.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -27,7 +28,7 @@ public:
     // ----------------------------------------
     /// @brief Update the camera information in the current frame.
     /// @param ts Timestep.
-    virtual void OnUpdate(const float ts) {}
+    virtual void OnUpdate(Timestep ts) {}
     
     // Event handler
     // ----------------------------------------

@@ -65,8 +65,6 @@ private:
     
     ///< Layers to be rendered.
     LayerStack m_LayerStack;
-    ///< Rendering time.
-    float m_LastFrame = 0.0f;
     
 protected:
     ///< Window size.

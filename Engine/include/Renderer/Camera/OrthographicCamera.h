@@ -16,7 +16,7 @@ public:
     
     // Rendering
     // ----------------------------------------
-    void OnUpdate(const float ts) override;
+    void OnUpdate(Timestep ts) override;
     
     // Getter(s)
     // ----------------------------------------

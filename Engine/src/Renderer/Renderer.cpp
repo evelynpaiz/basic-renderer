@@ -8,6 +8,8 @@ bool Renderer::s_ColorBuffer = true;
 bool Renderer::s_DepthBuffer = false;
 std::unique_ptr<SceneData> Renderer::s_SceneData = std::make_unique<SceneData>();
 
+static RenderingStatistics g_Stats;
+
 /**
  * Start the rendering of a scene by defining its general parameters.
  *
@@ -38,7 +40,9 @@ void Renderer::BeginScene(const std::shared_ptr<Camera> &camera)
  * End the rendering of a scene.
  */
 void Renderer::EndScene()
-{}
+{
+    g_Stats.renderPasses++;
+}
 
 /**
  * Clear the buffers to preset values.
@@ -83,7 +87,10 @@ void Renderer::Draw(const std::shared_ptr<VertexArray>& vao,
             std::vector<unsigned int> segments = vbo->GetSegments();
             // If no segments, draw the whole buffer
             if (segments.empty())
+            {
                 glDrawArrays(utils::OpenGL::PrimitiveTypeToOpenGLType(primitive), 0, vbo->GetCount());
+                g_Stats.drawCalls++;
+            }
             // Draw segments of the buffer separately
             else
             {
@@ -91,7 +98,9 @@ void Renderer::Draw(const std::shared_ptr<VertexArray>& vao,
                 for(unsigned int s : segments)
                 {
                     glDrawArrays(utils::OpenGL::PrimitiveTypeToOpenGLType(primitive), point, s + 1);
+                    
                     point += s + 1;
+                    g_Stats.drawCalls++;
                 }
             }
         }
@@ -103,6 +112,8 @@ void Renderer::Draw(const std::shared_ptr<VertexArray>& vao,
         glDrawElements(utils::OpenGL::PrimitiveTypeToOpenGLType(primitive),
                        vao->GetIndexBuffer()->GetCount(),
                        GL_UNSIGNED_INT, nullptr);
+        
+        g_Stats.drawCalls++;
     }
 }
 
@@ -176,4 +187,14 @@ void Renderer::SetDepthBuffer(bool enabled)
 void Renderer::SetFaceCulling(const FaceCulling culling)
 {
     glCullFace(utils::OpenGL::CullingToOpenGLType(culling));
+}
+
+void Renderer::ResetStats()
+{
+    memset(&g_Stats, 0, sizeof(RenderingStatistics));
+}
+
+RenderingStatistics Renderer::GetStats()
+{
+    return g_Stats;
 }

@@ -2,6 +2,7 @@
 #include "Layer/GuiLayer.h"
 
 #include "Core/Application.h"
+#include "Renderer/Renderer.h"
 
 #include <GLFW/glfw3.h>
 
@@ -104,6 +105,24 @@ void GuiLayer::End()
         ImGui::RenderPlatformWindowsDefault();
         glfwMakeContextCurrent(backupCurrentContext);
     }
+}
+
+/**
+ * Render the rendering statistics.
+ */
+void GuiLayer::GUIStats(Timestep ts)
+{
+    auto stats = Renderer::GetStats();
+    
+    ImGui::Begin("Rendering Statistics");
+    
+    ImGui::Text("FPS : %d", ts.GetFPS());
+    ImGui::Text("Time (ms) %.2f", ts.GetMilliseconds());
+    ImGui::Separator();
+    ImGui::Text("Render Passes: %d", stats.renderPasses);
+    ImGui::Text("Draw Calls: %d", stats.drawCalls);
+    
+    ImGui::End();
 }
 
 /**
