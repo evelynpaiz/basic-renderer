@@ -33,13 +33,10 @@ void Viewer::OnUpdate(Timestep ts)
     Renderer::BeginScene(m_LightSource->GetShadowCamera());
     Renderer::SetFaceCulling(FaceCulling::Front);
     
-    Renderer::SetDepthBuffer(true);
-    Renderer::SetColorBuffer(false);
-    
     // Render into the lights framebuffer
     m_Framebuffers["Shadow"]->Bind();
     
-    Renderer::Clear();
+    Renderer::Clear(m_Framebuffers["Shadow"]->GetActiveBuffers());
     
     m_Cube.SetMaterial(m_Materials["Depth"]);
     m_Cube.DrawModel();
@@ -55,13 +52,11 @@ void Viewer::OnUpdate(Timestep ts)
     // First pass: scene
     //--------------------------------
     Renderer::BeginScene(m_Camera);
-    Renderer::SetDepthBuffer(true);
-    Renderer::SetColorBuffer(true);
     
     // Render into the framebuffer
     m_Framebuffers["Viewport"]->Bind();
     
-    Renderer::Clear(glm::vec4(0.93f, 0.93f, 0.93f, 1.0f));
+    Renderer::Clear(glm::vec4(0.93f, 0.93f, 0.93f, 1.0f), m_Framebuffers["Viewport"]->GetActiveBuffers());
     
     m_LightSource->GetModel().DrawModel();
     
@@ -79,8 +74,6 @@ void Viewer::OnUpdate(Timestep ts)
     // Second pass: scene
     //--------------------------------
     Renderer::BeginScene();
-    Renderer::SetColorBuffer(true);
-    Renderer::SetDepthBuffer(false);
     
     // Render to the screen
     Renderer::Clear(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));

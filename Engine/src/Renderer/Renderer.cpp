@@ -4,8 +4,6 @@
 #include <GL/glew.h>
 
 // Define the renderer variable(s)
-bool Renderer::s_ColorBuffer = true;
-bool Renderer::s_DepthBuffer = false;
 std::unique_ptr<SceneData> Renderer::s_SceneData = std::make_unique<SceneData>();
 
 static RenderingStatistics g_Stats;
@@ -47,13 +45,12 @@ void Renderer::EndScene()
 /**
  * Clear the buffers to preset values.
  */
-void Renderer::Clear()
+void Renderer::Clear(const BufferState& buffersActive)
 {
-    if (s_ColorBuffer)
-        glClear(GL_COLOR_BUFFER_BIT);
-    
-    if (s_DepthBuffer)
-        glClear(GL_DEPTH_BUFFER_BIT);
+    // Clear buffers
+    glClear(utils::OpenGL::BufferStateToOpenGLMask(buffersActive));
+    // Activate depth testing if the depth buffer is active
+    SetDepthTesting(buffersActive.depthBufferActive);
 }
 
 /**
@@ -61,10 +58,10 @@ void Renderer::Clear()
  *
  * @param color Background color.
  */
-void Renderer::Clear(const glm::vec4& color)
+void Renderer::Clear(const glm::vec4& color, const BufferState& buffersActive)
 {
     glClearColor(color.r, color.g, color.b, color.a);
-    Clear();
+    Clear(buffersActive);
 }
 
 /**
@@ -166,14 +163,12 @@ void Renderer::SetViewport(unsigned int x, unsigned int y, unsigned int width, u
  *
  * @param enable Enable or not the depth testing.
  */
-void Renderer::SetDepthBuffer(bool enabled)
+void Renderer::SetDepthTesting(bool enabled)
 {
     if (enabled)
         glEnable(GL_DEPTH_TEST);
     else
         glDisable(GL_DEPTH_TEST);
-
-    s_DepthBuffer = enabled;
 }
 
 /**
@@ -189,12 +184,25 @@ void Renderer::SetFaceCulling(const FaceCulling culling)
     glCullFace(utils::OpenGL::CullingToOpenGLType(culling));
 }
 
+/**
+ * Reset rendering statistics.
+ *
+ * This function resets the stored rendering statistics, including information about
+ * the number of draw calls, vertices rendered, and other rendering-related data.
+ * After calling this function, the statistics will be reset to zero values.
+ */
 void Renderer::ResetStats()
 {
     memset(&g_Stats, 0, sizeof(RenderingStatistics));
 }
 
+/**
+ * Get the current rendering statistics.
+ *
+ * @return The rendering statistics structure containing performance metrics.
+ */
 RenderingStatistics Renderer::GetStats()
 {
     return g_Stats;
 }
+

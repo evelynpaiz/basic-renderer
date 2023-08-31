@@ -55,8 +55,8 @@ public:
     
     // Render
     // ----------------------------------------
-    static void Clear();
-    static void Clear(const glm::vec4& color);
+    static void Clear(const BufferState& buffersActive = {});
+    static void Clear(const glm::vec4& color, const BufferState& buffersActive = {});
     static void Draw(const std::shared_ptr<VertexArray>& vao,
                      const PrimitiveType &primitive = PrimitiveType::Triangles,
                      bool useIndexBuffer = true);
@@ -65,22 +65,12 @@ public:
               const glm::mat4 &transform = glm::mat4(1.0f),
               const PrimitiveType &primitive = PrimitiveType::Triangles,
               bool useIndexBuffer = true);
-    
-    // Getter(s)
-    // ----------------------------------------
-    /// @brief Check if depth testing is active.
-    /// @return `true` if the renderer is doing depth testing.
-    static bool IsDepthTestActive() { return s_DepthBuffer; }
-    
+
     // Setter(s)
     // ----------------------------------------
     static void SetViewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height);
     
-    static void SetDepthBuffer(bool enabled);
-    /// @brief Set the color buffer flag when rendering.
-    /// @param enabled Enable or not the color buffer.
-    static void SetColorBuffer(bool enabled) { s_ColorBuffer = enabled; }
-    
+    static void SetDepthTesting(const bool enabled);
     static void SetFaceCulling(const FaceCulling culling);
     
     // Statistics
@@ -89,10 +79,6 @@ public:
     static RenderingStatistics GetStats();
     
 private:
-    ///< Color buffer flag.
-    static bool s_ColorBuffer;
-    ///< Depth buffer flag.
-    static bool s_DepthBuffer;
     ///< Scene current general information.
     static std::unique_ptr<SceneData> s_SceneData;
 };

@@ -32,10 +32,17 @@ FrameBuffer::FrameBuffer(const FrameBufferSpecification& spec)
         
         // Depth attachment
         if (utils::OpenGL::IsDepthFormat(spec.Format))
+        {
+            // TODO: Add the stencil buffer activation too.
             m_DepthAttachmentSpec = spec;
+            m_ActiveBuffers.depthBufferActive = true;
+        }
         // Color attachment
         else
+        {
             m_ColorAttachmentsSpec.emplace_back(spec);
+            m_ActiveBuffers.colorBufferActive = true;
+        }
     }
     
     // Define the framebuffer along with all its attachments
@@ -104,27 +111,68 @@ void FrameBuffer::ClearAttachment(const unsigned int index, const int value)
 }
 
 /**
- * Copy a color attachment to this framebuffer color attachment.
+ * Blit the contents of a source framebuffer to a destination framebuffer.
  *
- * @param width Input framebuffer width.
- * @param height Input famebuffer height.
+ * @param src The source framebuffer from which to copy the contents.
+ * @param dst The destination framebuffer to which the contents are copied.
+ * @param filter The filtering method used for the blit operation.
+ * @param colorBuffer If true, copy color buffer components.
+ * @param depthBuffer If true, copy depth buffer components.
+ * @param stencilBuffer If true, copy stencil buffer components.
  */
-void FrameBuffer::BlitColorAttachment(const int width, const int height)
+void FrameBuffer::Blit(const std::shared_ptr<FrameBuffer>& src,
+                       const std::shared_ptr<FrameBuffer>& dst,
+                       const TextureFilter& filter,
+                       const BufferState& buffersActive)
 {
-    glBlitFramebuffer(0, 0, width, height, 0, 0, m_Spec.Width,
-            m_Spec.Height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    // Ensure that source and destination framebuffers are defined
+    CORE_ASSERT(src && dst, "Trying to blit undefined framebuffer(s)");
+    
+    // Determine the mask based on selected buffer components
+    GLbitfield mask = utils::OpenGL::BufferStateToOpenGLMask(buffersActive);
+    
+    // Bind the source framebuffer for reading and the destination framebuffer for drawing
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, src->m_ID);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst->m_ID);
+    // Perform the blit operation
+    glBlitFramebuffer(0, 0, src->m_Spec.Width, src->m_Spec.Height,
+                      0, 0, dst->m_Spec.Width, dst->m_Spec.Height,
+                      mask, utils::OpenGL::TextureFilterToOpenGLType(filter, false));
+    
+    // Unbind the framebuffers
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 /**
- * Copy a depth attachment to this framebuffer depth attachment.
+ * Blit a specific color attachment from a source framebuffer to a destination framebuffer.
  *
- * @param width Input framebuffer width.
- * @param height Input famebuffer height.
+ * @param src The source framebuffer from which to copy the color attachment.
+ * @param dst The destination framebuffer to which the color attachment is copied.
+ * @param srcIndex The index of the color attachment in the source framebuffer.
+ * @param dstIndex The index of the color attachment in the destination framebuffer.
+ * @param filter The filtering method used for the blit operation.
  */
-void FrameBuffer::BlitDepthAttachment(const int width, const int height)
+void FrameBuffer::BlitColorAttachments(const std::shared_ptr<FrameBuffer>& src,
+                                       const std::shared_ptr<FrameBuffer>& dst,
+                                       const unsigned int srcIndex, const unsigned int dstIndex,
+                                       const TextureFilter& filter)
 {
-    glBlitFramebuffer(0, 0, width, height, 0, 0, m_Spec.Width,
-            m_Spec.Height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+    // Bind the source framebuffer and set the read buffer to the specified color attachment
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, src->m_ID);
+    glReadBuffer(GL_COLOR_ATTACHMENT0 + srcIndex);
+    
+    // Bind the destination framebuffer and set the draw buffer to the specified color attachment
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst->m_ID);
+    glDrawBuffer(GL_COLOR_ATTACHMENT0 + dstIndex);
+    
+    // Copy the block of pixels from the source to the destination color attachment
+    glBlitFramebuffer(0, 0, src->m_Spec.Width, src->m_Spec.Height,
+                      0, 0, dst->m_Spec.Width, dst->m_Spec.Height,
+                      GL_COLOR_BUFFER_BIT, utils::OpenGL::TextureFilterToOpenGLType(filter, false));
+    
+    // Unbind the framebuffers and restore the default draw buffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDrawBuffer(GL_BACK);
 }
 
 /**
@@ -146,6 +194,26 @@ void FrameBuffer::Resize(const unsigned int width, const unsigned int height)
         spec.SetTextureSize(width, height);
     
     m_DepthAttachmentSpec.SetTextureSize(width, height);
+    
+    // Reset the framebuffer
+    Invalidate();
+}
+
+/**
+ * Adjust the sample count of the framebuffer.
+ *
+ * @param samples New number of samples for multi-sampling.
+ */
+void FrameBuffer::AdjustSampleCount(const unsigned int samples)
+{
+    // Update the sample count of the framebuffer
+    m_Spec.Samples = samples;
+    
+    // Update the sample count for the framebuffer attachments
+    for (auto& spec : m_ColorAttachmentsSpec)
+        spec.Samples = samples;
+    
+    m_DepthAttachmentSpec.Samples = samples;
     
     // Reset the framebuffer
     Invalidate();
