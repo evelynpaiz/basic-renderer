@@ -213,7 +213,7 @@ private:
     TextureSpecification m_DepthAttachmentSpec = TextureFormat::None;
     
     ///< The states active in the framebuffer.
-    BufferState m_ActiveBuffers;
+    BufferState m_ActiveBuffers = { false, false, false };
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

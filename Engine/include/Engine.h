@@ -51,6 +51,7 @@
 
 #include "Renderer/Material/Material.h"
 #include "Renderer/Material/LightedMaterial.h"
+#include "Renderer/Material/OcclusionMaterial.h"
 #include "Renderer/Material/SimpleMaterial.h"
 #include "Renderer/Material/PhongMaterial.h"
 

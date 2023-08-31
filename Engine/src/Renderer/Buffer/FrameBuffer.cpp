@@ -22,13 +22,10 @@ FrameBuffer::FrameBuffer(const FrameBufferSpecification& spec)
         spec.Height = m_Spec.Height;
         spec.Samples = m_Spec.Samples;
         
-        if (spec.Wrap == TextureWrap::None)
-        {
-            spec.Wrap = utils::OpenGL::IsDepthFormat(spec.Format) ?
+        spec.Wrap = utils::OpenGL::IsDepthFormat(spec.Format) ?
             TextureWrap::ClampToBorder : TextureWrap::ClampToEdge;
-        }
-        if (spec.Filter == TextureFilter::None)
-            spec.Filter = TextureFilter::Linear;
+        
+        spec.Filter = TextureFilter::Linear;
         
         // Depth attachment
         if (utils::OpenGL::IsDepthFormat(spec.Format))
