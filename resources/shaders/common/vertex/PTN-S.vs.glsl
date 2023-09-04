@@ -20,7 +20,7 @@ void main()
     vec4 worldPosition = u_Transform.Model * a_Position;
     vec3 worldNormal = normalize(u_Transform.Normal * a_Normal);
     // Transform the vertex position from world space to light space
-    vec4 lightSpacePosition = u_Transform.Light * worldPosition;
+    vec4 lightSpacePosition = u_Transform.Texture * u_Transform.Light * worldPosition;
     
     // Calculate the vertex position in world space
     v_Position = worldPosition.xyz / worldPosition.w;

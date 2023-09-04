@@ -13,17 +13,18 @@ vec3 calculateColor(vec3 ka, vec3 kd, vec3 ks, float shadow)
     // Calculate the normalized surface normal
     vec3 normal = normalize(v_Normal);
         
-    // Calculate the direction from the surface point to the light source
-    vec3 lightDirection = normalize(u_Light.Position - v_Position);
+    // Calculate the normalized light direction vector
+    vec3 lightDirection;
+    if (u_Light.Vector.w == 1.0f)
+        lightDirection = normalize(u_Light.Vector.xyz - v_Position);
+    else if (u_Light.Vector.w == 0.0f)
+        lightDirection = normalize(-u_Light.Vector.xyz);
     
     // Calculate the direction from the surface point to the viewer's eye
     vec3 viewDirection = normalize(u_View.Position - v_Position);
     
     // Calculate the reflection direction using the Phong reflection formula
     vec3 reflectionDirection = normalize(2.0 * dot(lightDirection, normal) * normal - lightDirection);
-    
-    // Calculate the distance from the light
-    float lightDistance = length(u_Light.Position - v_Position);
     
     // Calculate the ambient reflection component by scaling the ambient color
     vec3 ambient = u_Light.La * ka;
@@ -41,7 +42,13 @@ vec3 calculateColor(vec3 ka, vec3 kd, vec3 ks, float shadow)
     vec3 result = ambient + (1.0 - shadow) * (diffuse + specular);
     
     // Calculate light attenuention
-    float attenuation = 1.0 / (1.0f + 0.007f * lightDistance + 0.0002f * (lightDistance * lightDistance));
+    float attenuation = 1.0f;
+    if (u_Light.Vector.w == 1.0f)
+    {
+        float lightDistance = length(u_Light.Vector.xyz - v_Position);
+        attenuation = 1.0 / (1.0f + 0.007f * lightDistance + 0.0002f * (lightDistance * lightDistance));
+    }
+    
     result *= attenuation * u_Light.Color;
     
     return result;

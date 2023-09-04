@@ -132,5 +132,23 @@ inline Model<VertexData> ModelCube(const std::shared_ptr<Material>& material)
     return GenerateModel<VertexData>(material, utils::Geometry::DefineCubeGeometry);
 }
 
+/**
+ * Generate a model for a sphere using the specified material.
+ *
+ * @tparam VertexData The type of vertex data used to define the geometry.
+ *
+ * @param material A shared pointer to the material to be applied to the model.
+ * @param radius The radius of the sphere.
+ * @param sectorCount The number of sectors (longitude divisions) in the sphere.
+ * @param stackCount The number of stacks (latitude divisions) in the sphere.
+ *
+ * @return The generated model for the sphere with the specified material.
+ */
+template<typename VertexData>
+inline Model<VertexData> ModelSphere(const std::shared_ptr<Material>& material)
+{
+    return GenerateModel<VertexData>(material, utils::Geometry::DefineSphereGeometry);
+}
+
 } // namespace Geometry
 } // namespace utils

@@ -8,4 +8,5 @@ struct Transform {
     
     mat3 Normal;        ///< Normal matrix for transforming normals to world space.
     mat4 Light;         ///< Light matrix for transforming vertices to light space.
+    mat4 Texture;       ///< Texture matrix for transforming position to [0, 1] range for texture sampling.
 };

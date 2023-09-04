@@ -58,8 +58,6 @@ void Viewer::OnUpdate(Timestep ts)
     
     Renderer::Clear(glm::vec4(0.93f, 0.93f, 0.93f, 1.0f), m_Framebuffers["Viewport"]->GetActiveBuffers());
     
-    m_LightSource->GetModel().DrawModel();
-    
     m_Cube.SetMaterial(m_Materials["PhongTexture"]);
     m_Cube.DrawModel();
     m_Plane.SetMaterial(m_Materials["PhongColor"]);
@@ -104,7 +102,7 @@ void Viewer::OnEvent(Event &e)
 void Viewer::InitializeViewer()
 {
     // Define light source
-    m_LightSource = std::make_shared<PointLight>(glm::vec3(1.0f), glm::vec3(2.0f, 2.5f, 6.0f));
+    m_LightSource = std::make_shared<DirectionalLight>(glm::vec3(1.0f), glm::vec3(0.5f, -0.5f, 0.0f));
     m_LightSource->GetShadowCamera()->SetViewportSize(m_ViewportWidth, m_ViewportHeight);
     
     // Define the rendering camera

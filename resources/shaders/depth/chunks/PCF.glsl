@@ -1,19 +1,20 @@
 /**
  * Percentage Closer Filtering (PCF) with Gaussian weighting for shadow mapping.
  *
+ * @param shadowMap The sampler2D texture of the shadow map.
  * @param projectionCoord The normalized device coordinates of the fragment.
- * @param bias The bias to adjust shadow comparisons.
- * @param texelSize The size of a texel in the shadow map.
  * @param kernelSize The size of the PCF kernel.
  * @param opacity Opacity value.
  *
  * @return The shadow value for the fragment.
  */
-float PCF(sampler2D shadowMap, vec3 projectionCoord, float bias, vec2 texelSize, int kernelSize, float opacity)
+float PCF(sampler2D shadowMap, vec3 projectionCoord, int kernelSize, float opacity)
 {
     // Get depth of current fragment from light's perspective
     float currentDepth = projectionCoord.z;
     
+    // Calculate the size of a texel in the shadow map
+    vec2 texelSize = 1.0f / textureSize(shadowMap, 0);
     // Calculate half of the kernel size
     int halfKernel = kernelSize / 2;
     
@@ -32,7 +33,7 @@ float PCF(sampler2D shadowMap, vec3 projectionCoord, float bias, vec2 texelSize,
            float pcfDepth = texture(shadowMap, projectionCoord.xy + sampleOffset).r;
            
            // Update the shadow value using the sampled depth
-           shadow += currentDepth - bias > pcfDepth ? opacity : 0.0f;
+           shadow += currentDepth > pcfDepth ? opacity : 0.0f;
        }
     }
     

@@ -47,7 +47,8 @@
 #include "Renderer/Texture/Texture.h"
 
 #include "Renderer/Light/Light.h"
-#include "Renderer/Light/PointLight.h"
+#include "Renderer/Light/PositionalLight.h"
+#include "Renderer/Light/DirectionalLight.h"
 
 #include "Renderer/Material/Material.h"
 #include "Renderer/Material/LightedMaterial.h"

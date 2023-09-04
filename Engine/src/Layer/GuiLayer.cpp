@@ -116,7 +116,12 @@ void GuiLayer::GUIStats(Timestep ts)
     
     ImGui::Begin("Rendering Statistics");
     
-    ImGui::Text("FPS : %d", ts.GetFPS());
+    // Define the current window
+    Application &app = Application::Get();
+    
+    ImGui::Text("Resolution: %d x %d", app.GetWindow().GetWidth(), app.GetWindow().GetHeight());
+    ImGui::Separator();
+    ImGui::Text("FPS: %d", ts.GetFPS());
     ImGui::Text("Time (ms) %.2f", ts.GetMilliseconds());
     ImGui::Separator();
     ImGui::Text("Render Passes: %d", stats.renderPasses);

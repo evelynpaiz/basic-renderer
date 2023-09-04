@@ -132,6 +132,38 @@ inline std::vector<unsigned int> IndicesOfCube()
     };
 }
 
+/**
+ * Get the indices for a sphere geometry, which consists of triangles forming a sphere.
+ *
+ * @param resolution The number of horizontal and vertical segments of the sphere.
+ * @return A vector of indices forming a sphere.
+ */
+inline std::vector<unsigned int> IndicesOfSphere(int resolution)
+{
+    std::vector<unsigned int> indices;
+
+    for (int i = 0; i < resolution; i++)
+    {
+        for (int j = 0; j < resolution; j++)
+        {
+            int p1 = i * (resolution + 1) + j;
+            int p2 = p1 + 1;
+            int p3 = (i + 1) * (resolution + 1) + j;
+            int p4 = p3 + 1;
+
+            indices.push_back(p1);
+            indices.push_back(p2);
+            indices.push_back(p3);
+
+            indices.push_back(p3);
+            indices.push_back(p2);
+            indices.push_back(p4);
+        }
+    }
+
+    return indices;
+}
+
 // Plane geometry
 // ----------------------------------------
 /**
@@ -356,6 +388,138 @@ inline void DefineCubeGeometry(std::vector<GeoVertexData<glm::vec4, glm::vec2, g
     };
     
     indices = IndicesOfCube();
+}
+
+/**
+ * Define the geometry of a sphere with position information.
+ *
+ * @param vertices Vector to store the vertex data for the sphere (position-only vertices).
+ * @param indices Vector to store the indices of the vertices to form triangles.
+ * @param radius The radius of the sphere.
+ * @param resolution The number of horizontal and vertical segments of the sphere.
+ */
+inline void DefineSphereGeometry(std::vector<GeoVertexData<glm::vec4>>& vertices,
+                                std::vector<unsigned int>& indices)
+{
+    float radius = 1.0f;
+    int resolution = 32;
+
+    // Calculate the vertices of the sphere
+    for (int i = 0; i <= resolution; i++)
+    {
+        float theta = ((float)i / resolution) * glm::two_pi<float>();
+        for (int j = 0; j <= resolution; j++)
+        {
+            float phi = ((float)j / resolution) * glm::pi<float>();
+
+            float x = radius * cos(theta) * sin(phi);
+            float y = radius * cos(phi);
+            float z = radius * sin(theta) * sin(phi);
+            
+            vertices.push_back({ glm::vec4(x, y, z, 1.0f) });
+        }
+    }
+
+    indices = IndicesOfSphere(resolution);
+}
+
+/**
+ * Define the geometry of a sphere with position information.
+ *
+ * @param vertices Vector to store the vertex data for the sphere (position-only vertices).
+ * @param indices Vector to store the indices of the vertices to form triangles.
+ * @param radius The radius of the sphere.
+ * @param resolution The number of horizontal and vertical segments of the sphere.
+ */
+inline void DefineSphereGeometry(std::vector<GeoVertexData<glm::vec4, glm::vec2>>& vertices,
+                                std::vector<unsigned int>& indices)
+{
+    float radius = 1.0f;
+    int resolution = 32;
+
+    // Calculate the vertices of the sphere
+    for (int i = 0; i <= resolution; i++)
+    {
+        float theta = ((float)i / resolution);
+        for (int j = 0; j <= resolution; j++)
+        {
+            float phi = ((float)j / resolution);
+
+            float x = radius * cos(theta * glm::two_pi<float>()) * sin(phi * glm::pi<float>());
+            float y = radius * cos(phi * glm::pi<float>());
+            float z = radius * sin(theta * glm::two_pi<float>()) * sin(phi * glm::pi<float>());
+            
+            vertices.push_back({ glm::vec4(x, y, z, 1.0f), glm::vec2(theta, phi) });
+        }
+    }
+
+    indices = IndicesOfSphere(resolution);
+}
+
+/**
+ * Define the geometry of a sphere with position information.
+ *
+ * @param vertices Vector to store the vertex data for the sphere (position-only vertices).
+ * @param indices Vector to store the indices of the vertices to form triangles.
+ * @param radius The radius of the sphere.
+ * @param resolution The number of horizontal and vertical segments of the sphere.
+ */
+inline void DefineSphereGeometry(std::vector<GeoVertexData<glm::vec4, glm::vec3>>& vertices,
+                                std::vector<unsigned int>& indices)
+{
+    float radius = 1.0f;
+    int resolution = 32;
+
+    // Calculate the vertices of the sphere
+    for (int i = 0; i <= resolution; i++)
+    {
+        float theta = ((float)i / resolution) * glm::two_pi<float>();
+        for (int j = 0; j <= resolution; j++)
+        {
+            float phi = ((float)j / resolution) * glm::pi<float>();
+
+            float x = radius * cos(theta) * sin(phi);
+            float y = radius * cos(phi);
+            float z = radius * sin(theta) * sin(phi);
+            
+            vertices.push_back({ glm::vec4(x, y, z, 1.0f), glm::vec3(x, y, z) });
+        }
+    }
+
+    indices = IndicesOfSphere(resolution);
+}
+
+/**
+ * Define the geometry of a sphere with position information.
+ *
+ * @param vertices Vector to store the vertex data for the sphere (position-only vertices).
+ * @param indices Vector to store the indices of the vertices to form triangles.
+ * @param radius The radius of the sphere.
+ * @param resolution The number of horizontal and vertical segments of the sphere.
+ */
+inline void DefineSphereGeometry(std::vector<GeoVertexData<glm::vec4, glm::vec2, glm::vec3>>& vertices,
+                                std::vector<unsigned int>& indices)
+{
+    float radius = 1.0f;
+    int resolution = 32;
+
+    // Calculate the vertices of the sphere
+    for (int i = 0; i <= resolution; i++)
+    {
+        float theta = ((float)i / resolution);
+        for (int j = 0; j <= resolution; j++)
+        {
+            float phi = ((float)j / resolution);
+
+            float x = radius * cos(theta * glm::two_pi<float>()) * sin(phi * glm::pi<float>());
+            float y = radius * cos(phi * glm::pi<float>());
+            float z = radius * sin(theta * glm::two_pi<float>()) * sin(phi * glm::pi<float>());
+            
+            vertices.push_back({ glm::vec4(x, y, z, 1.0f), glm::vec2(theta, phi), glm::vec3(x, y, z)});
+        }
+    }
+
+    indices = IndicesOfSphere(resolution);
 }
 
 } // namespace Geometry

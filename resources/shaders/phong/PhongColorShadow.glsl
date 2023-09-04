@@ -35,7 +35,11 @@ void main()
     vec3 normal = normalize(v_Normal);
     
     // Calculate the normalized light direction vector
-    vec3 lightDirection = normalize(u_Light.Position - v_Position);
+    vec3 lightDirection;
+    if (u_Light.Vector.w == 1.0f)
+        lightDirection = normalize(u_Light.Vector.xyz - v_Position);
+    else if (u_Light.Vector.w == 0.0f)
+        lightDirection = normalize(-u_Light.Vector.xyz);
     
     // Calculate shadow factor
     float bias = calculateBias(normal, lightDirection, 0.005f, 0.01f);

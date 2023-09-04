@@ -34,8 +34,12 @@ void main()
     // Calculate the normalized surface normal
     vec3 normal = normalize(v_Normal);
     
-    // Calculate the direction of the light source
-    vec3 lightDirection = normalize(u_Light.Position - v_Position);
+    // Calculate the normalized light direction vector
+    vec3 lightDirection;
+    if (u_Light.Vector.w == 1.0f)
+        lightDirection = normalize(u_Light.Vector.xyz - v_Position);
+    else if (u_Light.Vector.w == 0.0f)
+        lightDirection = normalize(-u_Light.Vector.xyz);
     
     // Get the diffuse color (kd) from the DiffuseMap texture
     vec3 kd = vec3(texture(u_Material.DiffuseMap, v_TextureCoord));

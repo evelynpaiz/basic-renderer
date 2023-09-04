@@ -2,7 +2,8 @@
  * Represents a light source in the scene.
  */
 struct Light {
-    vec3 Position;   ///< Position of the light source in world space.
+    vec4 Vector;    ///< Position of the light source in world space if .w is defined as 1.0f,
+                    ///< Direction of the light source in world space if .w is defined as 0.0f
     
     vec3 Color;      ///< Color/intensity of the light.
     

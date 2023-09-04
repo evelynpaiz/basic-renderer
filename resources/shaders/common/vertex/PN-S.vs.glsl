@@ -18,7 +18,7 @@ void main()
     vec3 worldNormal = normalize(u_Transform.Normal * a_Normal);
 
     // Transform the vertex position from world space to light space
-    vec4 lightSpacePosition = u_Transform.Light * worldPosition;
+    vec4 lightSpacePosition = u_Transform.Texture * u_Transform.Light * worldPosition;
 
     // Perspective divide to get vertex position in normalized device coordinates
     v_Position = worldPosition.xyz / worldPosition.w;

@@ -164,9 +164,17 @@ public:
     /// @param shader Shader program to be used.
     void DefineTranformProperties(const std::shared_ptr<Shader> &shader)
     {
+        glm::mat4 textureMatrix = glm::mat4(
+            0.5f, 0.0f, 0.0f, 0.0f,
+            0.0f, 0.5f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.5f, 0.0f,
+            0.5f, 0.5f, 0.5f, 1.0f
+        );
+        
         shader->SetMat4("u_Transform.Light",
                         m_ShadowCamera->GetProjectionMatrix() *
                         m_ShadowCamera->GetViewMatrix());
+        shader->SetMat4("u_Transform.Texture", textureMatrix);
     }
     /// @brief Define light properties into the uniforms of the shader program.
     /// @param shader The shader program.
