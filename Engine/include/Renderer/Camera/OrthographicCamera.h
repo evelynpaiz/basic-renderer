@@ -11,8 +11,8 @@ class OrthographicCamera : public Camera
 public:
     // Constructor(s)/ Destructor
     // ----------------------------------------
-    OrthographicCamera(const int width, const int height, const float near = 0.1f,
-                       const float far = 100.0f);
+    OrthographicCamera(const int width, const int height, const float nearPlane = 0.1f,
+                       const float farPlane = 100.0f);
     
     // Rendering
     // ----------------------------------------

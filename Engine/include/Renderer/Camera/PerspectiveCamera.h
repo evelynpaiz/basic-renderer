@@ -23,7 +23,7 @@ public:
     // Constructor(s)/ Destructor
     // ----------------------------------------
     PerspectiveCamera(const int width, const int height, const float fov = 45.0f,
-                      const float near = 0.1f, const float far = 100.0f);
+                      const float nearPlane = 0.1f, const float farPlane = 100.0f);
     
     // Rendering
     // ----------------------------------------

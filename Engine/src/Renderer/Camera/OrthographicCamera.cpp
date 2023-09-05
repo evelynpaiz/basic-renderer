@@ -23,8 +23,8 @@
  * @param far Distance to the far plane.
  */
 OrthographicCamera::OrthographicCamera(const int width, const int height,
-    const float near, const float far)
-    : Camera(width, height, near, far)
+    const float nearPlane, const float farPlane)
+    : Camera(width, height, nearPlane, farPlane)
 {
     UpdateCameraMatrices();
 }

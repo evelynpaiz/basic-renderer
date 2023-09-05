@@ -134,8 +134,8 @@ protected:
     /// @param height Viewport size (height).
     /// @param near Distance to the near plane.
     /// @param far Distance to the far plane.
-    Camera(const int width, const int height, const float near, const float far)
-        : m_Width(width), m_Height(height), m_NearPlane(near), m_FarPlane(far)
+    Camera(const int width, const int height, const float nearPlane, const float farPlane)
+        : m_Width(width), m_Height(height), m_NearPlane(nearPlane), m_FarPlane(farPlane)
     {}
     
     // Getter(s)

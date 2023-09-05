@@ -23,7 +23,7 @@ void AssimpModel::LoadModel(const std::filesystem::path &filePath)
 {
     // Read the model file using the ASSIMP library
     Assimp::Importer importer;
-    const aiScene *scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_GenSmoothNormals);
+    const aiScene *scene = importer.ReadFile(filePath.string(), aiProcess_Triangulate | aiProcess_GenSmoothNormals);
 
     // Check for error(s) during loading
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)

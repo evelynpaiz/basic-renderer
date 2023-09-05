@@ -24,8 +24,8 @@
  * @param far Distance to the far plane.
  */
 PerspectiveCamera::PerspectiveCamera(const int width, const int height,
-    const float fov, const float near, const float far)
-    : Camera(width, height, near, far), m_FieldOfView(fov)
+    const float fov, const float nearPlane, const float farPlane)
+    : Camera(width, height, nearPlane, farPlane), m_FieldOfView(fov)
 {
     UpdateCameraMatrices();
 }
