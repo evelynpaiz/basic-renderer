@@ -21,15 +21,16 @@ FrameBuffer::FrameBuffer(const FrameBufferSpecification& spec)
         spec.Width = m_Spec.Width;
         spec.Height = m_Spec.Height;
         spec.Samples = m_Spec.Samples;
+        spec.MipMaps = m_Spec.MipMaps;
         
         spec.Wrap = utils::OpenGL::IsDepthFormat(spec.Format) ?
             TextureWrap::ClampToBorder : TextureWrap::ClampToEdge;
         
-        spec.Filter = TextureFilter::Linear;
-        
         // Depth attachment
         if (utils::OpenGL::IsDepthFormat(spec.Format))
         {
+            spec.Filter = TextureFilter::Nearest;
+            
             // TODO: Add the stencil buffer activation too.
             m_DepthAttachmentSpec = spec;
             m_ActiveBuffers.depthBufferActive = true;
@@ -37,6 +38,8 @@ FrameBuffer::FrameBuffer(const FrameBufferSpecification& spec)
         // Color attachment
         else
         {
+            spec.Filter = TextureFilter::Linear;
+            
             m_ColorAttachmentsSpec.emplace_back(spec);
             m_ActiveBuffers.colorBufferActive = true;
         }
@@ -89,6 +92,17 @@ void FrameBuffer::BindForReadAttachment(const unsigned int index) const
  */
 void FrameBuffer::Unbind() const
 {
+    // Generate mipmaps if necesary
+    if (m_Spec.MipMaps)
+    {
+        for (auto& attachment : m_ColorAttachments)
+        {
+            attachment->Bind();
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+    }
+    
+    // Bind to the default buffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 

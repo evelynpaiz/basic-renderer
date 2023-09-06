@@ -7,9 +7,9 @@
  * @param view The rendering camera.
  * @param filePath The file path to the shader used by the material.
  */
-OcclusionMaterial::OcclusionMaterial(const std::shared_ptr<Camera>& view,
+OcclusionMaterial::OcclusionMaterial(const std::shared_ptr<Camera>& view, unsigned int sampleCout,
                                      const std::filesystem::path& filePath)
-    : Material(filePath), m_View(view)
+    : Material(filePath), m_View(view), m_SampleCount(sampleCout)
 {
     // Create a random number generator for generating floats in the range [0.0f, 1.0f]
     std::uniform_real_distribution<float> randomFloats(0.0f, 1.0f);
@@ -35,8 +35,12 @@ void OcclusionMaterial::SetMaterialProperties()
     utils::Texturing::SetTextureMap(m_Shader, "u_Material.DepthMap", m_DepthTexture, m_Slot++);
     utils::Texturing::SetTextureMap(m_Shader, "u_Material.NoiseMap", m_NoiseTexture, m_Slot++);
     
-    for (unsigned int i = 0; i < 64; ++i)
+    m_Shader->SetInt("u_Material.SampleCount", m_SampleCount);
+    for (unsigned int i = 0; i < m_SampleCount; ++i)
         m_Shader->SetVec3("u_Kernel[" + std::to_string(i) + "]", m_Kernel[i]);
+    
+    m_Shader->SetFloat("u_Material.Radius", m_Radius);
+    m_Shader->SetFloat("u_Material.Bias", m_Bias);
 }
 
 /**
@@ -67,7 +71,7 @@ void OcclusionMaterial::GenerateKernelSamples(std::uniform_real_distribution<flo
                                               std::default_random_engine& generator)
 {
     // Generate 64 SSAO kernel samples
-    for (unsigned int i = 0; i < 64; ++i)
+    for (unsigned int i = 0; i < m_SampleCount; ++i)
     {
         // Generate a random 3D vector for the sample
         glm::vec3 sample(randomFloats(generator) * 2.0 - 1.0,
@@ -81,7 +85,7 @@ void OcclusionMaterial::GenerateKernelSamples(std::uniform_real_distribution<flo
         sample *= randomFloats(generator);
 
         // Calculate a scale factor based on the index to make samples more aligned to the center of the kernel
-        float scale = float(i) / 64.0f;
+        float scale = (float)i / m_SampleCount;
 
         // Apply a quadratic function to the scale factor to bias samples towards the center
         scale = Lerp(0.1f, 1.0f, scale * scale);

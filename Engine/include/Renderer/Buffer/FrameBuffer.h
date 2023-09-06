@@ -116,6 +116,8 @@ struct FrameBufferSpecification
     unsigned int Width = 0, Height = 0;
     ///< The number of samples in the framebuffer texture attachments.
     int Samples = 1;
+    ///< A flag indicating whether mipmaps should be created for the texture. 
+    bool MipMaps = false;
     
     ///< The properties for framebuffer texture attachments.
     AttachmentSpecification AttachmentsSpec;
