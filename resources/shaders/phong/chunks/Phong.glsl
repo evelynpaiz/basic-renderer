@@ -8,23 +8,21 @@
  *
  * @return Calculated color using Phong shading model with shadow.
  */
-vec3 calculateColor(vec3 ka, vec3 kd, vec3 ks, float shadow)
+vec3 calculateColor(vec3 ka, vec3 kd, vec3 ks, float shadow,
+                    float lightLinear, float lightQuadratic, float maxAttenuation)
 {
-    // Calculate the normalized surface normal
+    // Calculate the surface vector(s)
     vec3 normal = normalize(v_Normal);
-        
-    // Calculate the normalized light direction vector
-    vec3 lightDirection;
-    if (u_Light.Vector.w == 1.0f)
-        lightDirection = normalize(u_Light.Vector.xyz - v_Position);
-    else if (u_Light.Vector.w == 0.0f)
-        lightDirection = normalize(-u_Light.Vector.xyz);
     
-    // Calculate the direction from the surface point to the viewer's eye
+    // Calculate the direction vectors
+    vec3 lightDirection = u_Light.Vector.w == 1.0f ?
+                            normalize(u_Light.Vector.xyz - v_Position)      // positional light (.w = 1)
+                            : normalize(-u_Light.Vector.xyz);               // directional light (.w = 0)
     vec3 viewDirection = normalize(u_View.Position - v_Position);
-    
-    // Calculate the reflection direction using the Phong reflection formula
     vec3 reflectionDirection = normalize(2.0 * dot(lightDirection, normal) * normal - lightDirection);
+    
+    // Calculate the light radiance
+    vec3 radiance = u_Light.Color * calculateAttenuation(v_Position, u_Light.Vector, lightLinear, lightQuadratic, maxAttenuation);
     
     // Calculate the ambient reflection component by scaling the ambient color
     vec3 ambient = u_Light.La * ka;
@@ -39,17 +37,7 @@ vec3 calculateColor(vec3 ka, vec3 kd, vec3 ks, float shadow)
     
     // Calculate the final color by combining ambient, diffuse, and specular components,
     // and modulating with the shadow factor
-    vec3 result = ambient + (1.0 - shadow) * (diffuse + specular);
-    
-    // Calculate light attenuention
-    float attenuation = 1.0f;
-    if (u_Light.Vector.w == 1.0f)
-    {
-        float lightDistance = length(u_Light.Vector.xyz - v_Position);
-        attenuation = 1.0 / (1.0f + 0.007f * lightDistance + 0.0002f * (lightDistance * lightDistance));
-    }
-    
-    result *= attenuation * u_Light.Color;
+    vec3 result = ambient + radiance * (1.0 - shadow) * (diffuse + specular);
     
     return result;
 }

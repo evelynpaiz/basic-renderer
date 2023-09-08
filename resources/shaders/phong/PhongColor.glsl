@@ -20,6 +20,8 @@
 
 // Include additional functions
 #include "Resources/shaders/common/utils/Saturate.glsl"
+#include "Resources/shaders/common/utils/Attenuation.glsl"
+
 #include "Resources/shaders/phong/chunks/PhongSpecular.glsl"
 #include "Resources/shaders/phong/chunks/Phong.glsl"
 
@@ -29,7 +31,7 @@ void main()
     // Calculate the shading result using Phong shading model
     // Parameters: Ambient reflection (ka), Diffuse reflection (kd),
     // Specular reflection (ks), Shadow factor (0.0f for no shadow)
-    vec3 result = calculateColor(u_Material.Ka, u_Material.Kd, u_Material.Ks, 0.0f);
+    vec3 result = calculateColor(u_Material.Ka, u_Material.Kd, u_Material.Ks, 0.0f, 0.045f, 0.0075f, 0.7f);
 
     // Set the fragment color with the calculated result and material's alpha
     color = vec4(result, u_Material.Alpha);

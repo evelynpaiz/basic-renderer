@@ -198,9 +198,9 @@ protected:
     glm::vec3 m_Color;
     
     ///< The light intensities.
-    float m_AmbientStrength = 0.4f;
+    float m_AmbientStrength = 0.2f;
     float m_DiffuseStrength = 0.6f;
-    float m_SpecularStrength = 1.0f;
+    float m_SpecularStrength = 0.4f;
     
     ///< The light viewpoint (used for rendering shadows).
     std::shared_ptr<Camera> m_ShadowCamera;

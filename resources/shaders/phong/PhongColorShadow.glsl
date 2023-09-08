@@ -21,6 +21,8 @@
 
 // Include additional functions
 #include "Resources/shaders/common/utils/Saturate.glsl"
+#include "Resources/shaders/common/utils/Attenuation.glsl"
+
 #include "Resources/shaders/phong/chunks/PhongSpecular.glsl"
 #include "Resources/shaders/phong/chunks/Phong.glsl"
 
@@ -35,11 +37,9 @@ void main()
     vec3 normal = normalize(v_Normal);
     
     // Calculate the normalized light direction vector
-    vec3 lightDirection;
-    if (u_Light.Vector.w == 1.0f)
-        lightDirection = normalize(u_Light.Vector.xyz - v_Position);
-    else if (u_Light.Vector.w == 0.0f)
-        lightDirection = normalize(-u_Light.Vector.xyz);
+    vec3 lightDirection = u_Light.Vector.w == 1.0f ?
+                            normalize(u_Light.Vector.xyz - v_Position)      // positional light (.w = 1)
+                            : normalize(-u_Light.Vector.xyz);               // directional light (.w = 0)
     
     // Calculate shadow factor
     float bias = calculateBias(normal, lightDirection, 0.005f, 0.01f);
@@ -48,7 +48,7 @@ void main()
     // Calculate shading result using Phong shading model with shadows
     // Parameters: Ambient reflection (ka), Diffuse reflection (kd),
     // Specular reflection (ks), Shadow factor (calculated above)
-    vec3 result = calculateColor(u_Material.Ka, u_Material.Kd, u_Material.Ks, shadow);
+    vec3 result = calculateColor(u_Material.Ka, u_Material.Kd, u_Material.Ks, shadow, 0.045f, 0.0075f, 0.7f);
     
     // Set the fragment color with the calculated result and material's alpha
     color = vec4(result, u_Material.Alpha);
