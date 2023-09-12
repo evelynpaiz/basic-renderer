@@ -68,6 +68,7 @@ void FrameBuffer::Bind() const
 
 /**
  * Bind the framebuffer to draw in a specific color attachment.
+ *
  * @param index The color attachment index.
  */
 void FrameBuffer::BindForDrawAttachment(const unsigned int index) const
@@ -79,12 +80,33 @@ void FrameBuffer::BindForDrawAttachment(const unsigned int index) const
 
 /**
  * Bind the framebuffer to read a specific color attachment.
+ *
  * @param index The color attachment index.
  */
 void FrameBuffer::BindForReadAttachment(const unsigned int index) const
 {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, m_ID);
     glReadBuffer(GL_COLOR_ATTACHMENT0 + index);
+}
+
+/**
+ * Bind the framebuffer to draw in a specific (cube) color attachment.
+ *
+ * @param index The color attachment index.
+ * @param face The face to be selected from the cube attachment.
+ */
+void FrameBuffer::BindForDrawAttachmentCube(const unsigned int index, const unsigned int face) const
+{
+    if (m_ColorAttachmentsSpec[index].Type != TextureType::TextureCube)
+    {
+        CORE_WARN("Trying to bind for drawing an incorrect attachment type!");
+        return;
+    }
+    
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_ID);
+    glViewport(0, 0, m_Spec.Width, m_Spec.Height);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
+                           m_ColorAttachments[index]->m_ID, 0);
 }
 
 /**
@@ -256,7 +278,9 @@ void FrameBuffer::Invalidate()
     
         for (unsigned int i = 0; i < (unsigned int)m_ColorAttachments.size(); i++)
         {
-            m_ColorAttachments[i] = std::make_shared<Texture>(m_ColorAttachmentsSpec[i]);
+            m_ColorAttachments[i] = m_ColorAttachmentsSpec[i].Type == TextureType::Texture ?
+                                    std::make_shared<Texture>(m_ColorAttachmentsSpec[i]) :
+                                    std::make_shared<TextureCube>(m_ColorAttachmentsSpec[i]);
             TextureFormat &format = m_ColorAttachments[i]->m_Spec.Format;
             if(format != TextureFormat::None || !utils::OpenGL::IsDepthFormat(format))
             {

@@ -6,6 +6,21 @@
 class FrameBuffer;
 
 /**
+ * Enumeration representing the types of textures.
+ *
+ * The `TextureType` enum class defines the various types of textures that can be used
+ * within a graphics application. It provides identifiers for different texture categories,
+ * such as regular 2D textures and cube maps, which are used for different rendering purposes.
+ * This enum is typically used in functions and structures to specify the type of a texture.
+ */
+enum class TextureType
+{
+    None = 0,
+    Texture,
+    TextureCube,
+};
+
+/**
  * Specifications (properties) of a texture.
  *
  * The `TextureSpecification` provides a set of properties to define the characteristics of a
@@ -21,8 +36,8 @@ struct TextureSpecification
     TextureSpecification() = default;
     /// @brief Define a texture with a specific format.
     /// @param format The texture format.
-    TextureSpecification(const TextureFormat& format) :
-        Format(format)
+    TextureSpecification(const TextureFormat& format, const TextureType& type = TextureType::Texture) :
+        Format(format), Type(type)
     { }
     
     /// @brief Define the size of the texture (in pixels).
@@ -36,6 +51,9 @@ struct TextureSpecification
     
     // Texture specification variables
     // ----------------------------------------
+    ///< The type (category) of the texture.
+    TextureType Type = TextureType::Texture;
+    
     ///< The size (width and height) in pixels.
     int Width = 0, Height = 0;
     
@@ -55,6 +73,9 @@ struct TextureSpecification
     ///< precalculated versions of the texture at different levels of detail, providing smoother
     ///< rendering at varying distances
     bool MipMaps = false;
+    
+    ///< High dinamic range texture.
+    bool IsHDR = false;
 };
 
 /**
@@ -91,11 +112,11 @@ public:
 protected:
     // Target type
     // ----------------------------------------
-    GLenum TextureTarget() const;
+    virtual GLenum TextureTarget() const;
     
     // Constructor
     // ----------------------------------------
-    void CreateTexture(const void *data);
+    virtual void CreateTexture(const void *data);
     
     // Destructor
     // ----------------------------------------
@@ -130,12 +151,12 @@ public:
  * Copying or moving `Texture2D` objects is disabled to ensure single ownership and prevent
  * unintended texture duplication.
  */
-class Texture2D : public Texture
+class TextureResource : public Texture
 {
 public:
     // Constructor(s)/Destructor
     // ----------------------------------------
-    Texture2D(const std::filesystem::path& filePath, bool flip = true);
+    TextureResource(const std::filesystem::path& filePath, bool flip = true);
     
     // Getter(s)
     // ----------------------------------------
@@ -153,25 +174,72 @@ private:
     // Loading
     // ----------------------------------------
     void LoadFromFile(const std::filesystem::path& filePath);
-    void GenerateTexture2D(const void *data);
     
     // Texture variables
     // ----------------------------------------
 private:
     ///< Path to the file.
     std::filesystem::path m_FilePath;
+    
     ///< Texture flipping.
     bool m_Flip;
-
-    ///< Number of channels.
-    int m_Channels = 0;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    Texture2D(const Texture2D&) = delete;
-    Texture2D(Texture2D&&) = delete;
+    TextureResource(const TextureResource&) = delete;
+    TextureResource(TextureResource&&) = delete;
 
-    Texture2D& operator=(const Texture2D&) = delete;
-    Texture2D& operator=(Texture2D&&) = delete;
+    TextureResource& operator=(const TextureResource&) = delete;
+    TextureResource& operator=(TextureResource&&) = delete;
 };
+
+namespace utils { namespace Texturing {
+
+/**
+ * @brief Update the specifications of a texture resource based on width, height, channels, and extension.
+ *
+ * This function updates the specifications of a texture resource (`TextureSpecification`) based on the provided
+ * width, height, channels, and extension information. It determines the texture format, wrap mode, filter mode,
+ * and whether mipmaps are enabled based on the input data.
+ *
+ * @param spec The texture specification to be updated.
+ * @param width The width of the texture.
+ * @param height The height of the texture.
+ * @param channels The number of color channels in the texture.
+ * @param extension The file extension (e.g., ".hdr") to determine if the texture is HDR.
+ */
+inline void UpdateSpecsTextureResource(TextureSpecification& spec, const unsigned int width,
+                                       const unsigned int height, const unsigned int channels,
+                                       const std::string& extension = "")
+{
+    // Update width and height
+    spec.Width = width;
+    spec.Height = height;
+    
+    // Determine if the texture is HDR based on the file extension
+    spec.IsHDR = (extension == ".hdr");
+    
+    // Define the format of the data to be used
+    spec.Format = TextureFormat::None;
+    if (!spec.IsHDR && channels == 4)
+        spec.Format = TextureFormat::RGBA8;
+    else if (!spec.IsHDR && channels == 3)
+        spec.Format = TextureFormat::RGB8;
+    else if (spec.IsHDR && channels == 3)
+        spec.Format = TextureFormat::RGB16F;
+    
+    // Set default wrap mode based on HDR status
+    if (spec.Wrap == TextureWrap::None)
+        spec.Wrap = spec.IsHDR ? TextureWrap::ClampToEdge : TextureWrap::Repeat;
+    
+    // Set default filter mode
+    if (spec.Filter == TextureFilter::None)
+        spec.Filter = TextureFilter::Linear;
+    
+    // Enable mipmaps by default
+    spec.MipMaps = true;
+}
+
+} // namespace Texturing
+} // namespace utils

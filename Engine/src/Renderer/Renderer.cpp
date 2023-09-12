@@ -35,6 +35,22 @@ void Renderer::BeginScene(const std::shared_ptr<Camera> &camera)
 }
 
 /**
+ * Start the rendering of a scene by defining its general parameters.
+ *
+ * @param view The view matrix transformation.
+ * @param projection The projection matrix transformation.
+ * @param position The view position.
+ */
+void Renderer::BeginScene(const glm::mat4 &view, const glm::mat4 &projection,
+                          const glm::vec3& position)
+{
+    s_SceneData->viewPosition = position;
+    
+    s_SceneData->viewMatrix = view;
+    s_SceneData->projectionMatrix = projection;
+}
+
+/**
  * End the rendering of a scene.
  */
 void Renderer::EndScene()
@@ -169,6 +185,19 @@ void Renderer::SetDepthTesting(bool enabled)
         glEnable(GL_DEPTH_TEST);
     else
         glDisable(GL_DEPTH_TEST);
+}
+
+/**
+ * Set the depth function for rendering.
+ *
+ * The depth function determines how fragments (pixels) are compared to the depth buffer
+ * to determine if they should be drawn or discarded.
+ *
+ * @param depth The depth function to be set.
+ */
+void Renderer::SetDepthFunction(const DepthFunction depth)
+{
+    glDepthFunc(utils::OpenGL::DepthToOpenGLType(depth));
 }
 
 /**

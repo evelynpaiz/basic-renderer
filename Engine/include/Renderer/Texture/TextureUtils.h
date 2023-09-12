@@ -180,14 +180,14 @@ inline GLenum TextureFormatToOpenGLDataType(TextureFormat format)
         case TextureFormat::RGB8UI:
         case TextureFormat::RGBA8UI: return GL_UNSIGNED_BYTE;
             
-        case TextureFormat::R16F:
-        case TextureFormat::RGB16F:
-        case TextureFormat::RGBA16F: return GL_HALF_FLOAT;
-            
         case TextureFormat::DEPTH16:
         case TextureFormat::DEPTH24:
         case TextureFormat::DEPTH32:
         case TextureFormat::DEPTH24STENCIL8: return GL_UNSIGNED_INT;
+            
+        case TextureFormat::R16F:
+        case TextureFormat::RGB16F:
+        case TextureFormat::RGBA16F:
         
         case TextureFormat::RGB32F:
         case TextureFormat::RGBA32F:

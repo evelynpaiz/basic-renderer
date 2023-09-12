@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Renderer/Texture/Texture.h"
+#include "Renderer/Texture/TextureCube.h"
 #include "Renderer/Texture/TextureUtils.h"
 
 /**
@@ -164,6 +165,7 @@ public:
     void Bind() const;
     void BindForDrawAttachment(const unsigned int index) const;
     void BindForReadAttachment(const unsigned int index) const;
+    void BindForDrawAttachmentCube(const unsigned int index, const unsigned int face) const;
     void Unbind() const;
     
     // Draw

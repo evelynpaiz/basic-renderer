@@ -25,16 +25,20 @@ public:
     // Constructor(s)/Destructor
     // ----------------------------------------
     /// @brief Generate a light source with a position in the world space.
+    /// @param width The width that the light source covers.
+    /// @param height The height that the light source covers.
     /// @param color The color of the light source.
     /// @param position The position of the light source.
     /// @param angle The angle of visibility of the light source.
-    PositionalLight(const glm::vec3 &color = glm::vec3(1.0f),
+    PositionalLight(const unsigned int width, const unsigned int height,
+                    const glm::vec3 &color = glm::vec3(1.0f),
                     const glm::vec3 &position = glm::vec3(0.0f),
                     float angle = 90.0f)
         : Light(color), m_Position(position)
     {
         // Set the shadow camera parameters
         auto shadowCamera = std::make_shared<PerspectiveShadow>();
+        shadowCamera->SetViewportSize(width, height);
         shadowCamera->SetPosition(position);
         shadowCamera->SetFieldOfView(angle);
         m_ShadowCamera = shadowCamera;

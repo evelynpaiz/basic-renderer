@@ -25,7 +25,7 @@ inline void SetTextureMap(const std::shared_ptr<Shader>& shader, const std::stri
 }
 
 } // namespace Texturing
-} // namespace
+} // namespace utils
 
 /**
  * Base class representing a material used for rendering.

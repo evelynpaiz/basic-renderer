@@ -37,6 +37,7 @@ Texture::Texture(const void *data)
 Texture::Texture(const TextureSpecification& spec)
     : m_Spec(spec)
 {
+    m_Spec.Type = TextureType::Texture;
     glGenTextures(1, &m_ID);
 }
 
@@ -158,10 +159,12 @@ void Texture::CreateTexture(const void *data)
     if (m_Spec.MipMaps)
         glGenerateMipmap(GL_TEXTURE_2D);
     
+    // Unbind the texture
+    Unbind();
 }
 
 // --------------------------------------------
-// Texture 2D
+// Texture Resource
 // --------------------------------------------
 
 /**
@@ -170,7 +173,7 @@ void Texture::CreateTexture(const void *data)
  * @param filePath Texture file path.
  * @param flip Fip the texture vertically.
  */
-Texture2D::Texture2D(const std::filesystem::path& filePath, bool flip)
+TextureResource::TextureResource(const std::filesystem::path& filePath, bool flip)
     : Texture(), m_FilePath(filePath), m_Flip(flip)
 {
     LoadFromFile(filePath);
@@ -181,15 +184,20 @@ Texture2D::Texture2D(const std::filesystem::path& filePath, bool flip)
  *
  * @param filePath Texture file path.
  */
-void Texture2D::LoadFromFile(const std::filesystem::path& filePath)
+void TextureResource::LoadFromFile(const std::filesystem::path& filePath)
 {
-    // Flip vertically the image (if needed)
+    // Determine whether to flip the image vertically
     stbi_set_flip_vertically_on_load(m_Flip);
     
-    // Load the image into our local buffer
+    // Extract the file extension
+    std::string extension = filePath.extension().string();
+    
+    // Load the image into the local buffer
     int width, height, channels;
-    unsigned char* data = stbi_load(filePath.string().c_str(), &width,
-                                    &height, &channels, 0);
+    void* data = nullptr;
+    
+    data = (extension != ".hdr") ? stbi_load(filePath.string().c_str(), &width, &height, &channels, 0) :
+                            (void*)stbi_loadf(filePath.string().c_str(), &width, &height, &channels, 0);
     
     // Verify that the image has been loaded correctly
     if (!data)
@@ -199,43 +207,12 @@ void Texture2D::LoadFromFile(const std::filesystem::path& filePath)
     }
     
     // Save the corresponding image information
-    m_Spec.Width = width;
-    m_Spec.Height = height;
-    m_Channels = channels;
+    utils::Texturing::UpdateSpecsTextureResource(m_Spec, width, height, channels, extension);
+    CORE_ASSERT((unsigned int)m_Spec.Format, "Data format of " + m_FilePath.filename().string() + " not supported!");
     
     // Generate the 2D texture
-    GenerateTexture2D(data);
+    CreateTexture(data);
     
     // Free memory
     stbi_image_free(data);
-}
-
-/**
- * Generate a 2D texture from its loaded data.
- *
- * @param data Texture data.
- */
-void Texture2D::GenerateTexture2D(const void *data)
-{
-    // Define the format of the data to be used
-    if (m_Channels == 4)
-        m_Spec.Format = TextureFormat::RGBA8;
-    else if (m_Channels == 3)
-        m_Spec.Format = TextureFormat::RGB8;
-    
-    if (m_Spec.Wrap == TextureWrap::None)
-        m_Spec.Wrap = TextureWrap::Repeat;
-    if (m_Spec.Filter == TextureFilter::None)
-        m_Spec.Filter = TextureFilter::Linear;
-    
-    m_Spec.MipMaps = true;
-    
-    CORE_ASSERT((unsigned int)m_Spec.Format, "Data format of " + m_FilePath.filename().string() + " not supported!");
-    
-    // Generate a 2D texture
-    Bind();
-    CreateTexture(data);
-    
-    // Unbind the texture
-    Unbind();
 }

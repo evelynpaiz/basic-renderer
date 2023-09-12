@@ -102,8 +102,8 @@ void Viewer::OnEvent(Event &e)
 void Viewer::InitializeViewer()
 {
     // Define light source
-    m_LightSource = std::make_shared<DirectionalLight>(glm::vec3(1.0f), glm::vec3(0.5f, -0.5f, 0.0f));
-    m_LightSource->GetShadowCamera()->SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+    m_LightSource = std::make_shared<DirectionalLight>(m_ViewportWidth, m_ViewportHeight,
+                                                       glm::vec3(1.0f), glm::vec3(0.5f, -0.5f, 0.0f));
     
     // Define the rendering camera
     m_Camera = std::make_shared<PerspectiveCamera>(m_ViewportWidth, m_ViewportHeight);
@@ -128,8 +128,8 @@ void Viewer::InitializeViewer()
     m_Materials["Depth"] = depthMaterial;
     
     auto cubeMaterial = std::make_shared<PhongTextureMaterial>(m_LightSource, "Resources/shaders/phong/PhongTextureShadow.glsl");
-    cubeMaterial->SetDiffuseMap(std::make_shared<Texture2D>("Resources/textures/diffuse.jpeg"));
-    cubeMaterial->SetSpecularMap(std::make_shared<Texture2D>("Resources/textures/specular.jpeg"));
+    cubeMaterial->SetDiffuseMap(std::make_shared<TextureResource>("Resources/textures/diffuse.jpeg"));
+    cubeMaterial->SetSpecularMap(std::make_shared<TextureResource>("Resources/textures/specular.jpeg"));
     cubeMaterial->SetShadowMap(m_Framebuffers["Shadow"]->GetDepthAttachment());
     cubeMaterial->SetShininess(32.0f);
     m_Materials["PhongTexture"] = cubeMaterial;

@@ -20,14 +20,16 @@ public:
     // Constructor(s)/Destructor
     // ----------------------------------------
     /// @brief Generate a light source defined by a direction.
+    /// @param width The width that the light source covers.
+    /// @param height The height that the light source covers.
     /// @param color The color of the light source.
     /// @param direction The direction of the light source.
     /// @param distance The distance from the target position to the light source.
     /// @param orthoSize The orthographic size for shadow calculations.
-    DirectionalLight(const glm::vec3& color = glm::vec3(1.0f),
+    DirectionalLight(const unsigned int width, const unsigned int height,
+                     const glm::vec3& color = glm::vec3(1.0f),
                      const glm::vec3& direction = glm::vec3(0.0f, -1.0f, 0.0f),
-                     float distance = 15.0f,
-                     float orthoSize = 20.0f)
+                     float distance = 15.0f, float orthoSize = 20.0f)
         : Light(color), m_Direction(direction), m_Distance(distance)
     {
         // Set the shadow camera parameters

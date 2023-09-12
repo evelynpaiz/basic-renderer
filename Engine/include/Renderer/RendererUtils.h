@@ -24,6 +24,14 @@ enum class FaceCulling
     Front, Back, FrontAndBack,
 };
 
+/**
+ * Enumeration representing the different depth testing functions.
+ */
+enum class DepthFunction
+{
+    Always, Never, Less, Equal, LEqual, Greater, NotEqual, GEqual,
+};
+
 namespace utils { namespace OpenGL
 {
 /**
@@ -66,6 +74,33 @@ inline GLenum CullingToOpenGLType(FaceCulling culling)
     }
     
     CORE_ASSERT(false, "Unknown face culling mode!");
+    return 0;
+}
+
+/**
+ * Convert the depth function enumeration to its corresponding OpenGL type.
+ *
+ * @param depth The depth function mode to be converted.
+ *
+ * @return The corresponding OpenGL depth function.
+ *
+ * @note If the input depth function is not recognized, the function will assert with an error.
+ */
+inline GLenum DepthToOpenGLType(DepthFunction depth)
+{
+    switch (depth)
+    {
+        case DepthFunction::Always: return GL_ALWAYS;
+        case DepthFunction::Never: return GL_NEVER;
+        case DepthFunction::Less: return GL_LESS;
+        case DepthFunction::Equal: return GL_EQUAL;
+        case DepthFunction::LEqual: return GL_LEQUAL;
+        case DepthFunction::Greater: return GL_GREATER;
+        case DepthFunction::NotEqual: return GL_NOTEQUAL;
+        case DepthFunction::GEqual: return GL_GEQUAL;
+    }
+    
+    CORE_ASSERT(false, "Unknown depth function!");
     return 0;
 }
 

@@ -51,6 +51,8 @@ public:
     // ----------------------------------------
     static void BeginScene();
     static void BeginScene(const std::shared_ptr<Camera>& camera);
+    static void BeginScene(const glm::mat4& view, const glm::mat4& projection,
+                           const glm::vec3& position = glm::vec3(0.0f));
     static void EndScene();
     
     // Render
@@ -71,6 +73,7 @@ public:
     static void SetViewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height);
     
     static void SetDepthTesting(const bool enabled);
+    static void SetDepthFunction(const DepthFunction depth);
     static void SetFaceCulling(const FaceCulling culling);
     
     // Statistics
