@@ -87,47 +87,14 @@ void Renderer::Clear(const glm::vec4& color, const BufferState& buffersActive)
  * @param primitive The type of primitive to be drawn (e.g., Points, Lines, Triangles).
  * @param useIndexBuffer Whether to use the index buffer for rendering or not.
  */
-void Renderer::Draw(const std::shared_ptr<VertexArray>& vao,
-                    const PrimitiveType &primitive, bool useIndexBuffer)
+void Renderer::Draw(const std::shared_ptr<VertexArray>& vao, const PrimitiveType &primitive)
 {
     vao->Bind();
-    // Draw using the information in the vertex buffers (without index buffer)
-    if (!useIndexBuffer)
-    {
-        for (const std::shared_ptr<VertexBuffer>& vbo : vao->GetVertexBuffers())
-        {
-            // Check if geometries should be drawn separately (using segments)
-            std::vector<unsigned int> segments = vbo->GetSegments();
-            // If no segments, draw the whole buffer
-            if (segments.empty())
-            {
-                glDrawArrays(utils::OpenGL::PrimitiveTypeToOpenGLType(primitive), 0, vbo->GetCount());
-                g_Stats.drawCalls++;
-            }
-            // Draw segments of the buffer separately
-            else
-            {
-                int point = 0;
-                for(unsigned int s : segments)
-                {
-                    glDrawArrays(utils::OpenGL::PrimitiveTypeToOpenGLType(primitive), point, s + 1);
-                    
-                    point += s + 1;
-                    g_Stats.drawCalls++;
-                }
-            }
-        }
-    }
-    // Draw using the information in the index buffer
-    else
-    {
-        vao->GetIndexBuffer()->Bind();
-        glDrawElements(utils::OpenGL::PrimitiveTypeToOpenGLType(primitive),
-                       vao->GetIndexBuffer()->GetCount(),
-                       GL_UNSIGNED_INT, nullptr);
-        
-        g_Stats.drawCalls++;
-    }
+    vao->GetIndexBuffer()->Bind();
+    glDrawElements(utils::OpenGL::PrimitiveTypeToOpenGLType(primitive),
+                   vao->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+    
+    g_Stats.drawCalls++;
 }
 
 /**
@@ -139,9 +106,8 @@ void Renderer::Draw(const std::shared_ptr<VertexArray>& vao,
  * @param primitive The type of primitive to be drawn (e.g., Points, Lines, Triangles).
  * @param useIndexBuffer Whether to use the index buffer for rendering or not.
  */
-void Renderer::Draw(const std::shared_ptr<VertexArray>& vao,
-                    const std::shared_ptr<Material>& material, const glm::mat4 &transform,
-                    const PrimitiveType &primitive, bool useIndexBuffer)
+void Renderer::Draw(const std::shared_ptr<VertexArray>& vao, const std::shared_ptr<Material>& material,
+                    const glm::mat4 &transform, const PrimitiveType &primitive)
 {
     // Bind the material and set the corresponding information into
     // it for the shading
@@ -158,7 +124,7 @@ void Renderer::Draw(const std::shared_ptr<VertexArray>& vao,
         material->GetShader()->SetVec3("u_View.Position", s_SceneData->viewPosition);
     
     // Render the geometry
-    Draw(vao, primitive, useIndexBuffer);
+    Draw(vao, primitive);
 }
 
 /**

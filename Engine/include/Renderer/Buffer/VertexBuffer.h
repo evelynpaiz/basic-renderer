@@ -35,9 +35,6 @@ public:
     /// of vertex attributes within the buffer.
     /// @return The layout of the buffer.
     const BufferLayout& GetLayout() const { return m_Layout; }
-    /// @brief Get the segments defining the geometry groups.
-    /// @return A constant reference to the vector representing the number of vertices in each segment.
-    const std::vector<unsigned int> &GetSegments() const { return m_Segments; }
     
     // Setter(s)
     // ----------------------------------------
@@ -45,9 +42,6 @@ public:
     /// of vertex attributes within the buffer.
     /// @param layout The buffer layout.
     void SetLayout(const BufferLayout& layout) { m_Layout = layout; }
-    /// @brief Set the segments for splitting the geometry into groups.
-    /// @param segments A vector representing the number of vertices in each segment.
-    void SetSegments(const std::vector<unsigned int> &segments) { m_Segments = segments; }
     
     // Vertex buffer variables
     // ----------------------------------------
@@ -58,10 +52,6 @@ private:
     unsigned int m_Count = 0;
     ///< Layout for the vertex attributes.
     BufferLayout m_Layout;
-    ///< Number of vertices that represents a joined geometry. Each segment can be considered
-    ///< a separate geometry group, and it helps in organizing the rendering of complex geometries
-    ///< using different draw calls.
-    std::vector<unsigned int> m_Segments;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

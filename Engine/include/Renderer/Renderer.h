@@ -60,13 +60,11 @@ public:
     static void Clear(const BufferState& buffersActive = {});
     static void Clear(const glm::vec4& color, const BufferState& buffersActive = {});
     static void Draw(const std::shared_ptr<VertexArray>& vao,
-                     const PrimitiveType &primitive = PrimitiveType::Triangles,
-                     bool useIndexBuffer = true);
+                     const PrimitiveType &primitive = PrimitiveType::Triangles);
     static void Draw(const std::shared_ptr<VertexArray>& vao,
               const std::shared_ptr<Material>& material,
               const glm::mat4 &transform = glm::mat4(1.0f),
-              const PrimitiveType &primitive = PrimitiveType::Triangles,
-              bool useIndexBuffer = true);
+              const PrimitiveType &primitive = PrimitiveType::Triangles);
 
     // Setter(s)
     // ----------------------------------------
