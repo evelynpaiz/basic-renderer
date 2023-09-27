@@ -94,8 +94,10 @@ void FrameBuffer::BindForReadAttachment(const unsigned int index) const
  *
  * @param index The color attachment index.
  * @param face The face to be selected from the cube attachment.
+ * @param level The mipmap level of the texture image to be attached.
  */
-void FrameBuffer::BindForDrawAttachmentCube(const unsigned int index, const unsigned int face) const
+void FrameBuffer::BindForDrawAttachmentCube(const unsigned int index, const unsigned int face,
+                                            const unsigned int level) const
 {
     if (m_ColorAttachmentsSpec[index].Type != TextureType::TextureCube)
     {
@@ -106,21 +108,21 @@ void FrameBuffer::BindForDrawAttachmentCube(const unsigned int index, const unsi
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_ID);
     glViewport(0, 0, m_Spec.Width, m_Spec.Height);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
-                           m_ColorAttachments[index]->m_ID, 0);
+                           m_ColorAttachments[index]->m_ID, level);
 }
 
 /**
  * Unbind the vertex buffer.
  */
-void FrameBuffer::Unbind() const
+void FrameBuffer::Unbind(const bool& genMipMaps) const
 {
     // Generate mipmaps if necesary
-    if (m_Spec.MipMaps)
+    if (m_Spec.MipMaps && genMipMaps)
     {
         for (auto& attachment : m_ColorAttachments)
         {
             attachment->Bind();
-            glGenerateMipmap(GL_TEXTURE_2D);
+            glGenerateMipmap(attachment->TextureTarget());
         }
     }
     

@@ -26,84 +26,16 @@ class EnvironmentLight : public Light
 public:
     // Constructor(s)/Destructor
     // ----------------------------------------
-    /// @brief Generate an environment light source in the world space.
-    /// @param width The width that the light source covers.
-    /// @param height The height that the light source covers.
-    /// @param color The color of the light source.
-    /// @param position The position of the light source.
     EnvironmentLight(const unsigned int width, const unsigned int height,
                      const glm::vec3 &color = glm::vec3(1.0f),
-                    const glm::vec3 &position = glm::vec3(0.0f))
-        : Light(color), m_Position(position)
-    {
-        // Define the shadow camera for the light source
-        auto shadowCamera = std::make_shared<PerspectiveShadow>();
-        shadowCamera->SetViewportSize(width, height);
-        shadowCamera->SetPosition(position);
-        shadowCamera->SetFieldOfView(90.0f);
-        m_ShadowCamera = shadowCamera;
-        
-        // Define the framebuffer for the environment
-        FrameBufferSpecification spec(width, width);
-        spec.AttachmentsSpec = { TextureFormat::DEPTH24, { TextureFormat::RGB16F, TextureType::TextureCube } };
-        m_Framebuffer = std::make_shared<FrameBuffer>(spec);
-        
-        // Define the materias for the light source
-        m_EquirectangularMaterial = std::make_shared<SimpleTextureMaterial>("Resources/shaders/environment/EquirectangularMap.glsl");
-        m_CubeMaterial = std::make_shared<SimpleTextureMaterial>("Resources/shaders/environment/CubeMap.glsl");
-        
-        // Define the light source 3D model
-        m_Model = utils::Geometry::ModelCube<GeoVertexData<glm::vec4>>(m_CubeMaterial);
-    }
+                     const glm::vec3 &position = glm::vec3(0.0f));
     
     /// @brief Destructor for the environment light.
     ~EnvironmentLight() override = default;
     
     // Setter(s)
     // ----------------------------------------
-    /// @brief Change the environment map.
-    /// @param texture The texture to be used as the environment map.
-    void SetEnvironmentMap(const std::shared_ptr<Texture> texture)
-    {
-        // Define the tranformation matrices
-        static const glm::mat4 projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
-        static const glm::mat4 views[] =
-        {
-           glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-           glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-           glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
-           glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
-           glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-           glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
-        };
-        
-        // Render into the cube map
-        Renderer::ResetStats();
-        
-        m_EquirectangularMaterial->SetTextureMap(texture);
-    
-        m_Model.SetMaterial(m_EquirectangularMaterial);
-        m_Model.SetScale(glm::vec3(2.0f));
-        
-        for (unsigned int i = 0; i < 6; ++i)
-        {
-            Renderer::BeginScene(views[i], projection);
-            m_Framebuffer->BindForDrawAttachmentCube(0, i);
-            
-            Renderer::Clear(m_Framebuffer->GetActiveBuffers());
-            m_Model.DrawModel();
-            
-            Renderer::EndScene();
-        }
-        
-        m_Framebuffer->Unbind();
-        
-        // Update the 3D model of the light source with the rendered environment map
-        m_CubeMaterial->SetTextureMap(m_Framebuffer->GetColorAttachment(0));
-        
-        m_Model.SetMaterial(m_CubeMaterial);
-        m_Model.SetScale(glm::vec3(70.0f));
-    }
+    void SetEnvironmentMap(const std::shared_ptr<Texture> texture);
     
     // Getter(s)
     // ----------------------------------------
@@ -113,6 +45,11 @@ public:
     
     // Properties
     // ----------------------------------------
+    void DefineIrradianceMap(const std::shared_ptr<Shader> &shader,
+                             const unsigned int slot);
+    void DefinePreFilterMap(const std::shared_ptr<Shader> &shader,
+                            const unsigned int slot);
+    
     /// @brief Define light properties into the uniforms of the shader program.
     /// @param shader The shader program.
     void DefineLightProperties(const std::shared_ptr<Shader> &shader) override
@@ -124,6 +61,20 @@ public:
         shader->SetVec4("u_Light.Vector", glm::vec4(m_Position, 1.0f));
     }
     
+protected:
+    // Initialization
+    // ----------------------------------------
+    void InitEnvironmentFramebuffers(const unsigned int cubeSize);
+    void InitEnvironmentMaterials();
+    
+    // Render
+    // ----------------------------------------
+    void RenderCubeMap(const std::array<glm::mat4, 6> &views, const glm::mat4 &projection,
+                       const std::shared_ptr<SimpleTextureMaterial> &material,
+                       const std::shared_ptr<FrameBuffer> &framebuffer,
+                       const unsigned int& viewportWidth = 0, const unsigned int& viewportHeight = 0,
+                       const unsigned int &level = 0, const bool& genMipMaps = true);
+    
     // Light variables
     // ----------------------------------------
 private:
@@ -132,12 +83,12 @@ private:
     
     ///< Environment light's 3D model.
     Model<GeoVertexData<glm::vec4>> m_Model;
-    ///< Framebuffer for environment rendering.
-    std::shared_ptr<FrameBuffer> m_Framebuffer;
     
-    ///< Environment light's materials.
-    std::shared_ptr<SimpleTextureMaterial> m_EquirectangularMaterial;
-    std::shared_ptr<SimpleTextureMaterial> m_CubeMaterial;
+    ///< Environment light's framebuffer(s).
+    std::unordered_map<std::string, std::shared_ptr<FrameBuffer>> m_EnvFramebuffers;
+    
+    ///< Environment light's material(s).
+    std::unordered_map<std::string, std::shared_ptr<SimpleTextureMaterial>> m_EnvMaterials;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

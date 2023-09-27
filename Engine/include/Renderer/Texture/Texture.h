@@ -73,9 +73,6 @@ struct TextureSpecification
     ///< precalculated versions of the texture at different levels of detail, providing smoother
     ///< rendering at varying distances
     bool MipMaps = false;
-    
-    ///< High dinamic range texture.
-    bool IsHDR = false;
 };
 
 /**
@@ -197,6 +194,40 @@ public:
 namespace utils { namespace Texturing {
 
 /**
+ * Get a shared pointer to a 1x1 white texture.
+ *
+ * This function returns a shared pointer to a 1x1 texture with a single white pixel.
+ * If the texture has already been created, it will be reused to avoid redundant texture creation.
+ *
+ * @tparam T The type of texture to create (e.g., Texture or TextureCube).
+ * @return A shared pointer to the 1x1 white texture.
+ */
+template <typename T>
+inline std::shared_ptr<T>& WhiteTexture()
+{
+    // Static variable to hold the shared pointer to the texture
+    static std::shared_ptr<T> texture;
+
+    // Check if the texture has already been created
+    if (texture)
+        return texture;
+
+    // Define the texture specifications
+    TextureSpecification spec = TextureSpecification(TextureFormat::RGB8);
+    spec.SetTextureSize(1, 1);
+    spec.Wrap = TextureWrap::Repeat; // Set texture wrap mode to repeat
+
+    // Define the color data for a single white pixel (R, G, B values)
+    const unsigned char whitePixel[] = { 255, 255, 255 };
+
+    // Create the 1x1 white texture using the specified data and specifications
+    texture = std::make_shared<T>(whitePixel, spec);
+
+    // Return the created texture
+    return texture;
+}
+
+/**
  * @brief Update the specifications of a texture resource based on width, height, channels, and extension.
  *
  * This function updates the specifications of a texture resource (`TextureSpecification`) based on the provided
@@ -218,20 +249,20 @@ inline void UpdateSpecsTextureResource(TextureSpecification& spec, const unsigne
     spec.Height = height;
     
     // Determine if the texture is HDR based on the file extension
-    spec.IsHDR = (extension == ".hdr");
+    bool isHDR = (extension == ".hdr");
     
     // Define the format of the data to be used
     spec.Format = TextureFormat::None;
-    if (!spec.IsHDR && channels == 4)
+    if (!isHDR && channels == 4)
         spec.Format = TextureFormat::RGBA8;
-    else if (!spec.IsHDR && channels == 3)
+    else if (!isHDR && channels == 3)
         spec.Format = TextureFormat::RGB8;
-    else if (spec.IsHDR && channels == 3)
+    else if (isHDR && channels == 3)
         spec.Format = TextureFormat::RGB16F;
     
     // Set default wrap mode based on HDR status
     if (spec.Wrap == TextureWrap::None)
-        spec.Wrap = spec.IsHDR ? TextureWrap::ClampToEdge : TextureWrap::Repeat;
+        spec.Wrap = isHDR ? TextureWrap::ClampToEdge : TextureWrap::Repeat;
     
     // Set default filter mode
     if (spec.Filter == TextureFilter::None)

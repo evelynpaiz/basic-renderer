@@ -180,6 +180,23 @@ void Renderer::SetFaceCulling(const FaceCulling culling)
 }
 
 /**
+ * Enable or disable seamless cubemap sampling.
+ *
+ * This function allows you to enable or disable seamless cubemap sampling, which
+ * can improve the visual quality when rendering cubemaps, especially when used as
+ * skyboxes or for environment mapping.
+ *
+ * @param enabled Set to `true` to enable seamless cubemap sampling, or `false` to disable it.
+ */
+void Renderer::SetCubeMapSeamless(const bool enabled)
+{
+    if (enabled)
+        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+    else
+        glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+}
+
+/**
  * Reset rendering statistics.
  *
  * This function resets the stored rendering statistics, including information about

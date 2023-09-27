@@ -143,6 +143,10 @@ public:
     
     // Getters
     // ----------------------------------------
+    /// @brief Get the framebuffer configuration.
+    /// @return The specifications of the framebuffer.
+    const FrameBufferSpecification& GetSpec() const { return m_Spec; }
+    
     /// @brief Get a specific framebuffer color attachment.
     /// @param index Color attachment index.
     /// @return The color attachment (texture reference).
@@ -165,8 +169,9 @@ public:
     void Bind() const;
     void BindForDrawAttachment(const unsigned int index) const;
     void BindForReadAttachment(const unsigned int index) const;
-    void BindForDrawAttachmentCube(const unsigned int index, const unsigned int face) const;
-    void Unbind() const;
+    void BindForDrawAttachmentCube(const unsigned int index, const unsigned int face,
+                                   const unsigned int level = 0) const;
+    void Unbind(const bool& genMipMaps = true) const;
     
     // Draw
     // ----------------------------------------
