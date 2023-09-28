@@ -3,7 +3,16 @@
 #include "Renderer/Texture/TextureUtils.h"
 #include <filesystem>
 
+class Texture;
 class FrameBuffer;
+
+namespace utils { namespace Draw {
+
+inline bool TextureLoader(std::shared_ptr<Texture> &texture,
+                          std::filesystem::path &name, const char *label,
+                          const char *filter, const bool &flip);
+}
+}
 
 /**
  * Enumeration representing the types of textures.
@@ -105,6 +114,9 @@ public:
     // Friend class definition(s)
     // ----------------------------------------
     friend class FrameBuffer;
+    friend bool utils::Draw::TextureLoader(std::shared_ptr<Texture> &texture,
+                                           std::filesystem::path &name, const char *label,
+                                           const char *filter, const bool &flip);
     
 protected:
     // Target type
@@ -228,7 +240,31 @@ inline std::shared_ptr<T>& WhiteTexture()
 }
 
 /**
- * @brief Update the specifications of a texture resource based on width, height, channels, and extension.
+ * Get a shared pointer to an empty texture with a checkerboard pattern.
+ *
+ * This function returns a shared pointer to an empty texture with a checkerboard pattern.
+ * If the texture has already been created, it will be reused to avoid redundant texture creation.
+ *
+ * @return A shared pointer to the empty texture with a checkerboard pattern.
+ */
+inline std::shared_ptr<TextureResource> EmptyTexture()
+{
+    // Static variable to hold the shared pointer to the texture
+    static std::shared_ptr<TextureResource> texture;
+    
+    // Check if the texture has already been created
+    if (texture)
+        return texture;
+    
+    // Create the empty texture using a ccheckerboard pattern
+    texture = std::make_shared<TextureResource>("resources/common/checkerboard.png");
+    
+    // Return the created texture
+    return texture;
+}
+
+/**
+ * Update the specifications of a texture resource based on width, height, channels, and extension.
  *
  * This function updates the specifications of a texture resource (`TextureSpecification`) based on the provided
  * width, height, channels, and extension information. It determines the texture format, wrap mode, filter mode,

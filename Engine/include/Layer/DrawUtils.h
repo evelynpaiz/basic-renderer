@@ -1,9 +1,36 @@
 #pragma once
 
+#include "Core/FileDialogs.h"
+#include "Renderer/Texture/Texture.h"
+
 #include <imgui.h>
 #include <imgui_internal.h>
 
 namespace utils { namespace Draw {
+
+/**
+ * Display read-only text in an input field.
+ *
+ * @param id  A unique identifier for the input field.
+ * @param text The text to display in the input field.
+ * @param distance The relative width of the input field (default is 0.78f).
+ */
+inline void TextDisplay(const char *id, const char *text,
+                        float distance = 0.78f)
+{
+    ImGui::PushID(id);
+    char buffer[256];
+    strcpy(buffer, text);
+    ImGui::PushItemWidth(-1);
+    ImGui::InputText(
+            "##Text",
+            buffer,
+            sizeof(buffer),
+            ImGuiInputTextFlags_ReadOnly);
+    ImGui::PopItemWidth();
+    ImGui::PopID();
+}
+
 /**
  * Controller button.
  *
@@ -108,6 +135,60 @@ inline void Vec3Control(const std::string &label,
     ImGui::PopStyleVar();
     ImGui::Columns(1);
     ImGui::PopID();
+}
+
+/**
+ * Load and display an image texture using ImGui.
+ *
+ * @param texture  A reference to a shared pointer to a texture object. The loaded texture
+ *                 will be stored here.
+ * @param filePath A reference to the path where the loaded image file's path will be stored.
+ * @param label    The label text displayed on the load button.
+ * @param filter   A pointer to a filter string specifying the allowed file types for the image files.
+ * @param flip     A boolean flag indicating whether to flip the image vertically when displayed.
+ *
+ * @return `true` if the texture has been updated (new image loaded), `false` otherwise.
+ */
+inline bool TextureLoader(std::shared_ptr<Texture> &texture,
+                          std::filesystem::path &filePath, const char *label,
+                          const char *filter, const bool &flip = true)
+{
+    // Define result (texture has been updated)
+    bool updated = false;
+    
+    // Select the correct texture to be displayed
+    const auto &displayTexture = texture ? texture : utils::Texturing::EmptyTexture();
+    
+    ImTextureID textureID = (ImTextureID)((uintptr_t)(displayTexture->m_ID));
+    float aspect = (float)displayTexture->m_Spec.Height / displayTexture->m_Spec.Width;
+    
+    // Display the texture as an image button
+    ImGui::Columns(2);
+    
+    ImGui::SetColumnWidth(0, 92.f);
+    if (ImGui::ImageButton(
+            textureID,
+            ImVec2 { 70, 70 * aspect },
+            flip ? ImVec2 { 0, 1 } : ImVec2 { 1, 0 },
+            flip ? ImVec2 { 1, 0 } : ImVec2 { 0, 1 }))
+    {
+        filePath = FileDialogs::OpenFile(filter);
+        if (!filePath.empty())
+        {
+            texture = std::make_shared<TextureResource>(filePath);
+            updated = true;
+        }
+    }
+    
+    ImGui::NextColumn();
+    
+    // Texture name
+    ImGui::Text("%s", label);
+    ImGui::SameLine();
+    TextDisplay(label, filePath.filename().string().c_str());
+    ImGui::Columns(1);
+    
+    return updated;
 }
     
 } // namespace Draw

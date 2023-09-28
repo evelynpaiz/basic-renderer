@@ -5,7 +5,7 @@ file(
     GLOB_RECURSE sources
     LIST_DIRECTORIES false
     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-    src/*.cpp src/*.h
+    src/Common/*.cpp src/src/Common/*.mm src/src/Common/*.h
 )
 
 # Find header files
@@ -37,8 +37,26 @@ foreach (resource ${resources})
     list(APPEND outputs ${output})
 endforeach()
 
+# Platform-specific source files
+if(WIN32)
+    set(PLATFORM_DIR "Platform/OS/Windows")
+elseif(APPLE)
+    set(PLATFORM_DIR "Platform/OS/MacOS")
+else()
+    set(PLATFORM_DIR "Platform/OS/Generic")
+endif()
+
+file(
+    GLOB_RECURSE platform_sources
+    LIST_DIRECTORIES false
+    RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+    src/${PLATFORM_DIR}/*.cpp
+    src/${PLATFORM_DIR}/*.mm
+    src/${PLATFORM_DIR}/*.h
+)
+
 # Define the engine library
-add_library(Engine STATIC ${sources} ${public_headers})
+add_library(Engine STATIC ${sources} ${platform_sources} ${public_headers})
 add_library(Renderer::Engine ALIAS Engine)
 
 # Define the include directories for this target
@@ -64,5 +82,5 @@ target_precompile_headers(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/eng
 # Define solution tree organization
 source_group(
     TREE ${CMAKE_CURRENT_SOURCE_DIR}
-    FILES ${public_headers} ${sources}
+    FILES ${public_headers} ${sources} ${platform_sources}
 )
