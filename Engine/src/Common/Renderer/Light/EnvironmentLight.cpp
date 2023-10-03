@@ -92,7 +92,7 @@ void EnvironmentLight::InitEnvironmentMaterials()
  * 
  * @param texture The texture to be used as the environment map.
  */
-void EnvironmentLight::SetEnvironmentMap(const std::shared_ptr<Texture> texture)
+void EnvironmentLight::SetEnvironmentMap(const std::shared_ptr<Texture>& texture)
 {
     // Define the tranformation matrices
     static const glm::mat4 projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);

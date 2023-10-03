@@ -8,6 +8,24 @@ file(
     src/Common/*.cpp src/src/Common/*.mm src/src/Common/*.h
 )
 
+# Find platform-specific source files
+if(WIN32)
+    set(PLATFORM_DIR "Platform/OS/Windows")
+elseif(APPLE)
+    set(PLATFORM_DIR "Platform/OS/MacOS")
+else()
+    set(PLATFORM_DIR "Platform/OS/Generic")
+endif()
+
+file(
+    GLOB_RECURSE platform_sources
+    LIST_DIRECTORIES false
+    RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+    src/${PLATFORM_DIR}/*.cpp
+    src/${PLATFORM_DIR}/*.mm
+    src/${PLATFORM_DIR}/*.h
+)
+
 # Find header files
 file(
     GLOB_RECURSE public_headers
@@ -36,24 +54,6 @@ foreach (resource ${resources})
     )
     list(APPEND outputs ${output})
 endforeach()
-
-# Platform-specific source files
-if(WIN32)
-    set(PLATFORM_DIR "Platform/OS/Windows")
-elseif(APPLE)
-    set(PLATFORM_DIR "Platform/OS/MacOS")
-else()
-    set(PLATFORM_DIR "Platform/OS/Generic")
-endif()
-
-file(
-    GLOB_RECURSE platform_sources
-    LIST_DIRECTORIES false
-    RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-    src/${PLATFORM_DIR}/*.cpp
-    src/${PLATFORM_DIR}/*.mm
-    src/${PLATFORM_DIR}/*.h
-)
 
 # Define the engine library
 add_library(Engine STATIC ${sources} ${platform_sources} ${public_headers})

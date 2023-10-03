@@ -35,7 +35,7 @@ public:
     
     // Setter(s)
     // ----------------------------------------
-    void SetEnvironmentMap(const std::shared_ptr<Texture> texture);
+    void SetEnvironmentMap(const std::shared_ptr<Texture>& texture);
     
     // Getter(s)
     // ----------------------------------------

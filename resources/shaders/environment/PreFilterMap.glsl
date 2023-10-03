@@ -5,13 +5,13 @@
 #include "Resources/shaders/common/matrix/SimpleMatrix.glsl"
 
 // Input vertex attributes
-layout (location = 0) in vec4 a_Position;   // Vertex position in object space
+layout (location = 0) in vec4 a_Position;   ///< Vertex position in object space
 
 // Uniform buffer block containing transformation matrices
 uniform Transform u_Transform;
 
 // Outputs to fragment shader
-out vec3 v_Position;                        // Vertex position in world space
+out vec3 v_Position;                        ///< Vertex position in world space
 
 // Entry point of the vertex shader
 void main()
@@ -33,23 +33,32 @@ void main()
  * Represents the material properties of an object.
  */
 struct Material {
-    float Roughness;                    // Material roughness.
+    float Roughness;                        ///< Material roughness.
     
-    samplerCube TextureMap;             // Texture map applied to the material.
+    samplerCube TextureMap;                 ///< Texture map applied to the material.
 };
 
 // Specify the output color of the fragment shader
 layout (location = 0) out vec4 color;
 
 // Uniform buffer blocks
-uniform Material u_Material;            // Material properties
+uniform Material u_Material;                ///< Material properties
 
 // Input variables from the vertex shader
-in vec3 v_Position;                     // Vertex position in world space
+in vec3 v_Position;                         ///< Vertex position in world space
 
 // Define constant variables
 const float PI = 3.14159265359f;
 
+/**
+ * Generates a radical inverse using the Van der Corput sequence.
+ *
+ * This function takes an integer input `bits` and generates a radical inverse
+ * using the Van der Corput sequence.
+ *
+ * @param bits An unsigned integer input.
+ * @return The generated radical inverse as a floating-point value.
+ */
 float radicalInverseVDC(uint bits)
 {
     bits = (bits << 16u) | (bits >> 16u);
@@ -60,11 +69,33 @@ float radicalInverseVDC(uint bits)
     return float(bits) * 2.3283064365386963e-10; // / 0x100000000
 }
 
+/**
+ * Generates a 2D Hammersley point.
+ *
+ * This function generates a 2D point in the Hammersley sequence using an index `i`
+ * and the total number of samples `N`.
+ *
+ * @param i An unsigned integer index.
+ * @param N An unsigned integer representing the total number of samples.
+ * @return A 2D point in the Hammersley sequence as a vec2.
+ */
 vec2 hammersley(uint i, uint N)
 {
     return vec2(float(i)/float(N), radicalInverseVDC(i));
 }
 
+/**
+ * Importance samples the GGX (Trowbridge-Reitz) distribution.
+ *
+ * This function importance samples the GGX distribution for microfacet-based
+ * reflection with given random variables `xi`, surface normal `normal`, and
+ * roughness parameter `roughness`.
+ *
+ * @param xi A 2D random variable (typically from the Hammersley sequence).
+ * @param normal The surface normal vector.
+ * @param roughness The roughness parameter (0.0 for smooth, 1.0 for rough).
+ * @return A sampled direction in world space as a vec3.
+ */
 vec3 importanceSampleGGX(vec2 xi, vec3 normal, float roughness)
 {
     float a = roughness * roughness;

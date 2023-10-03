@@ -5,22 +5,20 @@
 #include "Resources/shaders/common/matrix/SimpleMatrix.glsl"
 
 // Input vertex attributes
-layout (location = 0) in vec4 a_Position;   // Vertex position in object space
+layout (location = 0) in vec4 a_Position;   ///< Vertex position in object space
 
 // Uniform buffer block containing transformation matrices
 uniform Transform u_Transform;
 
 // Outputs to fragment shader
-out vec3 v_Position;                        // Vertex position in world space
+out vec3 v_Position;                        ///< Vertex position in world space
 
 // Entry point of the vertex shader
 void main()
 {
     // Transform the vertex position and normal from object space to world space
     vec4 worldPosition = u_Transform.Model * a_Position;
-    
-    // Perspective divide to get vertex position in normalized device coordinates
-    v_Position = worldPosition.xyz / worldPosition.w;
+    v_Position = worldPosition.xyz;
     
     // Calculate the final position of the vertex in clip space
     gl_Position = u_Transform.Projection * u_Transform.View * worldPosition;
@@ -33,21 +31,20 @@ void main()
  * Represents the material properties of an object.
  */
 struct Material {
-    samplerCube TextureMap;             // Texture map applied to the material.
+    samplerCube TextureMap;                 ///< Texture map applied to the material.
 };
 
 // Specify the output color of the fragment shader
 layout (location = 0) out vec4 color;
 
 // Uniform buffer blocks
-uniform Material u_Material;            // Material properties
+uniform Material u_Material;                ///< Material properties
 
 // Input variables from the vertex shader
-in vec3 v_Position;                     // Vertex position in world space
+in vec3 v_Position;                         ///< Vertex position in world space
 
 // Define constant variables
 const float PI = 3.14159265359f;
-const float PI_SQUARE = PI * PI;
 
 // Entry point of the fragment shader
 void main()
