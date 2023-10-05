@@ -47,6 +47,7 @@
 #include "Renderer/Texture/Texture.h"
 #include "Renderer/Texture/TextureCube.h"
 
+#include "Renderer/Light/ShadowCamera.h"
 #include "Renderer/Light/Light.h"
 #include "Renderer/Light/PositionalLight.h"
 #include "Renderer/Light/DirectionalLight.h"

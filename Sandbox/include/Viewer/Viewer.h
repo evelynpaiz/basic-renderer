@@ -31,7 +31,7 @@ public:
     // ----------------------------------------
     /// @brief Get the light source.
     /// @return The light source.
-    const std::shared_ptr<Light>& GetLightSource() { return m_LightSource; }
+    const std::shared_ptr<Light>& GetLightSource() { return m_Environment->GetLightSource(); }
     
     // Setters(s)
     // ----------------------------------------
@@ -61,8 +61,8 @@ private:
     ///< Camera.
     std::shared_ptr<PerspectiveCamera> m_Camera;
     
-    ///< Light source.
-    std::shared_ptr<Light> m_LightSource;
+    ///< Environment along with its light source.
+    std::shared_ptr<EnvironmentLight> m_Environment;
     
     ///< Model(s).
     Model<GeoVertexData<glm::vec4, glm::vec2, glm::vec3>> m_Cube;

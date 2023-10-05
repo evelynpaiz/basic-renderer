@@ -1,6 +1,8 @@
 #include "enginepch.h"
 #include "Renderer/Light/EnvironmentLight.h"
 
+#include "Renderer/Light/PositionalLight.h"
+
 /**
  * Generate an environment light source in the world space.
  *
@@ -9,17 +11,8 @@
  * @param color The color of the light source.
  * @param position The position of the light source.
  */
-EnvironmentLight::EnvironmentLight(const unsigned int width, const unsigned int height,
-                                   const glm::vec3 &color, const glm::vec3 &position)
-    : Light(color), m_Position(position)
+EnvironmentLight::EnvironmentLight(const unsigned int width, const unsigned int height)
   {
-      // Define the shadow camera for the light source
-      auto shadowCamera = std::make_shared<PerspectiveShadow>();
-      shadowCamera->SetViewportSize(width, height);
-      shadowCamera->SetPosition(position);
-      shadowCamera->SetFieldOfView(90.0f);
-      m_ShadowCamera = shadowCamera;
-      
       // Define the framebuffer(s) for the environment
       const static unsigned int scale = 4;
       InitEnvironmentFramebuffers(scale * width);
@@ -28,7 +21,7 @@ EnvironmentLight::EnvironmentLight(const unsigned int width, const unsigned int 
       InitEnvironmentMaterials();
       
       // Define 3D model of the light source
-      m_Model = utils::Geometry::ModelCube<GeoVertexData<glm::vec4>>(m_EnvMaterials["Environment"]);
+      m_Model = utils::Geometry::ModelCube<GeoVertexData<glm::vec4>>(m_Materials["Environment"]);
   }
 
 /**
@@ -45,15 +38,15 @@ void EnvironmentLight::InitEnvironmentFramebuffers(const unsigned int cubeSize)
     };
     
     spec.MipMaps = true;
-    m_EnvFramebuffers["Environment"] = std::make_shared<FrameBuffer>(spec);
+    m_Framebuffers["Environment"] = std::make_shared<FrameBuffer>(spec);
     
     spec.SetFrameBufferSize(32, 32);
     spec.MipMaps = false;
-    m_EnvFramebuffers["Irradiance"] = std::make_shared<FrameBuffer>(spec);
+    m_Framebuffers["Irradiance"] = std::make_shared<FrameBuffer>(spec);
     
     spec.SetFrameBufferSize(128, 128);
     spec.MipMaps = true;
-    m_EnvFramebuffers["PreFilter"] = std::make_shared<FrameBuffer>(spec);
+    m_Framebuffers["PreFilter"] = std::make_shared<FrameBuffer>(spec);
 }
 
 /**
@@ -61,30 +54,30 @@ void EnvironmentLight::InitEnvironmentFramebuffers(const unsigned int cubeSize)
  */
 void EnvironmentLight::InitEnvironmentMaterials()
 {
-    auto& environment = m_EnvFramebuffers["Environment"]->GetColorAttachment(0);
+    auto& environment = m_Framebuffers["Environment"]->GetColorAttachment(0);
     
     // Equirectangular mapping
-    m_EnvMaterials["Equirectangular"] = std::make_shared<SimpleTextureMaterial>(
+    m_Materials["Equirectangular"] = std::make_shared<SimpleTextureMaterial>(
         "Resources/shaders/environment/EquirectangularMap.glsl"
     );
     
     // Irradiance mapping
-    m_EnvMaterials["Irradiance"] = std::make_shared<SimpleTextureMaterial>(
+    m_Materials["Irradiance"] = std::make_shared<SimpleTextureMaterial>(
         "Resources/shaders/environment/IrradianceMap.glsl"
     );
-    m_EnvMaterials["Irradiance"]->SetTextureMap(environment);
+    m_Materials["Irradiance"]->SetTextureMap(environment);
     
     // Pre-filtering mapping
-    m_EnvMaterials["PreFilter"] = std::make_shared<SimpleTextureMaterial>(
+    m_Materials["PreFilter"] = std::make_shared<SimpleTextureMaterial>(
         "Resources/shaders/environment/PreFilterMap.glsl"
     );
-    m_EnvMaterials["PreFilter"]->SetTextureMap(environment);
+    m_Materials["PreFilter"]->SetTextureMap(environment);
     
     // Cube mapping
-    m_EnvMaterials["Environment"] = std::make_shared<SimpleTextureMaterial>(
+    m_Materials["Environment"] = std::make_shared<SimpleTextureMaterial>(
         "Resources/shaders/environment/CubeMap.glsl"
     );
-    m_EnvMaterials["Environment"]->SetTextureMap(environment);
+    m_Materials["Environment"]->SetTextureMap(environment);
 }
 
 /**
@@ -93,6 +86,49 @@ void EnvironmentLight::InitEnvironmentMaterials()
  * @param texture The texture to be used as the environment map.
  */
 void EnvironmentLight::SetEnvironmentMap(const std::shared_ptr<Texture>& texture)
+{
+    // Save the information of the environment map
+    m_EnvironmentMap = texture;
+    
+    // Check for a valid texture
+    if (!texture)
+        return;
+    
+    // Update the environment information
+    UpdateEnvironment();
+    UpdateLight();
+}
+
+/**
+ * Detects light sources from the environment map.
+ *
+ * This function is intended to implement the logic for detecting light sources
+ * from the currently loaded environment map. The detected light sources can be
+ * used for various lighting calculations in the scene.
+ *
+ * @note This function needs to be implemented.
+ *
+ * @todo Implement the logic for detecting light sources from the environment map.
+ */
+void EnvironmentLight::UpdateLight()
+{}
+
+/**
+ * Updates the environment lighting information.
+ *
+ * This function renders various maps needed for environment-based lighting:
+ * - Cube map representing the environment.
+ * - Irradiance map for diffuse lighting.
+ * - Pre-filtered environment map for specular lighting.
+ *
+ * The function uses a pre-defined set of view matrices and a projection matrix
+ * for rendering the maps. It updates the current texture representing the environment
+ * map and the size of the environment (cube) model.
+ *
+ * @param views View matrices for each of the six cube map faces.
+ * @param projection Projection matrix for rendering the cube maps.
+ */
+void EnvironmentLight::UpdateEnvironment()
 {
     // Define the tranformation matrices
     static const glm::mat4 projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
@@ -107,18 +143,18 @@ void EnvironmentLight::SetEnvironmentMap(const std::shared_ptr<Texture>& texture
     };
     
     // Update the current texture representing the environment map
-    m_EnvMaterials["Equirectangular"]->SetTextureMap(texture);
+    m_Materials["Equirectangular"]->SetTextureMap(m_EnvironmentMap);
     
     // Update the size of the environment (cube) model
     m_Model.SetScale(glm::vec3(2.0f));
     
     // Render the environment map into a cube map configuration
-    RenderCubeMap(views, projection, m_EnvMaterials["Equirectangular"],
-                  m_EnvFramebuffers["Environment"]);
+    RenderCubeMap(views, projection, m_Materials["Equirectangular"],
+                  m_Framebuffers["Environment"]);
     
     // Render the irradiance map
-    RenderCubeMap(views, projection, m_EnvMaterials["Irradiance"],
-                  m_EnvFramebuffers["Irradiance"]);
+    RenderCubeMap(views, projection, m_Materials["Irradiance"],
+                  m_Framebuffers["Irradiance"]);
     
     // Render the pre-filter map
     static const unsigned int maxMipMapLevel = 5;
@@ -126,22 +162,22 @@ void EnvironmentLight::SetEnvironmentMap(const std::shared_ptr<Texture>& texture
     {
         // Define the roughness
         float roughness = (float)mip / (float)(maxMipMapLevel - 1);
-        m_EnvMaterials["PreFilter"]->GetShader()->SetFloat("u_Material.Roughness", roughness);
+        m_Materials["PreFilter"]->GetShader()->SetFloat("u_Material.Roughness", roughness);
         
         // reisze framebuffer according to mip-level size.
         unsigned int mipWidth  = 128 * std::pow(0.5, mip);
         unsigned int mipHeight = 128 * std::pow(0.5, mip);
         
         // Render into the cubemap
-        RenderCubeMap(views, projection, m_EnvMaterials["PreFilter"],
-                      m_EnvFramebuffers["PreFilter"],
+        RenderCubeMap(views, projection, m_Materials["PreFilter"],
+                      m_Framebuffers["PreFilter"],
                       mipWidth, mipHeight, mip, false);
     }
     
-    m_EnvFramebuffers["PreFilter"]->Unbind(false);
+    m_Framebuffers["PreFilter"]->Unbind(false);
     
     // Update the 3D model of the light source with the rendered environment map
-    m_Model.SetMaterial(m_EnvMaterials["Environment"]);
+    m_Model.SetMaterial(m_Materials["Environment"]);
     m_Model.SetScale(glm::vec3(70.0f));
 }
 
@@ -201,7 +237,7 @@ void EnvironmentLight::DefineIrradianceMap(const std::shared_ptr<Shader> &shader
                                            const unsigned int slot)
 {
     utils::Texturing::SetTextureMap(shader, "u_Light.IrradianceMap",
-                                    m_EnvFramebuffers["Irradiance"]->GetColorAttachment(0), slot);
+                                    m_Framebuffers["Irradiance"]->GetColorAttachment(0), slot);
 }
 
 /**
@@ -214,5 +250,5 @@ void EnvironmentLight::DefinePreFilterMap(const std::shared_ptr<Shader> &shader,
                                           const unsigned int slot)
 {
     utils::Texturing::SetTextureMap(shader, "u_Light.PreFilterMap",
-                                    m_EnvFramebuffers["PreFilter"]->GetColorAttachment(0), slot);
+                                    m_Framebuffers["PreFilter"]->GetColorAttachment(0), slot);
 }

@@ -30,7 +30,7 @@ void Viewer::OnUpdate(Timestep ts)
     
     // Shadow mapping: light source
     //--------------------------------
-    Renderer::BeginScene(m_LightSource->GetShadowCamera());
+    Renderer::BeginScene(m_Environment->GetLightSource()->GetShadowCamera());
     Renderer::SetFaceCulling(FaceCulling::Front);
     
     // Render into the lights framebuffer
@@ -101,9 +101,12 @@ void Viewer::OnEvent(Event &e)
  */
 void Viewer::InitializeViewer()
 {
-    // Define light source
-    m_LightSource = std::make_shared<DirectionalLight>(m_ViewportWidth, m_ViewportHeight,
-                                                       glm::vec3(1.0f), glm::vec3(0.5f, -0.5f, 0.0f));
+    // Define the environment and its light source
+    auto light = std::make_shared<DirectionalLight>(m_ViewportWidth, m_ViewportHeight,
+                                                    glm::vec3(1.0f), glm::vec3(0.5f, -0.5f, 0.0f));
+    
+    m_Environment = std::make_shared<EnvironmentLight>(m_ViewportWidth, m_ViewportHeight);
+    m_Environment->SetLightSource(light);
     
     // Define the rendering camera
     m_Camera = std::make_shared<PerspectiveCamera>(m_ViewportWidth, m_ViewportHeight);
@@ -127,14 +130,14 @@ void Viewer::InitializeViewer()
     auto depthMaterial = std::make_shared<Material>("Resources/shaders/depth/DepthMap.glsl");
     m_Materials["Depth"] = depthMaterial;
     
-    auto cubeMaterial = std::make_shared<PhongTextureMaterial>(m_LightSource, "Resources/shaders/phong/PhongTextureShadow.glsl");
+    auto cubeMaterial = std::make_shared<PhongTextureMaterial>(m_Environment, "Resources/shaders/phong/PhongTextureShadow.glsl");
     cubeMaterial->SetDiffuseMap(std::make_shared<TextureResource>("Resources/textures/diffuse.jpeg"));
     cubeMaterial->SetSpecularMap(std::make_shared<TextureResource>("Resources/textures/specular.jpeg"));
     cubeMaterial->SetShadowMap(m_Framebuffers["Shadow"]->GetDepthAttachment());
     cubeMaterial->SetShininess(32.0f);
     m_Materials["PhongTexture"] = cubeMaterial;
     
-    auto planeMaterial = std::make_shared<PhongColorMaterial>(m_LightSource, "Resources/shaders/phong/PhongColorShadow.glsl");
+    auto planeMaterial = std::make_shared<PhongColorMaterial>(m_Environment, "Resources/shaders/phong/PhongColorShadow.glsl");
     planeMaterial->SetAmbientColor(glm::vec3(0.8f, 0.2f, 0.4f));
     planeMaterial->SetDiffuseColor(glm::vec3(0.8f, 0.2f, 0.4f));
     planeMaterial->SetSpecularColor(glm::vec3(1.0f));

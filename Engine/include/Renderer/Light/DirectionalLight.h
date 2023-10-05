@@ -30,7 +30,7 @@ public:
                      const glm::vec3& color = glm::vec3(1.0f),
                      const glm::vec3& direction = glm::vec3(0.0f, -1.0f, 0.0f),
                      float distance = 15.0f, float orthoSize = 20.0f)
-        : Light(color), m_Direction(direction), m_Distance(distance)
+        : Light(glm::vec4(direction, 0.0f), color), m_Distance(distance)
     {
         // Set the shadow camera parameters
         auto shadowCamera = std::make_shared<OrthographicShadow>();
@@ -48,7 +48,7 @@ public:
     /// @param direction The light direction.
     void SetDirection(const glm::vec3& direction)
     {
-        m_Direction = direction;
+        m_Vector = glm::vec4(direction, 0.0f);
         UpdateShadowCamera();
     }
     /// @brief Change the distance of the light.
@@ -63,22 +63,10 @@ public:
     // ----------------------------------------
     /// @brief Get the light direction.
     /// @return The light direction vector.
-    glm::vec3 GetDirection() const { return m_Direction; }
+    glm::vec3 GetDirection() const { return m_Vector; }
     /// @brief Get the distance of the light source.
     /// @return The light distance.
     float GetDistance() const { return m_Distance; }
-    
-    // Properties
-    // ----------------------------------------
-    /// @brief Define light properties into the uniforms of the shader program.
-    /// @param shader The shader program.
-    void DefineLightProperties(const std::shared_ptr<Shader> &shader) override
-    {
-        // Define basic light properties
-        Light::DefineLightProperties(shader);
-        // Define the point of light properties
-        shader->SetVec4("u_Light.Vector", glm::vec4(m_Direction, 0.0f));
-    }
     
 private:
     // Update(s)
@@ -86,14 +74,13 @@ private:
     /// @brief Update the shadow camera based on the properties of the light source.
     void UpdateShadowCamera()
     {
-        m_ShadowCamera->SetPosition(m_ShadowCamera->GetTarget() - (glm::normalize(m_Direction) * m_Distance));
+        glm::vec3 position = m_ShadowCamera->GetTarget() - (glm::normalize(glm::vec3(m_Vector)) * m_Distance);
+        m_ShadowCamera->SetPosition(position);
     }
     
     // Light variables
     // ----------------------------------------
 private:
-    ///< The direction of the light.
-    glm::vec3 m_Direction;
     ///< The distance from the (shadow camera) target to the light source.
     float m_Distance;
     

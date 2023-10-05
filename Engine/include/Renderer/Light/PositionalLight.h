@@ -34,7 +34,7 @@ public:
                     const glm::vec3 &color = glm::vec3(1.0f),
                     const glm::vec3 &position = glm::vec3(0.0f),
                     float angle = 90.0f)
-        : Light(color), m_Position(position)
+        : Light(glm::vec4(position, 1.0f), color)
     {
         // Set the shadow camera parameters
         auto shadowCamera = std::make_shared<PerspectiveShadow>();
@@ -60,7 +60,7 @@ public:
     /// @brief Change the light position (x, y, z).
     /// @param position The light center position.
     void SetPosition(const glm::vec3& position) {
-        m_Position = position;
+        m_Vector = glm::vec4(position, 1.0f);
         m_ShadowCamera->SetPosition(position);
         m_Model.SetPosition(position);
     }
@@ -69,31 +69,15 @@ public:
     // ----------------------------------------
     /// @brief Get the light position (x, y, z).
     /// @return The light position coordinates.
-    glm::vec3 GetPosition() const { return m_Position; }
+    glm::vec3 GetPosition() const { return m_Vector; }
     
     /// @brief Get the light 3D model representing a positional light.
     /// @return The light 3D model.
     Model<GeoVertexData<glm::vec4>>& GetModel() {return m_Model; }
     
-    // Properties
-    // ----------------------------------------
-    /// @brief Define light properties into the uniforms of the shader program.
-    /// @param shader The shader program.
-    void DefineLightProperties(const std::shared_ptr<Shader> &shader) override
-    {
-        // Define basic light properties
-        Light::DefineLightProperties(shader);
-        // Define the positional light properties
-        // (set .w coordiante as 1 to identify it as a position vector)
-        shader->SetVec4("u_Light.Vector", glm::vec4(m_Position, 1.0f));
-    }
-    
     // Light variables
     // ----------------------------------------
 private:
-    ///< The light color.
-    glm::vec3 m_Position;
-    
     ///< Light 3D model.
     Model<GeoVertexData<glm::vec4>> m_Model;
     

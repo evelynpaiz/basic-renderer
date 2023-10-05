@@ -94,7 +94,7 @@ void Texture::BindToTextureUnit(const unsigned int slot) const
  */
 void Texture::Unbind() const
 {
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTexture(TextureTarget(), 0);
 }
 
 /**

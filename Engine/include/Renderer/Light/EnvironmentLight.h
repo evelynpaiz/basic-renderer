@@ -21,27 +21,34 @@
  * Copying or moving `EnvironmentLight` objects is disabled to ensure single ownership and prevent
  * unintended duplication of light resources.
  */
-class EnvironmentLight : public Light
+class EnvironmentLight
 {
 public:
     // Constructor(s)/Destructor
     // ----------------------------------------
-    EnvironmentLight(const unsigned int width, const unsigned int height,
-                     const glm::vec3 &color = glm::vec3(1.0f),
-                     const glm::vec3 &position = glm::vec3(0.0f));
+    EnvironmentLight(const unsigned int width, const unsigned int height);
     
     /// @brief Destructor for the environment light.
-    ~EnvironmentLight() override = default;
+    ~EnvironmentLight() = default;
     
     // Setter(s)
     // ----------------------------------------
     void SetEnvironmentMap(const std::shared_ptr<Texture>& texture);
     
+    void SetLightSource(const std::shared_ptr<Light>& light) { m_Light = light; }
+    
     // Getter(s)
     // ----------------------------------------
-    /// @brief Get the light 3D model representing a positional light.
-    /// @return The light 3D model.
-    Model<GeoVertexData<glm::vec4>>& GetModel() {return m_Model; }
+    /// @brief Get the light 3D model representing the environment.
+    /// @return The 3D model.
+    Model<GeoVertexData<glm::vec4>>& GetModel() { return m_Model; }
+    /// @brief Get the environment map.
+    /// @return The texture describing the environment.
+    const std::shared_ptr<Texture>& GetEnvironmentMap() { return m_EnvironmentMap; }
+    
+    /// @brief Get the light source.
+    /// @return The light source.
+    std::shared_ptr<Light>& GetLightSource() { return m_Light; }
     
     // Properties
     // ----------------------------------------
@@ -50,22 +57,16 @@ public:
     void DefinePreFilterMap(const std::shared_ptr<Shader> &shader,
                             const unsigned int slot);
     
-    /// @brief Define light properties into the uniforms of the shader program.
-    /// @param shader The shader program.
-    void DefineLightProperties(const std::shared_ptr<Shader> &shader) override
-    {
-        // Define basic light properties
-        Light::DefineLightProperties(shader);
-        // Define the positional light properties
-        // (set .w coordiante as 1 to identify it as a position vector)
-        shader->SetVec4("u_Light.Vector", glm::vec4(m_Position, 1.0f));
-    }
-    
-protected:
+private:
     // Initialization
     // ----------------------------------------
     void InitEnvironmentFramebuffers(const unsigned int cubeSize);
     void InitEnvironmentMaterials();
+    
+    // Update
+    // ----------------------------------------
+    void UpdateEnvironment();
+    void UpdateLight();
     
     // Render
     // ----------------------------------------
@@ -75,20 +76,21 @@ protected:
                        const unsigned int& viewportWidth = 0, const unsigned int& viewportHeight = 0,
                        const unsigned int &level = 0, const bool& genMipMaps = true);
     
-    // Light variables
+    // Environment variables
     // ----------------------------------------
 private:
-    ///< The position of the environment light.
-    glm::vec3 m_Position;
+    ///< The environment map.
+    std::shared_ptr<Texture> m_EnvironmentMap;
+    ///< The lights in the environment.
+    std::shared_ptr<Light> m_Light;
     
-    ///< Environment light's 3D model.
+    ///< 3D model representing the surrounding environment in the scene.
     Model<GeoVertexData<glm::vec4>> m_Model;
     
-    ///< Environment light's framebuffer(s).
-    std::unordered_map<std::string, std::shared_ptr<FrameBuffer>> m_EnvFramebuffers;
-    
-    ///< Environment light's material(s).
-    std::unordered_map<std::string, std::shared_ptr<SimpleTextureMaterial>> m_EnvMaterials;
+    ///< Framebuffer(s) for pre-processing.
+    std::unordered_map<std::string, std::shared_ptr<FrameBuffer>> m_Framebuffers;
+    ///< Material(s) for pre-processing.
+    std::unordered_map<std::string, std::shared_ptr<SimpleTextureMaterial>> m_Materials;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

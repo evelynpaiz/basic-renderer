@@ -229,11 +229,11 @@ public:
     // Constructor(s)/Destructor
     // ----------------------------------------
     /// @brief Generate a phong material object with the specified shader file path.
-    /// @param light The light source to be used for shading.
+    /// @param environment The configuration of the environment light to be used for shading.
     /// @param filePath The file path to the shader used by the material.
-    PhongColorMaterial(const std::shared_ptr<Light>& light, const std::filesystem::path& filePath =
+    PhongColorMaterial(const std::shared_ptr<EnvironmentLight>& environment, const std::filesystem::path& filePath =
                        std::filesystem::path("Resources/shaders/phong/PhongColor.glsl"))
-        : LightedMaterial(light, filePath), PhongColor()
+        : LightedMaterial(environment, filePath), PhongColor()
     {
         m_NormalMatrix = true;
         m_ViewDirection = true;
@@ -249,11 +249,6 @@ protected:
     {
         LightedMaterial::SetMaterialProperties();
         PhongColor::SetProperties(m_Shader);
-        
-        m_Light->DefineColorProperties(m_Shader);
-        m_Light->DefineStrenghtProperties(m_Shader);
-        if (m_ShadowMap)
-            m_Light->DefineTranformProperties(m_Shader);
     }
     
     // Disable the copying or moving of this resource
@@ -282,13 +277,12 @@ public:
     // Constructor(s)/Destructor
     // ----------------------------------------
     /// @brief Generate a phong material object with the specified shader file path.
-    /// @param light The light source to be used for shading.
+    /// @param environment The configuration of the environment light to be used for shading.
     /// @param filePath The file path to the shader used by the material.
-    PhongTextureMaterial(const std::shared_ptr<Light>& light, const std::filesystem::path& filePath =
+    PhongTextureMaterial(const std::shared_ptr<EnvironmentLight>& environment, const std::filesystem::path& filePath =
                          std::filesystem::path("Resources/shaders/phong/PhongTexture.glsl"))
-        : LightedMaterial(light, filePath), PhongTexture()
+        : LightedMaterial(environment, filePath), PhongTexture()
     {
-        LightedMaterial::SetLight(light);
         m_NormalMatrix = true;
         m_ViewDirection = true;
     }
@@ -303,11 +297,6 @@ protected:
     {
         LightedMaterial::SetMaterialProperties();
         PhongTexture::SetProperties(m_Shader, m_Slot);
-        
-        m_Light->DefineColorProperties(m_Shader);
-        m_Light->DefineStrenghtProperties(m_Shader);
-        if (m_ShadowMap)
-            m_Light->DefineTranformProperties(m_Shader);
     }
     
     // Disable the copying or moving of this resource
