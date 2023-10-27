@@ -45,8 +45,20 @@ struct TextureSpecification
     TextureSpecification() = default;
     /// @brief Define a texture with a specific format.
     /// @param format The texture format.
-    TextureSpecification(const TextureFormat& format, const TextureType& type = TextureType::Texture) :
+    TextureSpecification(const TextureFormat& format) :
+        Format(format)
+    { }
+    /// @brief Define a texture with a specific format.
+    /// @param format The texture format.
+    /// @param type The type of the texture.
+    TextureSpecification(const TextureFormat& format, const TextureType& type) :
         Format(format), Type(type)
+    { }
+    /// @brief Define a texture with a specific format.
+    /// @param format The texture format.
+    /// @param wrap The texture wrap.
+    TextureSpecification(const TextureFormat& format, const TextureWrap& wrap) :
+        Format(format), Wrap(wrap)
     { }
     
     /// @brief Define the size of the texture (in pixels).

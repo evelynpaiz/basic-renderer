@@ -23,8 +23,9 @@ FrameBuffer::FrameBuffer(const FrameBufferSpecification& spec)
         spec.Samples = m_Spec.Samples;
         spec.MipMaps = m_Spec.MipMaps;
         
-        spec.Wrap = utils::OpenGL::IsDepthFormat(spec.Format) ?
-            TextureWrap::ClampToBorder : TextureWrap::ClampToEdge;
+        spec.Wrap = spec.Wrap != TextureWrap::None ? spec.Wrap :
+                    utils::OpenGL::IsDepthFormat(spec.Format) ?
+                    TextureWrap::ClampToBorder : TextureWrap::ClampToEdge;
         
         // Depth attachment
         if (utils::OpenGL::IsDepthFormat(spec.Format))
