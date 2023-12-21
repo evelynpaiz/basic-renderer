@@ -343,16 +343,26 @@ void FrameBuffer::ReleaseFramebuffer()
  */
 void FrameBuffer::SaveAttachment(const unsigned int index, const std::filesystem::path &path)
 {
-    GLsizei nrChannels = 3;
-    GLsizei stride = nrChannels * m_Spec.Width;
-    stride += (stride % 4) ? (4 - stride % 4) : 0;
-    GLsizei bufferSize = stride * m_Spec.Height;
+    auto& format = m_ColorAttachmentsSpec[index].Format;
+    int channels = utils::OpenGL::TextureFormatToChannelNumber(format);
+    
+    // Ensure numChannels is within a valid range
+    if (channels < 1 || channels > 4)
+        CORE_ASSERT(false, "Invalid number of channels in the color attachment!");
+    
+    // TODO: Add support for float data too.
+    int stride = channels * m_Spec.Width;
+    channels += (stride % 4) ? (4 - stride % 4) : 0;
+    int bufferSize = stride * m_Spec.Height;
     std::vector<char> buffer(bufferSize);
-
+    
     BindForReadAttachment(index);
-    glPixelStorei(GL_PACK_ALIGNMENT, 4);
-    glReadPixels(0, 0, m_Spec.Width, m_Spec.Height, GL_RGB, GL_UNSIGNED_BYTE, buffer.data());
+    glPixelStorei(GL_PACK_ALIGNMENT, channels);
+    glReadPixels(0, 0, m_Spec.Width, m_Spec.Height,
+                 utils::OpenGL::TextureFormatToOpenGLBaseType(format),
+                 utils::OpenGL::TextureFormatToOpenGLDataType(format),
+                 buffer.data());
 
     stbi_flip_vertically_on_write(true);
-    stbi_write_png(path.string().c_str(), m_Spec.Width, m_Spec.Height, nrChannels, buffer.data(), stride);
+    stbi_write_png(path.string().c_str(), m_Spec.Width, m_Spec.Height, channels, buffer.data(), stride);
 }

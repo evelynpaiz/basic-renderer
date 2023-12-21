@@ -188,6 +188,36 @@ public:
                                      const unsigned int srcIndex, const unsigned int dstIndex,
                                      const TextureFilter& filter = TextureFilter::Nearest);
     
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Retrieves pixel data from a color attachment of the framebuffer.
+    /// @param index The index of the color attachment to retrieve data from.
+    /// @return A vector containing the pixel data of the color attachment, with each channel.
+    template <typename T>
+    std::vector<T> GetAttachmentData(const unsigned int index)
+    {
+        auto& format = m_ColorAttachmentsSpec[index].Format;
+        int channels = utils::OpenGL::TextureFormatToChannelNumber(format);
+        
+        // Ensure numChannels is within a valid range
+        if (channels < 1 || channels > 4)
+            CORE_ASSERT(false, "Invalid number of channels in the color attachment!");
+        
+        int stride = channels * m_Spec.Width;
+        channels += (stride % 4) ? (4 - stride % 4) : 0;
+        int bufferSize = stride * m_Spec.Height;
+        std::vector<T> buffer(bufferSize);
+
+        BindForReadAttachment(index);
+        glPixelStorei(GL_PACK_ALIGNMENT, channels);
+        glReadPixels(0, 0, m_Spec.Width, m_Spec.Height,
+                     utils::OpenGL::TextureFormatToOpenGLBaseType(format),
+                     utils::OpenGL::TextureFormatToOpenGLDataType(format),
+                     buffer.data());
+        
+        return buffer;
+    }
+    
     // Reset
     // ----------------------------------------
     void Resize(const unsigned int width, const unsigned int height);

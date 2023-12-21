@@ -33,10 +33,10 @@ enum class TextureFormat
     
     // Depth/stencil formats
     DEPTH16,             ///< 8-bit depth (depth buffer)
-    DEPTH24,            ///< 24-bit depth (depth buffer)
-    DEPTH32,            ///< 32-bit depth (depth buffer)
-    DEPTH32F,           ///< 32-bit float depth (depth buffer)
-    DEPTH24STENCIL8,    ///< 24-bit depth, 8-bit stencil (depth and stencil attachments)
+    DEPTH24,             ///< 24-bit depth (depth buffer)
+    DEPTH32,             ///< 32-bit depth (depth buffer)
+    DEPTH32F,            ///< 32-bit float depth (depth buffer)
+    DEPTH24STENCIL8,     ///< 24-bit depth, 8-bit stencil (depth and stencil attachments)
     
     // Defaults
     Depth = DEPTH24
@@ -238,6 +238,48 @@ inline GLenum TextureFormatToOpenGLDepthType(TextureFormat format)
     
     CORE_ASSERT(false, "Unknown depth texture format!");
     return false;
+}
+
+/**
+ * Define the number of channels in the texture based on its format.
+ *
+ * @param format The texture format.
+ *
+ * @return Channels number.
+ *
+ * @note If the input format is not recognized, the function will assert with an error.
+ */
+inline int TextureFormatToChannelNumber(TextureFormat format)
+{
+    switch (format)
+    {
+        case TextureFormat::R16F:
+        case TextureFormat::R8:
+        case TextureFormat::R8UI: return 1;
+            
+        case TextureFormat::RG8:
+        case TextureFormat::RG8UI: return 2;
+        
+        case TextureFormat::RGB32F:
+        case TextureFormat::RGB16F:
+        case TextureFormat::RGB8:
+        case TextureFormat::RGB8UI: return 3;
+            
+        case TextureFormat::RGBA32F:
+        case TextureFormat::RGBA16F:
+        case TextureFormat::RGBA8:
+        case TextureFormat::RGBA8UI: return 4;
+            
+        case TextureFormat::None:
+        case TextureFormat::DEPTH16:
+        case TextureFormat::DEPTH24:
+        case TextureFormat::DEPTH32:
+        case TextureFormat::DEPTH32F:
+        case TextureFormat::DEPTH24STENCIL8: return 0;
+    }
+    
+    CORE_ASSERT(false, "Unknown (or unsupported) texture format!");
+    return 0;
 }
 
 /**
