@@ -1,8 +1,7 @@
 #pragma once
 
-#include "Renderer/Texture/Texture.h"
-#include "Renderer/Texture/TextureCube.h"
 #include "Renderer/Texture/TextureUtils.h"
+#include "Renderer/Texture/Texture.h"
 
 /**
  * Structure to represent the state of color, depth, and stencil buffers.
@@ -92,30 +91,25 @@ struct FrameBufferSpecification
     // ----------------------------------------
     /// @brief Define a framebuffer with a default specification.
     FrameBufferSpecification() = default;
-    /// @brief Define a framebuffer with a specification.
-    /// @param width The framebuffer size (width).
-    /// @param height The framebuffer size (height)
-    /// @param samples The number of samples.
-    FrameBufferSpecification(unsigned int width, unsigned int height, unsigned int samples = 1)
-        : Width(width), Height(height), Samples(samples)
-    {}
     
     // Setter(s)
     // ----------------------------------------
     /// @brief Define the size of the framebuffer (in pixels).
     /// @param width The framebuffer size (width).
     /// @param height The framebuffer size (height)
-    void SetFrameBufferSize(unsigned int width, unsigned int height)
+    void SetFrameBufferSize(unsigned int width, unsigned int height = 0,
+                            unsigned int depth = 0)
     {
         Width = width;
         Height = height;
+        Depth = depth;
     }
     
     // Framebuffer specification variables
     // ----------------------------------------
-    ///< The size (width and height) in pixels.
-    unsigned int Width = 0, Height = 0;
-    ///< The number of samples in the framebuffer texture attachments.
+    ///< The size (width, height, and depth) in pixels.
+    unsigned int Width = 0, Height = 0, Depth = 0;
+    ///< The number of samples in the framebuffer texture attachments (only valid for 2D textures).
     int Samples = 1;
     ///< A flag indicating whether mipmaps should be created for the texture. 
     bool MipMaps = false;
@@ -205,12 +199,20 @@ public:
         
         int stride = channels * m_Spec.Width;
         channels += (stride % 4) ? (4 - stride % 4) : 0;
-        int bufferSize = stride * m_Spec.Height;
+        int bufferSize = stride * (m_Spec.Height > 0 ? m_Spec.Height : 1.0f);
         std::vector<T> buffer(bufferSize);
 
         BindForReadAttachment(index);
         glPixelStorei(GL_PACK_ALIGNMENT, channels);
-        glReadPixels(0, 0, m_Spec.Width, m_Spec.Height,
+        
+        // TODO: Add support for all texture types (currently only supports 1D and 2D).
+        // consider using maybe:
+        //glGetTexImage(m_ColorAttachments[index]->TextureTarget(), 0,
+        //              utils::OpenGL::TextureFormatToOpenGLBaseType(format),
+        //              utils::OpenGL::TextureFormatToOpenGLDataType(format),
+        //              buffer.data());
+        
+        glReadPixels(0, 0, m_Spec.Width, (m_Spec.Height > 0 ? m_Spec.Height : 1.0f),
                      utils::OpenGL::TextureFormatToOpenGLBaseType(format),
                      utils::OpenGL::TextureFormatToOpenGLDataType(format),
                      buffer.data());
@@ -220,7 +222,8 @@ public:
     
     // Reset
     // ----------------------------------------
-    void Resize(const unsigned int width, const unsigned int height);
+    void Resize(const unsigned int width, const unsigned int height = 0,
+                const unsigned int depth = 0);
     void AdjustSampleCount(const unsigned int samples);
     void Invalidate();
     

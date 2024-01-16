@@ -73,7 +73,13 @@ enum class TextureFilter
     Linear,             ///< Linear filtering (interpolate between neighboring pixels).
 };
 
-namespace utils { namespace OpenGL
+/**
+ * Utility functions related to texture operations.
+ */
+namespace utils {
+
+/// @brief Namespace containing utility functions for OpenGL conversions.
+namespace OpenGL
 {
 /**
  * Convert the texture format to its corresponding OpenGL (base) format type.
@@ -384,5 +390,6 @@ inline GLenum TextureFilterToOpenGLType(TextureFilter filter, bool useMipmaps)
     CORE_ASSERT(false, "Unknown texture filter mode!");
     return 0;
 }
+
 } // namespace OpenGL
 } // namespace utils

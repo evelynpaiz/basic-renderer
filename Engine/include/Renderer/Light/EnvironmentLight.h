@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Renderer/Texture/TextureCube.h"
+#include "Renderer/Texture/Texture3D.h"
 
 #include "Renderer/Light/Light.h"
 

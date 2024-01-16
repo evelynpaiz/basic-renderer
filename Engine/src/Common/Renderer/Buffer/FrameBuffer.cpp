@@ -1,6 +1,11 @@
 #include "enginepch.h"
 #include "Renderer/Buffer/FrameBuffer.h"
 
+#include "Renderer/Texture/Texture1D.h"
+#include "Renderer/Texture/Texture2D.h"
+#include "Renderer/Texture/Texture3D.h"
+#include "Renderer/Texture/TextureCube.h"
+
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
@@ -20,7 +25,6 @@ FrameBuffer::FrameBuffer(const FrameBufferSpecification& spec)
         // Update the information of each attachment
         spec.Width = m_Spec.Width;
         spec.Height = m_Spec.Height;
-        spec.Samples = m_Spec.Samples;
         spec.MipMaps = m_Spec.MipMaps;
         
         spec.Wrap = spec.Wrap != TextureWrap::None ? spec.Wrap :
@@ -64,7 +68,7 @@ FrameBuffer::~FrameBuffer()
 void FrameBuffer::Bind() const
 {
     glBindFramebuffer(GL_FRAMEBUFFER, m_ID);
-    glViewport(0, 0, m_Spec.Width, m_Spec.Height);
+    glViewport(0, 0, m_Spec.Width, m_Spec.Height > 0 ? m_Spec.Height : 1);
 }
 
 /**
@@ -75,7 +79,7 @@ void FrameBuffer::Bind() const
 void FrameBuffer::BindForDrawAttachment(const unsigned int index) const
 {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_ID);
-    glViewport(0, 0, m_Spec.Width, m_Spec.Height);
+    glViewport(0, 0, m_Spec.Width, m_Spec.Height > 0 ? m_Spec.Height : 1);
     glDrawBuffer(GL_COLOR_ATTACHMENT0 + index);
 }
 
@@ -100,14 +104,14 @@ void FrameBuffer::BindForReadAttachment(const unsigned int index) const
 void FrameBuffer::BindForDrawAttachmentCube(const unsigned int index, const unsigned int face,
                                             const unsigned int level) const
 {
-    if (m_ColorAttachmentsSpec[index].Type != TextureType::TextureCube)
+    if (m_ColorAttachmentsSpec[index].Type != TextureType::TEXTURECUBE)
     {
         CORE_WARN("Trying to bind for drawing an incorrect attachment type!");
         return;
     }
     
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_ID);
-    glViewport(0, 0, m_Spec.Width, m_Spec.Height);
+    glViewport(0, 0, m_Spec.Width, m_Spec.Height > 0 ? m_Spec.Height : 1);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
                            m_ColorAttachments[index]->m_ID, level);
 }
@@ -217,19 +221,20 @@ void FrameBuffer::BlitColorAttachments(const std::shared_ptr<FrameBuffer>& src,
  * @param width Framebuffer width.
  * @param height Famebuffer height.
  */
-void FrameBuffer::Resize(const unsigned int width, const unsigned int height)
+void FrameBuffer::Resize(const unsigned int width, const unsigned int height,
+                         const unsigned int depth)
 {
     // Update the size of the framebuffer
-    m_Spec.SetFrameBufferSize(width, height);
+    m_Spec.SetFrameBufferSize(width, height, depth);
     
     // Update the size for the framebuffer attachments
     for (auto& spec : m_Spec.AttachmentsSpec.TexturesSpec)
-        spec.SetTextureSize(width, height);
+        spec.SetTextureSize(width, height, depth);
     
     for (auto& spec : m_ColorAttachmentsSpec)
-        spec.SetTextureSize(width, height);
+        spec.SetTextureSize(width, height, depth);
     
-    m_DepthAttachmentSpec.SetTextureSize(width, height);
+    m_DepthAttachmentSpec.SetTextureSize(width, height, depth);
     
     // Reset the framebuffer
     Invalidate();
@@ -244,12 +249,6 @@ void FrameBuffer::AdjustSampleCount(const unsigned int samples)
 {
     // Update the sample count of the framebuffer
     m_Spec.Samples = samples;
-    
-    // Update the sample count for the framebuffer attachments
-    for (auto& spec : m_ColorAttachmentsSpec)
-        spec.Samples = samples;
-    
-    m_DepthAttachmentSpec.Samples = samples;
     
     // Reset the framebuffer
     Invalidate();
@@ -278,18 +277,61 @@ void FrameBuffer::Invalidate()
     {
         // Based on the defined specifications, generate the corresponding attachments
         m_ColorAttachments.resize(m_ColorAttachmentsSpec.size());
-    
+        
         for (unsigned int i = 0; i < (unsigned int)m_ColorAttachments.size(); i++)
         {
-            m_ColorAttachments[i] = m_ColorAttachmentsSpec[i].Type == TextureType::Texture ?
-                                    std::make_shared<Texture>(m_ColorAttachmentsSpec[i]) :
-                                    std::make_shared<TextureCube>(m_ColorAttachmentsSpec[i]);
-            TextureFormat &format = m_ColorAttachments[i]->m_Spec.Format;
-            if(format != TextureFormat::None || !utils::OpenGL::IsDepthFormat(format))
+            TextureType &type = m_ColorAttachmentsSpec[i].Type;
+            TextureFormat &format = m_ColorAttachmentsSpec[i].Format;
+            
+            // Define the attachment depending on its type (1D, 2D, 3D, ...)
+            auto createTexture = [&]() -> std::shared_ptr<Texture> {
+                switch (type)
+                {
+                    case TextureType::TEXTURE1D: 
+                        return std::make_shared<Texture1D>(m_ColorAttachmentsSpec[i]);
+                    case TextureType::TEXTURE2D: 
+                        return std::make_shared<Texture2D>(m_ColorAttachmentsSpec[i], m_Spec.Samples);
+                    case TextureType::TEXTURE3D: 
+                        return std::make_shared<Texture3D>(m_ColorAttachmentsSpec[i]);
+                    case TextureType::TEXTURECUBE: 
+                        return std::make_shared<TextureCube>(m_ColorAttachmentsSpec[i]);
+                    case TextureType::None:
+                    default: return nullptr;
+                }
+            };
+            m_ColorAttachments[i] = createTexture();
+            
+            // Check if the attachment has been properly defined
+            if (!m_ColorAttachments[i] || format == TextureFormat::None || utils::OpenGL::IsDepthFormat(format))
             {
-                m_ColorAttachments[i]->CreateTexture(nullptr);
-                glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, m_ColorAttachments[i]->TextureTarget(),
-                                       m_ColorAttachments[i]->m_ID, 0);
+                CORE_WARN("Data in color attachment not properly defined");
+                continue;
+            }
+            
+            // Create the texture for the color attachment
+            m_ColorAttachments[i]->CreateTexture(nullptr);
+            
+            switch (type)
+            {
+                case TextureType::TEXTURE1D:
+                    glFramebufferTexture1D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, 
+                                           m_ColorAttachments[i]->TextureTarget(), m_ColorAttachments[i]->m_ID, 0);
+                    break;
+                case TextureType::TEXTURE2D:
+                    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, 
+                                           m_ColorAttachments[i]->TextureTarget(), m_ColorAttachments[i]->m_ID, 0);
+                    break;
+                case TextureType::TEXTURE3D:
+                    glFramebufferTexture3D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, 
+                                           m_ColorAttachments[i]->TextureTarget(), m_ColorAttachments[i]->m_ID, 0, 0);
+                    break;
+                case TextureType::TEXTURECUBE:
+                    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, 
+                                           m_ColorAttachments[i]->TextureTarget(), m_ColorAttachments[i]->m_ID, 0);
+                    break;
+                case TextureType::None:
+                default:
+                    break;
             }
         }
     }
@@ -298,7 +340,7 @@ void FrameBuffer::Invalidate()
     if(m_DepthAttachmentSpec.Format != TextureFormat::None &&
        utils::OpenGL::IsDepthFormat(m_DepthAttachmentSpec.Format))
     {
-        m_DepthAttachment = std::make_shared<Texture>(m_DepthAttachmentSpec);
+        m_DepthAttachment = std::make_shared<Texture2D>(m_DepthAttachmentSpec, m_Spec.Samples);
         m_DepthAttachment->CreateTexture(nullptr);
         glFramebufferTexture2D(GL_FRAMEBUFFER, utils::OpenGL::TextureFormatToOpenGLDepthType(m_DepthAttachment->m_Spec.Format),
                                m_DepthAttachment->TextureTarget(), m_DepthAttachment->m_ID, 0);

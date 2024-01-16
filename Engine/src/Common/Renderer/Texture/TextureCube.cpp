@@ -5,20 +5,20 @@
 #include <stb_image.h>
 
 // --------------------------------------------
-// Texture Cube
+// Texture (3D)
 // --------------------------------------------
 
 /**
- * Create a base texture.
+ * Create a base cube texture.
  */
 TextureCube::TextureCube()
     : Texture()
 {
-    m_Spec.Type = TextureType::TextureCube;
+    m_Spec.Type = TextureType::TEXTURECUBE;
 }
 
 /**
- * Create a texture from input data.
+ * Create a cube texture from input data.
  *
  * @param data The data for the cube texture.
  */
@@ -29,7 +29,7 @@ TextureCube::TextureCube(const void *data)
 }
 
 /**
- * Create a texture from input data.
+ * Create a cube texture from input data.
  *
  * @param data The data for the cube texture.
  */
@@ -40,18 +40,18 @@ TextureCube::TextureCube(const std::vector<const void *>& data)
 }
 
 /**
- * Create a base texture with specific properties.
- * 
+ * Create a base cube texture with specific properties.
+ *
  * @param spec The texture specifications.
  */
 TextureCube::TextureCube(const TextureSpecification& spec)
     : Texture(spec), m_CubeSpecs(std::vector<TextureSpecification>(6, spec))
 {
-    m_Spec.Type = TextureType::TextureCube;
+    m_Spec.Type = TextureType::TEXTURECUBE;
 }
 
 /**
- * Create a texture from input data and with specific properties.
+ * Create a cube texture from input data and with specific properties.
  *
  * @param data The data for the cube texture.
  * @param spec The texture specifications.
@@ -63,7 +63,7 @@ TextureCube::TextureCube(const void *data, const TextureSpecification& spec)
 }
 
 /**
- * Create a texture from input data and with specific properties.
+ * Create a cube texture from input data and with specific properties.
  *
  * @param data The data for the cube texture.
  * @param spec The texture specifications.
@@ -110,11 +110,11 @@ void TextureCube::CreateTexture(const std::vector<const void *>& data)
     Bind();
     
     // Set texture wrapping and filtering parameters
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R,
-                    utils::OpenGL::TextureWrapToOpenGLType(m_Spec.Wrap));
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S,
                     utils::OpenGL::TextureWrapToOpenGLType(m_Spec.Wrap));
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T,
+                    utils::OpenGL::TextureWrapToOpenGLType(m_Spec.Wrap));
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R,
                     utils::OpenGL::TextureWrapToOpenGLType(m_Spec.Wrap));
     
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER,
@@ -124,6 +124,9 @@ void TextureCube::CreateTexture(const std::vector<const void *>& data)
     
     for (unsigned int i = 0; i < data.size(); ++i)
     {
+        // Verify size of the 2D texture
+        CORE_ASSERT(m_CubeSpecs[i].Width > 0 && m_CubeSpecs[i].Height > 0, "2D texture size not properly defined!");
+        // Create the texture with the data
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, utils::OpenGL::TextureFormatToOpenGLInternalType(m_CubeSpecs[i].Format),
                      m_CubeSpecs[i].Width, m_CubeSpecs[i].Height, 0, utils::OpenGL::TextureFormatToOpenGLBaseType(m_CubeSpecs[i].Format),
                      utils::OpenGL::TextureFormatToOpenGLDataType(m_CubeSpecs[i].Format), data[i]);

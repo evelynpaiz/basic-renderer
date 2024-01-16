@@ -3,17 +3,6 @@
 #include "Renderer/Texture/TextureUtils.h"
 #include <filesystem>
 
-class Texture;
-class FrameBuffer;
-
-namespace utils { namespace Draw {
-
-inline bool TextureLoader(std::shared_ptr<Texture> &texture,
-                          std::filesystem::path &name, const char *label,
-                          const char *filter, const bool &flip);
-}
-}
-
 /**
  * Enumeration representing the types of textures.
  *
@@ -25,8 +14,10 @@ inline bool TextureLoader(std::shared_ptr<Texture> &texture,
 enum class TextureType
 {
     None = 0,
-    Texture,
-    TextureCube,
+    TEXTURE1D,
+    TEXTURE2D,
+    TEXTURE3D,
+    TEXTURECUBE,
 };
 
 /**
@@ -64,7 +55,8 @@ struct TextureSpecification
     /// @brief Define the size of the texture (in pixels).
     /// @param width The texture size (width).
     /// @param height The texture size (height)
-    void SetTextureSize(unsigned int width, unsigned int height)
+    void SetTextureSize(unsigned int width, unsigned int height = 0,
+                        unsigned int depth = 0)
     {
         Width = width;
         Height = height;
@@ -72,11 +64,11 @@ struct TextureSpecification
     
     // Texture specification variables
     // ----------------------------------------
-    ///< The type (category) of the texture.
-    TextureType Type = TextureType::Texture;
-    
     ///< The size (width and height) in pixels.
-    int Width = 0, Height = 0;
+    int Width = 0, Height = 0, Depth = 0;
+    
+    ///< The type (dimension) of the texture.
+    TextureType Type = TextureType::TEXTURE2D;
     
     ///< The internal format of the texture data.
     TextureFormat Format = TextureFormat::None;
@@ -86,15 +78,14 @@ struct TextureSpecification
     ///< The texture filtering mode, specifying how the texture is sampled during rendering.
     TextureFilter Filter = TextureFilter::None;
     
-    ///< The number of samples in the texture. Typically used for multisampling to improve
-    ///< image quality.
-    int Samples = 1;
-    
     ///< A flag indicating whether mipmaps should be created for the texture. Mipmaps are
     ///< precalculated versions of the texture at different levels of detail, providing smoother
     ///< rendering at varying distances
     bool MipMaps = false;
 };
+
+// Forward declarations
+class FrameBuffer;
 
 /**
  * Represents a texture that can be bound to geometry during rendering.
@@ -109,12 +100,8 @@ struct TextureSpecification
 class Texture
 {
 public:
-    // Constructor(s)/Destructor
+    // Destructor
     // ----------------------------------------
-    Texture();
-    Texture(const void *data);
-    Texture(const TextureSpecification& spec);
-    Texture(const void *data, const TextureSpecification& spec);
     virtual ~Texture();
     
     // Usage
@@ -126,18 +113,20 @@ public:
     // Friend class definition(s)
     // ----------------------------------------
     friend class FrameBuffer;
-    friend bool utils::Draw::TextureLoader(std::shared_ptr<Texture> &texture,
-                                           std::filesystem::path &name, const char *label,
-                                           const char *filter, const bool &flip);
     
 protected:
+    // Constructor(s)
+    // ----------------------------------------
+    Texture();
+    Texture(const TextureSpecification& spec);
+    
     // Target type
     // ----------------------------------------
-    virtual GLenum TextureTarget() const;
+    virtual GLenum TextureTarget() const = 0;
     
-    // Constructor
+    // Texture creation
     // ----------------------------------------
-    virtual void CreateTexture(const void *data);
+    virtual void CreateTexture(const void *data) = 0;
     
     // Destructor
     // ----------------------------------------
@@ -162,60 +151,11 @@ public:
 };
 
 /**
- * Represents a (loaded) 2D texture used to add details to rendered geometry.
- *
- * The `Texture2D` class is a specialized subclass of  `Texture` that provides functionality to
- * load and bind 2D textures that can be applied to geometry during rendering. The class supports
- * loading textures from file paths, binding them to specific texture slots for use in a `Shader`, and
- * unbinding them after they have been used.
- *
- * Copying or moving `Texture2D` objects is disabled to ensure single ownership and prevent
- * unintended texture duplication.
+ * Utility functions related to texture operations.
  */
-class TextureResource : public Texture
-{
-public:
-    // Constructor(s)/Destructor
-    // ----------------------------------------
-    TextureResource(const std::filesystem::path& filePath, bool flip = true);
-    
-    // Getter(s)
-    // ----------------------------------------
-    /// @brief Get the file path of the texture.
-    /// @return The path to the file.
-    std::filesystem::path GetPath() const { return m_FilePath; }
-    /// @brief Get the name of the loaded texture (file name).
-    /// @return The texture name.
-    std::string GetName() { return m_FilePath.filename().string(); }
-    /// @brief Get the directory where the texture file is located.
-    /// @return The directory of the texture.
-    std::string GetDirectory() { return m_FilePath.parent_path().string(); }
-        
-private:
-    // Loading
-    // ----------------------------------------
-    void LoadFromFile(const std::filesystem::path& filePath);
-    
-    // Texture variables
-    // ----------------------------------------
-private:
-    ///< Path to the file.
-    std::filesystem::path m_FilePath;
-    
-    ///< Texture flipping.
-    bool m_Flip;
-    
-    // Disable the copying or moving of this resource
-    // ----------------------------------------
-public:
-    TextureResource(const TextureResource&) = delete;
-    TextureResource(TextureResource&&) = delete;
-
-    TextureResource& operator=(const TextureResource&) = delete;
-    TextureResource& operator=(TextureResource&&) = delete;
-};
-
-namespace utils { namespace Texturing {
+namespace utils {
+/// @brief Namespace containing utility functions for texturing operations.
+namespace Texturing {
 
 /**
  * Get a shared pointer to a 1x1 white texture.
@@ -223,7 +163,7 @@ namespace utils { namespace Texturing {
  * This function returns a shared pointer to a 1x1 texture with a single white pixel.
  * If the texture has already been created, it will be reused to avoid redundant texture creation.
  *
- * @tparam T The type of texture to create (e.g., Texture or TextureCube).
+ * @tparam T The type of texture to create (e.g., 1D, 2D, or 3D).
  * @return A shared pointer to the 1x1 white texture.
  */
 template <typename T>
@@ -231,45 +171,21 @@ inline std::shared_ptr<T>& WhiteTexture()
 {
     // Static variable to hold the shared pointer to the texture
     static std::shared_ptr<T> texture;
-
+    
     // Check if the texture has already been created
     if (texture)
         return texture;
-
+    
     // Define the texture specifications
     TextureSpecification spec = TextureSpecification(TextureFormat::RGB8);
     spec.SetTextureSize(1, 1);
     spec.Wrap = TextureWrap::Repeat; // Set texture wrap mode to repeat
-
+    
     // Define the color data for a single white pixel (R, G, B values)
     const unsigned char whitePixel[] = { 255, 255, 255 };
-
+    
     // Create the 1x1 white texture using the specified data and specifications
     texture = std::make_shared<T>(whitePixel, spec);
-
-    // Return the created texture
-    return texture;
-}
-
-/**
- * Get a shared pointer to an empty texture with a checkerboard pattern.
- *
- * This function returns a shared pointer to an empty texture with a checkerboard pattern.
- * If the texture has already been created, it will be reused to avoid redundant texture creation.
- *
- * @return A shared pointer to the empty texture with a checkerboard pattern.
- */
-inline std::shared_ptr<TextureResource> EmptyTexture()
-{
-    // Static variable to hold the shared pointer to the texture
-    static std::shared_ptr<TextureResource> texture;
-    
-    // Check if the texture has already been created
-    if (texture)
-        return texture;
-    
-    // Create the empty texture using a ccheckerboard pattern
-    texture = std::make_shared<TextureResource>("resources/common/checkerboard.png");
     
     // Return the created texture
     return texture;

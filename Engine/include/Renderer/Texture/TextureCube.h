@@ -9,7 +9,7 @@
  * Represents a cube texture that can be bound to geometry during rendering.
  *
  * The `TextureCube` class provides functionality to create, bind, unbind, and configure cube textures.
- * Cube textures consist of six individual faces, each with its own texture data. These textures can
+ * Cube textures consist of six faces, each with its own texture data. These textures can
  * be bound to specific texture slots for use in a `Shader`.
  *
  * Copying or moving `TextureCube` objects is disabled to ensure single ownership and prevent
@@ -32,7 +32,7 @@ protected:
     // ----------------------------------------
     GLenum TextureTarget() const override;
     
-    // Constructor
+    // Texture creation
     // ----------------------------------------
     void CreateTexture(const void *data) override;
     void CreateTexture(const std::vector<const void *>& data);
@@ -56,11 +56,11 @@ public:
 /**
  * Represents a cube texture loaded from individual files.
  *
- * The `TextureCubeResource` class is a specialization of `TextureCube` that provides functionality
- * to load cube textures from individual image files, one for each face of the cube. It is particularly
+ * The `Texture3DResource` class is a specialization of `Texture3D` that provides functionality
+ * to load 3D textures from individual image files, one for each face of the cube. It is particularly
  * useful for creating environment maps and reflections.
  *
- * Copying or moving `TextureCubeResource` objects is disabled to ensure single ownership and prevent
+ * Copying or moving `Texture3DResource` objects is disabled to ensure single ownership and prevent
  * unintended resource duplication.
  */
 class TextureCubeResource : public TextureCube

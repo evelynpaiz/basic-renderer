@@ -113,7 +113,8 @@ void Viewer::InitializeViewer()
     m_Camera->SetPosition(glm::vec3(0.0f, 0.0f, 10.0f));
     
     // Define the framebuffer(s)
-    FrameBufferSpecification framebufferSpec(m_ViewportWidth, m_ViewportHeight);
+    FrameBufferSpecification framebufferSpec;
+    framebufferSpec.SetFrameBufferSize(m_ViewportWidth, m_ViewportHeight);
     
     framebufferSpec.AttachmentsSpec = {
         TextureFormat::DEPTH24
@@ -131,8 +132,8 @@ void Viewer::InitializeViewer()
     m_Materials["Depth"] = depthMaterial;
     
     auto cubeMaterial = std::make_shared<PhongTextureMaterial>(m_Environment, "Resources/shaders/phong/PhongTextureShadow.glsl");
-    cubeMaterial->SetDiffuseMap(std::make_shared<TextureResource>("Resources/textures/diffuse.jpeg"));
-    cubeMaterial->SetSpecularMap(std::make_shared<TextureResource>("Resources/textures/specular.jpeg"));
+    cubeMaterial->SetDiffuseMap(std::make_shared<Texture2DResource>("Resources/textures/diffuse.jpeg"));
+    cubeMaterial->SetSpecularMap(std::make_shared<Texture2DResource>("Resources/textures/specular.jpeg"));
     cubeMaterial->SetShadowMap(m_Framebuffers["Shadow"]->GetDepthAttachment());
     cubeMaterial->SetShininess(32.0f);
     m_Materials["PhongTexture"] = cubeMaterial;

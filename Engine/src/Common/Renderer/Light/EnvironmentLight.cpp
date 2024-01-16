@@ -31,10 +31,11 @@ EnvironmentLight::EnvironmentLight(const unsigned int width, const unsigned int 
  */
 void EnvironmentLight::InitEnvironmentFramebuffers(const unsigned int cubeSize)
 {
-    FrameBufferSpecification spec(cubeSize, cubeSize);
+    FrameBufferSpecification spec;
+    spec.SetFrameBufferSize(cubeSize, cubeSize);
     spec.AttachmentsSpec = {
         TextureFormat::DEPTH24,
-        { TextureFormat::RGB16F, TextureType::TextureCube }
+        { TextureFormat::RGB16F, TextureType::TEXTURECUBE }
     };
     
     spec.MipMaps = true;

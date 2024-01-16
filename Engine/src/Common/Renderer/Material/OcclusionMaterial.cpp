@@ -1,6 +1,8 @@
 #include "enginepch.h"
 #include "Renderer/Material/OcclusionMaterial.h"
 
+#include "Renderer/Texture/Texture2D.h"
+
 /**
  * Generate an occlusion material object with the specified shader file path.
  *
@@ -124,5 +126,5 @@ void OcclusionMaterial::GenerateNoiseTexture(std::uniform_real_distribution<floa
     spec.Filter = TextureFilter::Nearest;
     spec.Wrap = TextureWrap::Repeat;
     
-    m_NoiseTexture = std::make_shared<Texture>(ssaoNoise.data(), spec);
+    m_NoiseTexture = std::make_shared<Texture2D>(ssaoNoise.data(), spec);
 }

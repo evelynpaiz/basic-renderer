@@ -6,27 +6,12 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-// --------------------------------------------
-// Texture
-// --------------------------------------------
-
 /**
  * Create a base texture.
  */
 Texture::Texture()
 {
     glGenTextures(1, &m_ID);
-}
-
-/**
- * Create a texture from input data.
- *
- * @param data The texture data.
- */
-Texture::Texture(const void *data)
-    : Texture()
-{
-    CreateTexture(data);
 }
 
 /**
@@ -37,20 +22,7 @@ Texture::Texture(const void *data)
 Texture::Texture(const TextureSpecification& spec)
     : m_Spec(spec)
 {
-    m_Spec.Type = TextureType::Texture;
     glGenTextures(1, &m_ID);
-}
-
-/**
- * Create a texture from input data and with specific properties.
- *
- * @param data The texture data.
- * @param spec The texture specifications.
- */
-Texture::Texture(const void *data, const TextureSpecification& spec)
-    : Texture(spec)
-{
-    CreateTexture(data);
 }
 
 /**
@@ -95,124 +67,4 @@ void Texture::BindToTextureUnit(const unsigned int slot) const
 void Texture::Unbind() const
 {
     glBindTexture(TextureTarget(), 0);
-}
-
-/**
- * Get the texture target based on the texture specification.
- *
- * @return The OpenGL texture target.
- */
-GLenum Texture::TextureTarget() const
-{
-    return (GLenum)(m_Spec.Samples > 1 ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D);
-}
-
-/**
- * Create and configure the texture based on the texture specification and provided data.
- *
- * @param data The texture data. This can be nullptr if the texture is to be written.
- */
-void Texture::CreateTexture(const void *data)
-{
-    // Bind the texture
-    Bind();
-    
-    // For multisample textures, use glTexImage2DMultisample to create the texture
-    if (m_Spec.Samples > 1)
-    {
-        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Spec.Samples,
-                                utils::OpenGL::TextureFormatToOpenGLInternalType(m_Spec.Format),
-                                m_Spec.Width, m_Spec.Height, GL_FALSE);
-        return;
-    }
-    
-    // Set texture wrapping and filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R,
-                    utils::OpenGL::TextureWrapToOpenGLType(m_Spec.Wrap));
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-                    utils::OpenGL::TextureWrapToOpenGLType(m_Spec.Wrap));
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
-                    utils::OpenGL::TextureWrapToOpenGLType(m_Spec.Wrap));
-    
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                    utils::OpenGL::TextureFilterToOpenGLType(m_Spec.Filter, m_Spec.MipMaps));
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                    utils::OpenGL::TextureFilterToOpenGLType(m_Spec.Filter, false));
-    
-    // Create the texture based on the format and data type
-    if (utils::OpenGL::IsDepthFormat(m_Spec.Format))
-    {
-        glTexStorage2D(GL_TEXTURE_2D, 1, utils::OpenGL::TextureFormatToOpenGLBaseType(m_Spec.Format),
-                       m_Spec.Width, m_Spec.Height);
-        
-        float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-    }
-    else
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, utils::OpenGL::TextureFormatToOpenGLInternalType(m_Spec.Format),
-                     m_Spec.Width, m_Spec.Height, 0, utils::OpenGL::TextureFormatToOpenGLBaseType(m_Spec.Format),
-                     utils::OpenGL::TextureFormatToOpenGLDataType(m_Spec.Format), data);
-    }
-    
-    // Generate mipmaps if specified
-    if (m_Spec.MipMaps)
-        glGenerateMipmap(GL_TEXTURE_2D);
-    
-    // Unbind the texture
-    Unbind();
-}
-
-// --------------------------------------------
-// Texture Resource
-// --------------------------------------------
-
-/**
- * Generate a texture from the input source file.
- *
- * @param filePath Texture file path.
- * @param flip Fip the texture vertically.
- */
-TextureResource::TextureResource(const std::filesystem::path& filePath, bool flip)
-    : Texture(), m_FilePath(filePath), m_Flip(flip)
-{
-    LoadFromFile(filePath);
-}
-
-/**
- * Load the texture from an input (image) source file.
- *
- * @param filePath Texture file path.
- */
-void TextureResource::LoadFromFile(const std::filesystem::path& filePath)
-{
-    // Determine whether to flip the image vertically
-    stbi_set_flip_vertically_on_load(m_Flip);
-    
-    // Extract the file extension
-    std::string extension = filePath.extension().string();
-    
-    // Load the image into the local buffer
-    int width, height, channels;
-    void* data = nullptr;
-    
-    data = (extension != ".hdr") ? stbi_load(filePath.string().c_str(), &width, &height, &channels, 0) :
-                            (void*)stbi_loadf(filePath.string().c_str(), &width, &height, &channels, 0);
-    
-    // Verify that the image has been loaded correctly
-    if (!data)
-    {
-        CORE_WARN("Failed to load: " + filePath.filename().string());
-        return;
-    }
-    
-    // Save the corresponding image information
-    utils::Texturing::UpdateSpecsTextureResource(m_Spec, width, height, channels, extension);
-    CORE_ASSERT((unsigned int)m_Spec.Format, "Data format of " + m_FilePath.filename().string() + " not supported!");
-    
-    // Generate the 2D texture
-    CreateTexture(data);
-    
-    // Free memory
-    stbi_image_free(data);
 }

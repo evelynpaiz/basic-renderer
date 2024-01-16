@@ -45,6 +45,9 @@
 
 #include "Renderer/Shader/Shader.h"
 #include "Renderer/Texture/Texture.h"
+#include "Renderer/Texture/Texture1D.h"
+#include "Renderer/Texture/Texture2D.h"
+#include "Renderer/Texture/Texture3D.h"
 #include "Renderer/Texture/TextureCube.h"
 
 #include "Renderer/Light/ShadowCamera.h"

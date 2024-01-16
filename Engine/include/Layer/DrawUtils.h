@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Core/FileDialogs.h"
-#include "Renderer/Texture/Texture.h"
+
+#include "Renderer/Texture/Texture2D.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -149,7 +150,7 @@ inline void Vec3Control(const std::string &label,
  *
  * @return `true` if the texture has been updated (new image loaded), `false` otherwise.
  */
-inline bool TextureLoader(std::shared_ptr<Texture> &texture,
+inline bool TextureLoader(std::shared_ptr<Texture2DResource> &texture,
                           std::filesystem::path &filePath, const char *label,
                           const char *filter, const bool &flip = true)
 {
@@ -158,7 +159,7 @@ inline bool TextureLoader(std::shared_ptr<Texture> &texture,
     
     // Select the correct texture to be displayed
     const auto &displayTexture = texture ? texture : utils::Texturing::EmptyTexture();
-    
+
     ImTextureID textureID = (ImTextureID)((uintptr_t)(displayTexture->m_ID));
     float aspect = (float)displayTexture->m_Spec.Height / displayTexture->m_Spec.Width;
     
@@ -175,7 +176,7 @@ inline bool TextureLoader(std::shared_ptr<Texture> &texture,
         filePath = FileDialogs::OpenFile(filter);
         if (!filePath.empty())
         {
-            texture = std::make_shared<TextureResource>(filePath);
+            texture = std::make_shared<Texture2DResource>(filePath);
             updated = true;
         }
     }
