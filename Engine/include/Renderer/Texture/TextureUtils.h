@@ -390,6 +390,97 @@ inline GLenum TextureFilterToOpenGLType(TextureFilter filter, bool useMipmaps)
     CORE_ASSERT(false, "Unknown texture filter mode!");
     return 0;
 }
-
 } // namespace OpenGL
+
+/**
+ * @brief Allocate memory for a buffer based on the specified texture format and size.
+ *
+ * @param format The texture format for which the buffer is allocated.
+ * @param bufferSize The size of the buffer to be allocated.
+ *
+ * @return A void pointer to the allocated buffer. Returns nullptr if the format is not recognized.
+ *
+ * @note Ensure to delete[] the allocated memory after use to avoid memory leaks.
+ */
+inline void* AllocateBufferForFormat(TextureFormat format, unsigned int bufferSize)
+{
+    switch (format)
+    {
+        case TextureFormat::None: return nullptr;
+        case TextureFormat::R8:
+        case TextureFormat::RG8:
+        case TextureFormat::RGB8:
+        case TextureFormat::RGBA8:
+        case TextureFormat::R8UI:
+        case TextureFormat::RG8UI:
+        case TextureFormat::RGB8UI:
+        case TextureFormat::RGBA8UI: return static_cast<void*>(new char[bufferSize]);
+            
+        case TextureFormat::DEPTH16:
+        case TextureFormat::DEPTH24:
+        case TextureFormat::DEPTH32:
+        case TextureFormat::DEPTH24STENCIL8: return static_cast<void*>(new int[bufferSize]);
+            
+        case TextureFormat::R16F:
+        case TextureFormat::RGB16F:
+        case TextureFormat::RGBA16F:
+        
+        case TextureFormat::RGB32F:
+        case TextureFormat::RGBA32F:
+        case TextureFormat::DEPTH32F: return static_cast<void*>(new float[bufferSize]);
+    }
+    
+    CORE_ASSERT(false, "Unknown texture format!");
+    return nullptr;
+}
+
+/**
+ * @brief Deallocate memory for a buffer based on the specified texture format.
+ *
+ * @param format The texture format for which the buffer was allocated.
+ * @param buffer A pointer to the allocated buffer.
+ *
+ * @note Ensure to use this function to delete the buffer to avoid memory leaks.
+ */
+inline void DeallocateBufferForFormat(TextureFormat format, void* buffer)
+{
+    switch (format)
+    {
+        case TextureFormat::None:
+            // Do nothing, as nullptr was returned in AllocateBufferForFormat
+            break;
+
+        case TextureFormat::R8:
+        case TextureFormat::RG8:
+        case TextureFormat::RGB8:
+        case TextureFormat::RGBA8:
+        case TextureFormat::R8UI:
+        case TextureFormat::RG8UI:
+        case TextureFormat::RGB8UI:
+        case TextureFormat::RGBA8UI:
+            delete[] static_cast<char*>(buffer);
+            break;
+
+        case TextureFormat::DEPTH16:
+        case TextureFormat::DEPTH24:
+        case TextureFormat::DEPTH32:
+        case TextureFormat::DEPTH24STENCIL8:
+            delete[] static_cast<int*>(buffer);
+            break;
+
+        case TextureFormat::R16F:
+        case TextureFormat::RGB16F:
+        case TextureFormat::RGBA16F:
+        case TextureFormat::RGB32F:
+        case TextureFormat::RGBA32F:
+        case TextureFormat::DEPTH32F:
+            delete[] static_cast<float*>(buffer);
+            break;
+
+        default:
+            CORE_ASSERT(false, "Unknown texture format!");
+            break;
+    }
+}
+
 } // namespace utils

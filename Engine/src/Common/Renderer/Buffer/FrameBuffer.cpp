@@ -388,23 +388,39 @@ void FrameBuffer::SaveAttachment(const unsigned int index, const std::filesystem
     auto& format = m_ColorAttachmentsSpec[index].Format;
     int channels = utils::OpenGL::TextureFormatToChannelNumber(format);
     
-    // Ensure numChannels is within a valid range
+    std::string extension = path.extension().string();
+    std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+    
+    // Ensure the number of channel is in a valid range
     if (channels < 1 || channels > 4)
         CORE_ASSERT(false, "Invalid number of channels in the color attachment!");
     
-    // TODO: Add support for float data too.
+    // Define the buffer to allocate the attachment data
     int stride = channels * m_Spec.Width;
     channels += (stride % 4) ? (4 - stride % 4) : 0;
     int bufferSize = stride * m_Spec.Height;
-    std::vector<char> buffer(bufferSize);
+    void* buffer = utils::AllocateBufferForFormat(format, bufferSize);
     
+    // Read the pixel data
     BindForReadAttachment(index);
     glPixelStorei(GL_PACK_ALIGNMENT, channels);
     glReadPixels(0, 0, m_Spec.Width, m_Spec.Height,
                  utils::OpenGL::TextureFormatToOpenGLBaseType(format),
                  utils::OpenGL::TextureFormatToOpenGLDataType(format),
-                 buffer.data());
+                 buffer);
 
+    // TODO: support more file formats
+    // Save data into the file
     stbi_flip_vertically_on_write(true);
-    stbi_write_png(path.string().c_str(), m_Spec.Width, m_Spec.Height, channels, buffer.data(), stride);
+    
+    if (extension == ".png")
+        stbi_write_png(path.string().c_str(), m_Spec.Width, m_Spec.Height, channels, buffer, stride);
+    else if (extension == ".jpg" || extension == ".jpeg")
+        stbi_write_jpg(path.string().c_str(), m_Spec.Width, m_Spec.Height, channels, buffer, 100);  // Quality parameter (0-100)
+    else if (extension == ".hdr")
+        stbi_write_hdr(path.string().c_str(), m_Spec.Width, m_Spec.Height, channels, (float*)buffer);
+    else
+        CORE_WARN("Unsupported file format!");
+    
+    utils::DeallocateBufferForFormat(format, buffer);
 }
