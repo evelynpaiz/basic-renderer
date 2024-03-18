@@ -14,5 +14,7 @@ struct Light {
     sampler2D ShadowMap;            ///< Shadow map texture for shadow calculations.
     
     samplerCube IrradianceMap;      ///< Irradiance map for (diffuse) indirect lighting.
-    samplerCube PreFilterMap;       ///< Pre-filter map for (specular) indirect lighting.
+
+    // TODO: to be added.
+    //samplerCube PreFilterMap;       ///< Pre-filter map for (specular) indirect lighting.
 };

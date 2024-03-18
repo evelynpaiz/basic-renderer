@@ -34,6 +34,7 @@ vec3 calculateColor(vec3 ka, vec3 kd, vec3 ks, float shadow,
     // Calculate the specular reflection component using the Phong specular reflection formula
     vec3 specular = cosTheta > 0.0f ? calculateSpecular(viewDirection, reflectionDirection,
         ks, u_Material.Shininess) : vec3(0.0f);
+    specular *= u_Light.Ls;
     
     // Calculate the final color by combining ambient, diffuse, and specular components,
     // and modulating with the shadow factor

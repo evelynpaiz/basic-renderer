@@ -132,8 +132,8 @@ void Viewer::InitializeViewer()
     m_Materials["Depth"] = depthMaterial;
     
     auto cubeMaterial = std::make_shared<PhongTextureMaterial>(m_Environment, "Resources/shaders/phong/PhongTextureShadow.glsl");
-    cubeMaterial->SetDiffuseMap(std::make_shared<Texture2DResource>("Resources/textures/diffuse.jpeg"));
-    cubeMaterial->SetSpecularMap(std::make_shared<Texture2DResource>("Resources/textures/specular.jpeg"));
+    cubeMaterial->SetDiffuseMap(std::make_shared<Texture2DResource>("Resources/textures/diffuse.jpg"));
+    cubeMaterial->SetSpecularMap(std::make_shared<Texture2DResource>("Resources/textures/specular.jpg"));
     cubeMaterial->SetShadowMap(m_Framebuffers["Shadow"]->GetDepthAttachment());
     cubeMaterial->SetShininess(32.0f);
     m_Materials["PhongTexture"] = cubeMaterial;
