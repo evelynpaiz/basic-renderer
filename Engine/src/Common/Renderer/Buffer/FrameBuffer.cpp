@@ -278,7 +278,7 @@ void FrameBuffer::Invalidate()
         // Based on the defined specifications, generate the corresponding attachments
         m_ColorAttachments.resize(m_ColorAttachmentsSpec.size());
         
-        for (unsigned int i = 0; i < (unsigned int)m_ColorAttachments.size(); i++)
+        for (unsigned int i = 0; i < m_ColorAttachments.size(); i++)
         {
             TextureType &type = m_ColorAttachmentsSpec[i].Type;
             TextureFormat &format = m_ColorAttachmentsSpec[i].Format;

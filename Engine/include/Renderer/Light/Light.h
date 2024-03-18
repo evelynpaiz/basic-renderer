@@ -75,9 +75,12 @@ public:
     /// @param shader Shader program to be used.
     void DefineStrenghtProperties(const std::shared_ptr<Shader> &shader)
     {
-        shader->SetFloat("u_Light.La", m_AmbientStrength);
-        shader->SetFloat("u_Light.Ld", m_DiffuseStrength);
-        shader->SetFloat("u_Light.Ls", m_SpecularStrength);
+        if (m_AmbientStrength > 0.0)
+            shader->SetFloat("u_Light.La", m_AmbientStrength);
+        if (m_DiffuseStrength > 0.0)
+            shader->SetFloat("u_Light.Ld", m_DiffuseStrength);
+        if (m_SpecularStrength > 0.0)
+            shader->SetFloat("u_Light.Ls", m_SpecularStrength);
     }
     /// @brief Define the transformation properties (from the light) into the uniforms of the shader program.
     /// @param shader Shader program to be used.

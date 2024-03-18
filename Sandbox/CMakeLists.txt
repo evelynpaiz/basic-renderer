@@ -29,6 +29,9 @@ set_target_properties(Sandbox PROPERTIES
     XCODE_SCHEME_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
 )
 
+# Add pre-processing flag
+target_compile_definitions(Sandbox PRIVATE _SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING)
+
 # Define solution tree organization
 source_group(
     TREE ${CMAKE_CURRENT_SOURCE_DIR}

@@ -79,6 +79,9 @@ target_link_libraries(Engine
 # Define pre-compiled header
 target_precompile_headers(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/enginepch.h)
 
+# Add pre-processing flag
+target_compile_definitions(Engine PRIVATE _SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING)
+
 # Define solution tree organization
 source_group(
     TREE ${CMAKE_CURRENT_SOURCE_DIR}
