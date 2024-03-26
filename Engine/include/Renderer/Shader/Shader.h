@@ -13,14 +13,17 @@ struct ShaderProgramSource
     std::string VertexSource;
     ///< Fragment shader source code
     std::string FragmentSource;
+    ///< Geometry shader source code
+    std::string GeometrySource;
     
     // Constructor(s)/Destructor
     // ----------------------------------------
     /// @brief Define the shader program source.
     /// @param vs Vertex shader source.
     /// @param fs Fragment shader source.
-    ShaderProgramSource(const std::string& vs, const std::string& fs)
-        : VertexSource(vs), FragmentSource(fs)
+    ShaderProgramSource(const std::string& vs, const std::string& fs, 
+        const std::string& gs = "")
+        : VertexSource(vs), FragmentSource(fs), GeometrySource(gs)
     {}
     /// @brief Delete the shader program source.
     ~ShaderProgramSource() = default;
@@ -72,7 +75,8 @@ private:
     // ----------------------------------------
     unsigned int CompileShader(unsigned int type, const std::string& source);
     unsigned int CreateShader(const std::string& vertexShader,
-                              const std::string& fragmentShader);
+                              const std::string& fragmentShader,
+                              const std::string& gemetryShader = "");
     // Parsing
     // ----------------------------------------
     ShaderProgramSource ParseShader(const std::filesystem::path& filepath);

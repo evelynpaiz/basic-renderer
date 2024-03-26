@@ -12,7 +12,8 @@ Shader::Shader(const std::filesystem::path& filePath)
     : m_FilePath(filePath)
 {
     ShaderProgramSource source = ParseShader(filePath);
-    m_ID = CreateShader(source.VertexSource, source.FragmentSource);
+    m_ID = CreateShader(source.VertexSource, source.FragmentSource, 
+                        source.GeometrySource);
 }
 
 /**
@@ -168,30 +169,44 @@ void Shader::SetMat4(const std::string& name, const glm::mat4& value)
  *
  * @return the ID of the shader program.
  */
-unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
+unsigned int Shader::CompileShader(unsigned int type, const std::string& source) 
 {
     // Define the shader from the input source and compile
     unsigned int id = glCreateShader(type);
     const char* src = source.c_str();
     glShaderSource(id, 1, &src, nullptr);
     glCompileShader(id);
-    
+
     int result;
     glGetShaderiv(id, GL_COMPILE_STATUS, &result);
-    if (result == GL_FALSE)
-    {
+    if (result == GL_FALSE) {
         int length;
         glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
         char* message = (char*)alloca(length * sizeof(char));
         glGetShaderInfoLog(id, length, &length, message);
-        std::string t = (type == GL_VERTEX_SHADER ? "vertex" : "fragment");
-        
-        CORE_ERROR("Failed to compile " + t + " shader!");
+
+        std::string shaderType;
+        switch (type) {
+        case GL_VERTEX_SHADER:
+            shaderType = "vertex";
+            break;
+        case GL_FRAGMENT_SHADER:
+            shaderType = "fragment";
+            break;
+        case GL_GEOMETRY_SHADER:
+            shaderType = "geometry";
+            break;
+        default:
+            shaderType = "unknown";
+            break;
+        }
+
+        CORE_ERROR("Failed to compile " + shaderType + " shader!");
         CORE_ASSERT(result == GL_TRUE, message);
         glDeleteShader(id);
         return 0;
     }
-    
+
     return id;
 }
 
@@ -204,24 +219,35 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
  * @return ID of the shader program.
  */
 unsigned int Shader::CreateShader(const std::string& vertexShader,
-                        const std::string& fragmentShader) {
+                        const std::string& fragmentShader, 
+                        const std::string& geometryShader) 
+{
     // Define a shader program
     unsigned int program = glCreateProgram();
     
     // Vertex shader
     unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
+    glAttachShader(program, vs);
     // Fragment shader
     unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
+    glAttachShader(program, fs);
+    // Geometry shader
+    unsigned int gs = 0;
+    if (!geometryShader.empty()) 
+    {
+		unsigned int gs = CompileShader(GL_GEOMETRY_SHADER, geometryShader);
+		glAttachShader(program, gs);
+	}
     
     // Link shaders
-    glAttachShader(program, vs);
-    glAttachShader(program, fs);
     glLinkProgram(program);
     glValidateProgram(program);
     
     // De-allocate the shader resources
     glDeleteShader(vs);
     glDeleteShader(fs);
+    if (!geometryShader.empty())
+        glDeleteShader(gs);
     
     // Return the shader program
     return program;
@@ -242,12 +268,12 @@ ShaderProgramSource Shader::ParseShader(const std::filesystem::path& filepath)
     // Define the different shader classes available
     enum class ShaderType
     {
-        NONE = -1, VERTEX = 0, FRAGMENT = 1
+        NONE = -1, VERTEX = 0, FRAGMENT = 1, GEOMETRY = 2
     };
     
     // Parse the file
     std::string line;
-    std::stringstream ss[2];
+    std::stringstream ss[3];
     ShaderType type = ShaderType::NONE;
     while (getline(stream, line))
     {
@@ -259,6 +285,9 @@ ShaderProgramSource Shader::ParseShader(const std::filesystem::path& filepath)
             // Set mode to fragment
             else if (line.find("fragment") != std::string::npos)
                 type = ShaderType::FRAGMENT;
+            // Set mode to fragment
+            else if (line.find("geometry") != std::string::npos)
+                type = ShaderType::GEOMETRY;
         }
         else
         {
@@ -276,7 +305,7 @@ ShaderProgramSource Shader::ParseShader(const std::filesystem::path& filepath)
     }
     
     // Return the shader sources
-    return ShaderProgramSource(ss[0].str(), ss[1].str());
+    return ShaderProgramSource(ss[0].str(), ss[1].str(), ss[2].str());
 }
 
 /**
