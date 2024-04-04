@@ -77,13 +77,13 @@ std::string FileDialogs::SelectDirectory()
  * @param filter The filter string in the format "*.ext1;*.ext2".
  * @param openPanel The NSOpenPanel instance to set the allowed file types for.
  */
-void ProcessFilterString(const char* filter, NSPanel* panel)
+void ProcessFilterString(const char* filter, NSOpenPanel* panel)
 {
     // Check if the filter string is empty or null
     if (filter == nullptr || strlen(filter) == 0)
     {
         // If the filter is empty or null, disallow all files by setting an empty array
-        [panel setAllowedFileTypes:@[]];
+        [panel setAllowedContentTypes:@[]];
         return;
     }
 
@@ -111,7 +111,7 @@ void ProcessFilterString(const char* filter, NSPanel* panel)
             // Check if the trimmed extension is "*"
             if ([trimmedExtension isEqualToString:@"*"]) {
                 // Allow all files by setting a wildcard array
-                [panel setAllowedFileTypes:@[@"public.item"]];
+                [panel setAllowedContentTypes:@[@"public.item"]];
                 return;
             }
             
