@@ -225,7 +225,6 @@ public:
     void Resize(const unsigned int width, const unsigned int height = 0,
                 const unsigned int depth = 0);
     void AdjustSampleCount(const unsigned int samples);
-    void Invalidate();
     
     // Save
     // ----------------------------------------
@@ -235,6 +234,10 @@ private:
     // Destructor
     // ----------------------------------------
     void ReleaseFramebuffer();
+    
+    // Reset
+    // ----------------------------------------
+    void Invalidate();
 
     // Framebuffer variables
     // ----------------------------------------

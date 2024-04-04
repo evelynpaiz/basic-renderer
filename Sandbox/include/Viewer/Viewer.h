@@ -37,12 +37,16 @@ public:
     // ----------------------------------------
     /// @brief Set the interaction state inside this layer.
     /// @param e Enable/disable the interaction.
-    void EnableInteraction(const bool e) { m_Camera->Enable(e); }
+    void EnableInteraction(const bool e) { m_RenderContext->GetCamera()->Enable(e); }
     
 private:
     // Initialization
     // ----------------------------------------
     void InitializeViewer();
+    
+    void DefineFramebuffers();
+    void DefineMaterials();
+    void DefineSceneGeometry();
     
     // Events handler(s)
     // ----------------------------------------
@@ -51,15 +55,8 @@ private:
     // Viewer layer variables
     // ----------------------------------------
 private:
-    ///< Size of the viewport.
-    int m_ViewportWidth = 0;
-    int m_ViewportHeight = 0;
-    
-    ///< Framebufer(s) library.
-    std::unordered_map<std::string, std::shared_ptr<FrameBuffer>> m_Framebuffers;
-    
-    ///< Camera.
-    std::shared_ptr<PerspectiveCamera> m_Camera;
+    ///< Context of rendering.
+    std::unique_ptr<RenderContext> m_RenderContext;
     
     ///< Environment along with its light source.
     std::shared_ptr<EnvironmentLight> m_Environment;
@@ -67,10 +64,6 @@ private:
     ///< Model(s).
     Model<GeoVertexData<glm::vec4, glm::vec2, glm::vec3>> m_Cube;
     Model<GeoVertexData<glm::vec4, glm::vec3>> m_Plane;
-    Model<GeoVertexData<glm::vec4, glm::vec2>> m_Screen;
-    
-    ///< Material(s) library.
-    std::unordered_map<std::string, std::shared_ptr<Material>> m_Materials;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

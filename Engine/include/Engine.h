@@ -73,3 +73,11 @@
 #include "Renderer/Camera/OrthographicCamera.h"
 
 #include "Renderer/Renderer.h"
+
+// --------------------------------------------
+// Rendering Context & Scene
+// --------------------------------------------
+#include "Scene/Scene.h"
+
+#include "Context/Viewport.h"
+#include "Context/RenderContext.h"
