@@ -38,6 +38,7 @@ public:
         m_ShadowCamera = shadowCamera;
         
         UpdateShadowCamera();
+        InitShadowMapBuffer(width, height);
     }
     /// @brief Destructor for the directional light.
     ~DirectionalLight() override = default;

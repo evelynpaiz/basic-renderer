@@ -42,6 +42,7 @@ public:
         shadowCamera->SetPosition(position);
         shadowCamera->SetFieldOfView(angle);
         m_ShadowCamera = shadowCamera;
+        InitShadowMapBuffer(width, height);
         
         // Define the 3D model for the positional light
         std::shared_ptr<SimpleColorMaterial> material = std::make_shared<SimpleColorMaterial>();

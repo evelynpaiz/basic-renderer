@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Renderer/Shader/Shader.h"
+#include "Renderer/Material/Material.h"
 #include "Renderer/Buffer/FrameBuffer.h"
 
 #include "Renderer/Light/ShadowCamera.h"
@@ -60,7 +61,18 @@ public:
     
     /// @brief Get the camera used for shadow mapping to generate depth maps for shadow calculations.
     /// @return The viewpoint of the light source.
-    const std::shared_ptr<Camera>& GetShadowCamera() { return m_ShadowCamera; }
+    const std::shared_ptr<Camera>& GetShadowCamera() const { return m_ShadowCamera; }
+    /// @brief Get the framebuffer with the rendered shadow map.
+    /// @return The shadow map framebuffer.
+    const std::shared_ptr<FrameBuffer>& GetFramebuffer() const { return m_Framebuffer; }
+    /// @brief Get the shading material for shadow mapping.
+    /// @return The material for shadow mapping.
+    const std::shared_ptr<Material>& GetDepthMaterial() const
+    {
+        static std::shared_ptr<Material> material =
+            std::make_shared<Material>("Resources/shaders/depth/DepthMap.glsl");
+        return material;
+    }
     
     // Properties
     // ----------------------------------------
@@ -116,6 +128,16 @@ protected:
           const glm::vec3 &color = glm::vec3(1.0f))
         : m_Vector(vector), m_Color(color)
     {};
+    /// @brief Initialize the shadow map framebuffer.
+    /// @param width Framebuffer's width.
+    /// @param height Framebuffer's height.
+    void InitShadowMapBuffer(int width, int height)
+    {
+        FrameBufferSpecification spec;
+        spec.SetFrameBufferSize(width, height);
+        spec.AttachmentsSpec = { TextureFormat::DEPTH24 };
+        m_Framebuffer = std::make_shared<FrameBuffer>(spec);
+    }
     
 protected:
     // Light variables
@@ -134,6 +156,8 @@ protected:
     
     ///< The light viewpoint (used for rendering shadows).
     std::shared_ptr<Camera> m_ShadowCamera;
+    ///< Framebuffer to render into the shadow map.
+    std::shared_ptr<FrameBuffer> m_Framebuffer;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

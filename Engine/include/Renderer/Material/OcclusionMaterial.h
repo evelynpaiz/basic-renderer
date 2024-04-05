@@ -2,6 +2,7 @@
 
 #include "Renderer/Material/Material.h"
 #include "Renderer/Texture/Texture.h"
+#include "Renderer/Camera/Camera.h"
 
 #include <random>
 

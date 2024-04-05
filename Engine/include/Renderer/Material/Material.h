@@ -2,7 +2,6 @@
 
 #include "Renderer/Shader/Shader.h"
 #include "Renderer/Texture/Texture.h"
-#include "Renderer/Light/Light.h"
 
 namespace utils { namespace Texturing {
 

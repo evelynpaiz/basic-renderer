@@ -44,7 +44,6 @@ private:
     // ----------------------------------------
     void InitializeViewer();
     
-    void DefineFramebuffers();
     void DefineMaterials();
     void DefineSceneGeometry();
     

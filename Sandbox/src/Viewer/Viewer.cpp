@@ -34,11 +34,11 @@ void Viewer::OnUpdate(Timestep ts)
     Renderer::SetFaceCulling(FaceCulling::Front);
     
     // Render into the lights framebuffer
-    auto shadowFramebuffer = m_RenderContext->GetFramebuffer("Shadow");
+    const auto& shadowFramebuffer = m_Environment->GetLightSource()->GetFramebuffer();
     shadowFramebuffer->Bind();
     Renderer::Clear(shadowFramebuffer->GetActiveBuffers());
     
-    auto depthMaterial = m_RenderContext->GetMaterial("Depth");
+    const auto& depthMaterial = m_Environment->GetLightSource()->GetDepthMaterial();
     m_Cube.SetMaterial(depthMaterial);
     m_Cube.DrawModel();
     m_Plane.SetMaterial(depthMaterial);
@@ -54,7 +54,7 @@ void Viewer::OnUpdate(Timestep ts)
     Renderer::BeginScene(m_RenderContext->GetCamera());
     
     // Render into the framebuffer
-    auto viewportFramebuffer = m_RenderContext->GetViewport()->GetFramebuffer();
+    const auto& viewportFramebuffer = m_RenderContext->GetViewport()->GetFramebuffer();
     viewportFramebuffer->Bind();
     
     Renderer::Clear(glm::vec4(0.93f, 0.93f, 0.93f, 1.0f), viewportFramebuffer->GetActiveBuffers());
@@ -110,9 +110,6 @@ void Viewer::InitializeViewer()
     // Update the position of the rendering camera
     m_RenderContext->GetCamera()->SetPosition(glm::vec3(0.0f, 0.0f, 10.0f));
     
-    // Define the framebuffer(s) to render into
-    DefineFramebuffers();
-    
     // Define the material(s) to be used for shading
     DefineMaterials();
     
@@ -121,31 +118,15 @@ void Viewer::InitializeViewer()
 }
 
 /**
- * Defines the framebuffers used in the rendering process.
- */
-void Viewer::DefineFramebuffers()
-{
-    int viewportWidth = m_RenderContext->GetViewport()->GetWidth();
-    int viewportHeight = m_RenderContext->GetViewport()->GetHeight();
-    
-    FrameBufferSpecification shadowSpec;
-    shadowSpec.SetFrameBufferSize(viewportWidth, viewportHeight);
-    shadowSpec.AttachmentsSpec = { TextureFormat::DEPTH24 };
-    m_RenderContext->CreateFrameBuffer("Shadow", shadowSpec);
-}
-
-/**
  * Defines the materials used in the rendering process.
  */
 void Viewer::DefineMaterials()
 {
-    auto depthMaterial = m_RenderContext->CreateMaterial<Material>("Depth", "Resources/shaders/depth/DepthMap.glsl");
-    
     auto cubeMaterial = m_RenderContext->CreateMaterial<PhongTextureMaterial>("PhongTexture", m_Environment,
         "Resources/shaders/phong/PhongTextureShadow.glsl");
     cubeMaterial->SetDiffuseMap(std::make_shared<Texture2DResource>("Resources/textures/diffuse.jpeg"));
     cubeMaterial->SetSpecularMap(std::make_shared<Texture2DResource>("Resources/textures/specular.jpeg"));
-    cubeMaterial->SetShadowMap(m_RenderContext->GetFramebuffer("Shadow")->GetDepthAttachment());
+    cubeMaterial->SetShadowMap(m_Environment->GetLightSource()->GetFramebuffer()->GetDepthAttachment());
     cubeMaterial->SetShininess(32.0f);
     
     auto planeMaterial = m_RenderContext->CreateMaterial<PhongColorMaterial>("PhongColor", m_Environment,
@@ -153,7 +134,7 @@ void Viewer::DefineMaterials()
     planeMaterial->SetAmbientColor(glm::vec3(0.8f, 0.2f, 0.4f));
     planeMaterial->SetDiffuseColor(glm::vec3(0.8f, 0.2f, 0.4f));
     planeMaterial->SetSpecularColor(glm::vec3(1.0f));
-    planeMaterial->SetShadowMap(m_RenderContext->GetFramebuffer("Shadow")->GetDepthAttachment());
+    planeMaterial->SetShadowMap(m_Environment->GetLightSource()->GetFramebuffer()->GetDepthAttachment());
     planeMaterial->SetShininess(100.0f);
 }
 
