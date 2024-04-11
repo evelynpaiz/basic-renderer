@@ -44,7 +44,7 @@ public:
     // ----------------------------------------
     /// @brief Get the name of the layer.
     /// @return Name of the layer.
-    const std::string& GetName() const { return m_LayerName; }
+    std::string GetName() const { return m_LayerName; }
     
     // Layer variables
     // ----------------------------------------

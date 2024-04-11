@@ -44,6 +44,7 @@ class Shader
 public:
     // Constructor(s)/Destructor
     // ----------------------------------------
+    Shader(const std::string& name, const std::filesystem::path& filePath);
     Shader(const std::filesystem::path& filePath);
     ~Shader();
     
@@ -54,6 +55,10 @@ public:
     
     // Getter(s)
     // ----------------------------------------
+    /// @brief Get the name that identifies the shader.
+    /// @return The shader's name.
+    const std::string& GetName() const { return m_Name; }
+    
     int GetUniformLocation(const std::string& name);
     
     // Setter(s)
@@ -85,6 +90,8 @@ private:
     // Shader variables
     // ----------------------------------------
 private:
+    ///< Name of the shader.
+    std::string m_Name;
     ///< File path of shader source program.
     std::filesystem::path m_FilePath;
     ///< ID of the shader program.
@@ -100,4 +107,48 @@ public:
 
     Shader& operator=(const Shader&) = delete;
     Shader& operator=(Shader&&) = delete;
+};
+
+/**
+ * @brief Represents a library of shader programs.
+ *
+ * The `ShaderLibrary` class manages a collection of shader programs. It provides
+ * functionality to add, load, retrieve, and check for the existence of shaders within
+ * the library.
+ *
+ * Shaders can be added to the library individually using the `Add` method or loaded
+ * from file paths using the `Load` methods. Shaders in the library are associated with
+ * unique names.
+ *
+ * Once added or loaded, shaders can be retrieved from the library using their names
+ * with the `Get` method. The existence of a shader with a given name can be checked
+ * using the `Exists` method.
+ */
+class ShaderLibrary
+{
+public:
+    // Constructor/Destructor
+    // ----------------------------------------
+    /// @brief Create a new shader library.
+    ShaderLibrary() = default;
+    /// @brief Delete the shader library.
+    ~ShaderLibrary() = default;
+    
+    // Add/Load
+    // ----------------------------------------
+    void Add(const std::shared_ptr<Shader>& shader);
+    std::shared_ptr<Shader> Load(const std::filesystem::path& filePath);
+    std::shared_ptr<Shader> Load(const std::string& name,
+                                 const std::filesystem::path& filePath);
+    
+    // Getter(s)
+    // ----------------------------------------
+    std::shared_ptr<Shader> Get(const std::string& name);
+    bool Exists(const std::string& name) const;
+    
+    // Shader library
+    // ----------------------------------------
+private:
+    ///< A map of shader names to their corresponding shader program.
+    std::unordered_map<std::string, std::shared_ptr<Shader>> m_Shaders;
 };

@@ -48,9 +48,10 @@ public:
         std::shared_ptr<SimpleColorMaterial> material = std::make_shared<SimpleColorMaterial>();
         material->SetColor(glm::vec4(color, 1.0f));
         
-        m_Model = utils::Geometry::ModelSphere<GeoVertexData<glm::vec4>>(material);
-        m_Model.SetScale(glm::vec3(0.25f));
-        m_Model.SetPosition(position);
+        using VertexData = GeoVertexData<glm::vec4>;
+        m_Model = utils::Geometry::ModelSphere<VertexData>(material);
+        m_Model->SetScale(glm::vec3(0.25f));
+        m_Model->SetPosition(position);
     }
     
     /// @brief Destructor for the positional light.
@@ -63,7 +64,7 @@ public:
     void SetPosition(const glm::vec3& position) {
         m_Vector = glm::vec4(position, 1.0f);
         m_ShadowCamera->SetPosition(position);
-        m_Model.SetPosition(position);
+        m_Model->SetPosition(position);
     }
     
     // Getter(s)
@@ -71,16 +72,6 @@ public:
     /// @brief Get the light position (x, y, z).
     /// @return The light position coordinates.
     glm::vec3 GetPosition() const { return m_Vector; }
-    
-    /// @brief Get the light 3D model representing a positional light.
-    /// @return The light 3D model.
-    Model<GeoVertexData<glm::vec4>>& GetModel() {return m_Model; }
-    
-    // Light variables
-    // ----------------------------------------
-private:
-    ///< Light 3D model.
-    Model<GeoVertexData<glm::vec4>> m_Model;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

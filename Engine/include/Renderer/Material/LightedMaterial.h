@@ -22,24 +22,30 @@ public:
     // Constructor(s)/ Destructor
     // ----------------------------------------
     /// @brief Generate a (lighted) material with the specified shader file path.
-    /// @param environment The configuration of the environment light to be used for shading.
+    /// @param light The light source to be used for shading.
     /// @param filePath The file path to the shader used by the material.
-    LightedMaterial(const std::shared_ptr<EnvironmentLight>& environment,
+    LightedMaterial(const std::shared_ptr<Light>& light,
                     const std::filesystem::path& filePath)
-        : Material(filePath), m_Environment(environment)
-    {}
+        : Material(filePath)
+    {
+        SetLightSource(light);
+    }
     /// @brief Destructor for the (lighted) material.
     virtual ~LightedMaterial() = default;
     
     // Setter(s)
     // ----------------------------------------
     /// @brief Set the light source used for shading.
-    /// @param environment The configuration of the environment light.
-    void SetEnvironment(const std::shared_ptr<EnvironmentLight>& environment) { m_Environment = environment; }
+    /// @param light The light source.
+    void SetEnvironment(const std::shared_ptr<Light>& light) { m_Light = light; }
     
-    /// @brief Set the shadow map.
-    /// @param texture The texture representing the shadow map.
-    void SetShadowMap(const std::shared_ptr<Texture>& texture) { m_ShadowMap = texture; }
+    /// @brief Set the light source used for shading.
+    /// @param light The light source.
+    void SetLightSource(const std::shared_ptr<Light>& light)
+    {
+        m_Light = light;
+        m_ShadowMap = light->GetShadowMap();
+    }
     
     // Getter(s)
     // ----------------------------------------
@@ -57,14 +63,14 @@ protected:
         if (!m_ShadowMap)
             return;
         
-        m_Environment->GetLightSource()->DefineTranformProperties(m_Shader);
+        m_Light->DefineTranformProperties(m_Shader);
         utils::Texturing::SetTextureMap(m_Shader, "u_Light.ShadowMap", m_ShadowMap, m_Slot++);
     }
     /// @brief Set the material properties.
     void SetMaterialProperties() override
     {
         Material::SetMaterialProperties();
-        m_Environment->GetLightSource()->DefineLightProperties(m_Shader);
+        m_Light->DefineLightProperties(m_Shader);
         DefineShadowProperties();
     }
     
@@ -72,7 +78,7 @@ protected:
     // ----------------------------------------
 protected:
     ///< Light source.
-    std::shared_ptr<EnvironmentLight> m_Environment;
+    std::shared_ptr<Light> m_Light;
     
     ///< The light map.
     std::shared_ptr<Texture> m_ShadowMap;

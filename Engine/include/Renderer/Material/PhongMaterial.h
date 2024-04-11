@@ -229,11 +229,11 @@ public:
     // Constructor(s)/Destructor
     // ----------------------------------------
     /// @brief Generate a phong material object with the specified shader file path.
-    /// @param environment The configuration of the environment light to be used for shading.
+    /// @param light The light source to be used for shading.
     /// @param filePath The file path to the shader used by the material.
-    PhongColorMaterial(const std::shared_ptr<EnvironmentLight>& environment, const std::filesystem::path& filePath =
+    PhongColorMaterial(const std::shared_ptr<Light>& light, const std::filesystem::path& filePath =
                        std::filesystem::path("Resources/shaders/phong/PhongColor.glsl"))
-        : LightedMaterial(environment, filePath), PhongColor()
+        : LightedMaterial(light, filePath), PhongColor()
     {
         m_NormalMatrix = true;
         m_ViewDirection = true;
@@ -277,11 +277,11 @@ public:
     // Constructor(s)/Destructor
     // ----------------------------------------
     /// @brief Generate a phong material object with the specified shader file path.
-    /// @param environment The configuration of the environment light to be used for shading.
+    /// @param environment The light source to be used for shading.
     /// @param filePath The file path to the shader used by the material.
-    PhongTextureMaterial(const std::shared_ptr<EnvironmentLight>& environment, const std::filesystem::path& filePath =
+    PhongTextureMaterial(const std::shared_ptr<Light>& light, const std::filesystem::path& filePath =
                          std::filesystem::path("Resources/shaders/phong/PhongTexture.glsl"))
-        : LightedMaterial(environment, filePath), PhongTexture()
+        : LightedMaterial(light, filePath), PhongTexture()
     {
         m_NormalMatrix = true;
         m_ViewDirection = true;

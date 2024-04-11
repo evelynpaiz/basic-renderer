@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/Library.h"
 #include "Renderer/Mesh/Mesh.h"
 
 #include <glm/glm.hpp>
@@ -19,52 +20,37 @@ struct BBox
 };
 
 /**
- * Represents a model used for rendering geometry.
+ * Represents a basic model used for rendering geometry.
  *
- * The `Model` class serves as a base class for defining models and provides functionality for loading and rendering
- * meshes that make up the model. It encapsulates the necessary information, such as the file path and a collection of
- * meshes, required to load and render a model.
- *
- * @tparam VertexData The type of vertex data used by the meshes in the model.
+ * The `BaseModel` class provides functionality for drawing the model with a specified transformation
+ * matrix and primitive type. It encapsulates information about the model's position, rotation, scale,
+ * model matrix, and up axis direction. Derived classes must implement protected virtual methods
+ * for updating the model matrix.
  */
-template<typename VertexData>
-class Model
+class BaseModel
 {
 public:
-    // Constructor(s)/Destructor
+    // Destructor
     // ----------------------------------------
-    /// @brief Define a model.
-    Model() = default;
-    /// @brief Define with a specific mesh.
-    Model(const Mesh<VertexData>& mesh) { m_Meshes.push_back(mesh); }
-    /// @brief Delete the model.
-    virtual ~Model() = default;
+    /// @brief Delete the base model.
+    virtual ~BaseModel() = default;
     
     // Render
     // ----------------------------------------
     /// @brief Draw the model using the specified transformation matrix.
     /// @param transform The transformation matrix for the model.
     /// @param primitive The type of primitive to be drawn (e.g., Points, Lines, Triangles).
-    void DrawModelWithTransform(const glm::mat4 &transform = glm::mat4(1.0f),
-                                const PrimitiveType &primitive = PrimitiveType::Triangles)
-    {
-        for(unsigned int i = 0; i < m_Meshes.size(); i++)
-            m_Meshes[i].DrawMesh(transform, primitive);
-    }
+    virtual void DrawModelWithTransform(const glm::mat4 &transform = glm::mat4(1.0f)) = 0;
     /// @brief Draw the model using the model matrix transformation.
     /// @param primitive The type of primitive to be drawn (e.g., Points, Lines, Triangles).
-    void DrawModel(const PrimitiveType &primitive = PrimitiveType::Triangles)
+    void DrawModel()
     {
         UpdateModelMatrix();
-        DrawModelWithTransform(m_ModelMatrix, primitive);
+        DrawModelWithTransform(m_ModelMatrix);
     }
     
     // Getter(s)
     // ----------------------------------------
-    /// @brief Get the number of meshes representing the model.
-    /// @return The number of meshes.
-    int GetMeshNumber() const { return (int)m_Meshes.size(); }
-    
     /// @brief Get the model position (x, y, z).
     /// @return The model position coordinates.
     const glm::vec3& GetPosition() const { return m_Position; }
@@ -78,6 +64,10 @@ public:
     
     // Setter(s)
     // ----------------------------------------
+    /// @brief Sets the material for all the meshes in the model.
+    /// @param material The material defining the surface of the meshes.
+    virtual void SetMaterial(const std::shared_ptr<Material>& material) = 0;
+    
     /// @brief Change the model position (x, y, z).
     /// @param position The model center position.
     void SetPosition(const glm::vec3 &position)
@@ -107,9 +97,126 @@ public:
         UpdateModelMatrix();
     }
     
+protected:
+    // Constructor(s)
+    // ----------------------------------------
+    /// @brief Define a base model.
+    /// @param primitives The type of the primitive that defines the model.
+    BaseModel(const PrimitiveType &primitive)
+        : m_Primitive(primitive)
+    {}
+    
+    // Transformation matrices
+    // ----------------------------------------
+    virtual void UpdateModelMatrix() = 0;
+    
+    // Model variables
+    // ----------------------------------------
+protected:
+    ///< Model position (x, y, z).
+    glm::vec3 m_Position = glm::vec3(0.0f);
+    /// Model orientation (yaw, pitch and roll angles).
+    glm::vec3 m_Rotation = glm::vec3(0.0f);
+    ///< Model scale factor.
+    glm::vec3 m_Scale = glm::vec3(1.0f);
+    
+    ///< Model matrix.
+    glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
+    ///< Model up axis direction.
+    glm::vec3 m_UpAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+    
+    ///< Primitive type defined for the model.
+    PrimitiveType m_Primitive;
+    
+    // Disable the copying or moving of this resource
+    // ----------------------------------------
+public:
+    BaseModel(const BaseModel&) = delete;
+    BaseModel(BaseModel&&) = delete;
+
+    BaseModel& operator=(const BaseModel&) = delete;
+    BaseModel& operator=(BaseModel&&) = delete;
+};
+
+/**
+ * A library for managing models used in rendering.
+ *
+ * The `ModelLibrary` class provides functionality to add, load, retrieve, and check
+ * for the existence of models within the library. Each model is associated with
+ * a unique name.
+ */
+class ModelLibrary : public Library<std::shared_ptr<BaseModel>>
+{
+public:
+    /// @brief Loads a model and adds it to the library.
+    /// @tparam Type The type of object to load.
+    /// @tparam Args The types of arguments to forward to the object constructor.
+    /// @param name The name to associate with the loaded object.
+    /// @param args The arguments to forward to the object constructor.
+    /// @return The model created.
+    template<typename Type, typename... Args>
+    std::shared_ptr<Type> Create(const std::string& name, Args&&... args)
+    {
+        auto model = std::make_shared<Type>(std::forward<Args>(args)...);
+        CORE_ASSERT(std::dynamic_pointer_cast<BaseModel>(model),
+                    "Object '{0}' is not of the specified type!", name);
+        Add(name, model);
+        return model;
+    }
+};
+
+/**
+ * Represents a model used for rendering geometry.
+ *
+ * The `Model` class inherits from the `BaseModel` class and provides additional
+ * functionality specific to defining models. It encapsulates information required to and render
+ * a model, such as a collection of meshes.
+ *
+ * @tparam VertexData The type of vertex data used by the meshes in the model.
+ */
+template<typename VertexData>
+class Model : public BaseModel
+{
+public:
+    // Constructor(s)/Destructor
+    // ----------------------------------------
+    /// @brief Define a model.
+    /// @param primitive The primitive type of the model.
+    Model(const PrimitiveType &primitive = PrimitiveType::Triangles) : BaseModel(primitive) {};
+    /// @brief Define with a specific mesh.
+    /// @param mesh The set of meshes defining the model.
+    /// @param primitive The primitive type of the model.
+    Model(const Mesh<VertexData>& mesh,
+          const PrimitiveType &primitive = PrimitiveType::Triangles)
+    : BaseModel(primitive)
+    {
+        m_Meshes.push_back(mesh);
+    }
+    /// @brief Delete the model.
+    virtual ~Model() = default;
+    
+    // Render
+    // ----------------------------------------
+    /// @brief Draw the model using the specified transformation matrix.
+    /// @param transform The transformation matrix for the model.
+    /// @param primitive The type of primitive to be drawn (e.g., Points, Lines, Triangles).
+    void DrawModelWithTransform(const glm::mat4 &transform = glm::mat4(1.0f)) override
+    {
+        for(unsigned int i = 0; i < m_Meshes.size(); i++)
+            m_Meshes[i].DrawMesh(transform, m_Primitive);
+    }
+    
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Get the number of meshes representing the model.
+    /// @return The number of meshes.
+    int GetMeshNumber() const { return (int)m_Meshes.size(); }
+    
+    // Setter(s)
+    // ----------------------------------------
     /// @brief Sets the material for all the meshes in the model.
     /// @param material The material defining the surface of the meshes.
-    void SetMaterial(const std::shared_ptr<Material>& material)
+    void SetMaterial(const std::shared_ptr<Material>& material) override
     {
         for(unsigned int i = 0; i < m_Meshes.size(); i++)
             m_Meshes[i].SetMaterial(material);
@@ -130,7 +237,7 @@ protected:
     
     // Transformation matrices
     // ----------------------------------------
-    virtual void UpdateModelMatrix();
+    void UpdateModelMatrix() override;
     
     // Model variables
     // ----------------------------------------
@@ -140,20 +247,25 @@ protected:
     ///< Set of meshes defining the model.
     std::vector<Mesh<VertexData>> m_Meshes;
     
-    ///< Model position (x, y, z).
-    glm::vec3 m_Position = glm::vec3(0.0f);
-    /// Model orientation (yaw, pitch and roll angles).
-    glm::vec3 m_Rotation = glm::vec3(0.0f);
-    ///< Model scale factor.
-    glm::vec3 m_Scale = glm::vec3(1.0f);
-    
-    ///< Model matrix.
-    glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
-    ///< Model up axis direction.
-    glm::vec3 m_UpAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+    // Disable the copying or moving of this resource
+    // ----------------------------------------
+public:
+    Model(const Model&) = delete;
+    Model(Model&&) = delete;
+
+    Model& operator=(const Model&) = delete;
+    Model& operator=(Model&&) = delete;
 };
 
-
+/**
+ * Represents a model loaded from a file.
+ *
+ * The `LoadedModel` class inherits from the Model class and adds functionality specific to 
+ * loading models from a file. It encapsulates methods for loading meshes and associated data
+ * from a file and populating the model with the loaded data.
+ *
+ * @tparam VertexData The type of vertex data used by the meshes in the model.
+ */
 template<typename VertexData>
 class LoadedModel : public Model<VertexData>
 {
@@ -167,10 +279,7 @@ public:
     // ----------------------------------------
     /// @brief Load the model from the specified file path.
     /// @param filePath The path to the model file.
-    virtual void LoadModel(const std::filesystem::path& filePath)
-    {
-        m_FilePath = filePath;
-    }
+    virtual void LoadModel(const std::filesystem::path& filePath) = 0;
     
     // Getter(s)
     // ----------------------------------------
@@ -185,21 +294,28 @@ public:
     std::string GetDirectory() { return m_FilePath.parent_path().string(); }
     
 protected:
-    /// @brief Define a model.
-    LoadedModel() : Model<VertexData>() {}
     /// @brief Define a model from a file source.
     /// @param filePath The path to the model file.
-    LoadedModel(const std::filesystem::path& filePath)
-    : Model<VertexData>()
-    {
-        LoadModel(filePath);
-    }
+    /// @param primitive The primitive type of the model.
+    LoadedModel(const std::filesystem::path& filePath,
+                const PrimitiveType &primitive)
+        : m_FilePath(filePath), Model<VertexData>(primitive)
+    {}
     
     // Model variables
     // ----------------------------------------
 protected:
     ///< Path to the file.
     std::filesystem::path m_FilePath;
+    
+    // Disable the copying or moving of this resource
+    // ----------------------------------------
+public:
+    LoadedModel(const LoadedModel&) = delete;
+    LoadedModel(LoadedModel&&) = delete;
+
+    LoadedModel& operator=(const LoadedModel&) = delete;
+    LoadedModel& operator=(LoadedModel&&) = delete;
 };
 
 /**

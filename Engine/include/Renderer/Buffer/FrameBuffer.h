@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/Library.h"
 #include "Renderer/Texture/TextureUtils.h"
 #include "Renderer/Texture/Texture.h"
 
@@ -144,7 +145,7 @@ public:
     /// @brief Get a specific framebuffer color attachment.
     /// @param index Color attachment index.
     /// @return The color attachment (texture reference).
-    std::shared_ptr<Texture>& GetColorAttachment(const unsigned int index)
+    const std::shared_ptr<Texture>& GetColorAttachment(const unsigned int index) const
     {
         CORE_ASSERT(index >= 0 && index < m_ColorAttachments.size(),
                     "Trying to get color attachment out of scope!");
@@ -152,7 +153,7 @@ public:
     }
     /// @brief Get the framebuffer depth attachment.
     /// @return The depth attachment (texture reference).
-    std::shared_ptr<Texture>& GetDepthAttachment() { return m_DepthAttachment; }
+    const std::shared_ptr<Texture>& GetDepthAttachment() const { return m_DepthAttachment; }
     
     /// @brief Get the active buffers in this framebuffer.
     /// @return The state of the color, depth and stencil buffers.
@@ -268,4 +269,29 @@ public:
 
     FrameBuffer& operator=(const FrameBuffer&) = delete;
     FrameBuffer& operator=(FrameBuffer&&) = delete;
+};
+
+/**
+ * A library for managing framebuffers used in rendering.
+ *
+ * The `FrameBufferLibrary` class provides functionality to add, create, retrieve, and check for
+ * the existence of framebuffers within the library. Framebuffers can be associated with unique names
+ * for easy access.
+ */
+class FrameBufferLibrary : public Library<std::shared_ptr<FrameBuffer>>
+{
+public:
+    /// @brief Loads a framebuffer and adds it to the library.
+    /// @tparam Type The type of object to load.
+    /// @tparam Args The types of arguments to forward to the object constructor.
+    /// @param name The name to associate with the loaded object.
+    /// @param args The arguments to forward to the object constructor.
+    /// @return The framebuffer created.
+    std::shared_ptr<FrameBuffer> Create(const std::string& name,
+                                        FrameBufferSpecification spec)
+    {
+        auto framebuffer = std::make_shared<FrameBuffer>(spec);
+        Add(name, framebuffer);
+        return framebuffer;
+    }
 };

@@ -5,11 +5,60 @@
 #include "Renderer/Buffer/FrameBuffer.h"
 
 #include "Renderer/Light/ShadowCamera.h"
+#include "Renderer/Model/Model.h"
 
 #include <glm/glm.hpp>
 
 /**
- * Base class for light sources used in 3D rendering.
+ * Base class for light.
+ *
+ * Copying or moving `BaseLight` objects is disabled to ensure single ownership and prevent unintended
+ * duplication of light resources.
+ */
+class BaseLight
+{
+public:
+    // Destructor
+    // ----------------------------------------
+    /// @brief Delete the base light.
+    virtual ~BaseLight() = default;
+    
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Get the light 3D model representing the light.
+    /// @return The light 3D model.
+    virtual const std::shared_ptr<BaseModel>& GetModel() { return m_Model; }
+    
+protected:
+    // Constructor(s)
+    // ----------------------------------------
+    /// @brief Define a base light.
+    BaseLight()
+    {
+        // Define the depth material if it has not been define yet
+        auto& library = Renderer::GetMaterialLibrary();
+        if (!library.Exists("Depth"))
+            library.Create<Material>("Depth", "Resources/shaders/depth/DepthMap.glsl");
+    }
+    
+    // Light variables
+    // ----------------------------------------
+protected:
+    ///< Light model (visible in the scene).
+    std::shared_ptr<BaseModel> m_Model;
+    
+    // Disable the copying or moving of this resource
+    // ----------------------------------------
+public:
+    BaseLight(const BaseLight&) = delete;
+    BaseLight(BaseLight&&) = delete;
+
+    BaseLight& operator=(const BaseLight&) = delete;
+    BaseLight& operator=(BaseLight&&) = delete;
+};
+
+/**
+ * Base class for light sources used in a scene.
  *
  * The `Light` class serves as a base class for defining different types of light sources used in 3D
  * rendering. It provides common functionality for defining and retrieving the color of the light source.
@@ -19,7 +68,7 @@
  * Copying or moving `Light` objects is disabled to ensure single ownership and prevent unintended
  * duplication of light resources.
  */
-class Light
+class Light : public BaseLight
 {
 public:
     // Destructor
@@ -59,20 +108,19 @@ public:
     /// @return The specular strength of the light source.
     float GetSpecularStrength() const { return m_SpecularStrength; }
     
+    /// @brief Get the texture containing the shadow map of the light source.
+    /// @return The shadow map.
+    const std::shared_ptr<Texture>& GetShadowMap() const
+    {
+        return m_Framebuffer->GetDepthAttachment();
+    }
+    
     /// @brief Get the camera used for shadow mapping to generate depth maps for shadow calculations.
     /// @return The viewpoint of the light source.
     const std::shared_ptr<Camera>& GetShadowCamera() const { return m_ShadowCamera; }
     /// @brief Get the framebuffer with the rendered shadow map.
     /// @return The shadow map framebuffer.
-    const std::shared_ptr<FrameBuffer>& GetFramebuffer() const { return m_Framebuffer; }
-    /// @brief Get the shading material for shadow mapping.
-    /// @return The material for shadow mapping.
-    const std::shared_ptr<Material>& GetDepthMaterial() const
-    {
-        static std::shared_ptr<Material> material =
-            std::make_shared<Material>("Resources/shaders/depth/DepthMap.glsl");
-        return material;
-    }
+    const std::shared_ptr<FrameBuffer>&  GetFramebuffer() const { return m_Framebuffer; }
     
     // Properties
     // ----------------------------------------
@@ -126,7 +174,7 @@ protected:
     /// @param color The color of the light source.
     Light(const glm::vec4 &vector,
           const glm::vec3 &color = glm::vec3(1.0f))
-        : m_Vector(vector), m_Color(color)
+        : BaseLight(), m_Vector(vector), m_Color(color)
     {};
     /// @brief Initialize the shadow map framebuffer.
     /// @param width Framebuffer's width.

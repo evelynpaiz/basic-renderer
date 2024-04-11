@@ -6,15 +6,6 @@
 #include <assimp/postprocess.h>
 
 /**
- * Generate a model by loading it with the ASSIMP library.
- *
- * @param filePath The path to the model file.
- */
-AssimpModel::AssimpModel(const std::filesystem::path& filePath)
-    : LoadedModel<AssimpVertexData>(filePath)
-{}
-
-/**
  * Load the model from the specified file path.
  *
  * @param filePath The path to the model file.

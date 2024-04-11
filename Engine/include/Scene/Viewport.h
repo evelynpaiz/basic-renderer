@@ -35,8 +35,9 @@ public:
         m_Material->SetTextureMap(m_Framebuffer->GetColorAttachment(0));
         
         // Create the geometric model of the viewport
-        m_Geometry = utils::Geometry::ModelPlane<GeoVertexData<glm::vec4, glm::vec2>>();
-        m_Geometry.SetScale(glm::vec3(2.0f));
+        using VertexData = GeoVertexData<glm::vec4, glm::vec2>;
+        m_Geometry = utils::Geometry::ModelPlane<VertexData>();
+        m_Geometry->SetScale(glm::vec3(2.0f));
     }
     /// @brief Delete the viewport.
     ~Viewport() = default;
@@ -82,8 +83,8 @@ public:
         Renderer::BeginScene();
         Renderer::SetViewport(0, 0, m_Width, m_Height);
         Renderer::Clear();
-        m_Geometry.SetMaterial(m_Material);
-        m_Geometry.DrawModel();
+        m_Geometry->SetMaterial(m_Material);
+        m_Geometry->DrawModel();
         Renderer::EndScene();
     }
     /// @brief Render the viewport geometry into a framebuffer.
@@ -96,8 +97,8 @@ public:
         
         Renderer::BeginScene();
         Renderer::Clear(framebuffer->GetActiveBuffers());
-        m_Geometry.SetMaterial(material);
-        m_Geometry.DrawModel();
+        m_Geometry->SetMaterial(material);
+        m_Geometry->DrawModel();
         Renderer::EndScene();
         
         framebuffer->Unbind();
@@ -111,10 +112,15 @@ private:
     ///< Height of the viewport.
     int m_Height;
     ///< 3D geometry of the viewport.
-    Model<GeoVertexData<glm::vec4, glm::vec2>> m_Geometry;
+    std::shared_ptr<BaseModel> m_Geometry;
     
     ///< Framebuffer to render into.
     std::shared_ptr<FrameBuffer> m_Framebuffer;
     ///< Material to be used to display the framebuffer.
     std::shared_ptr<SimpleTextureMaterial> m_Material;
+    
+    // Friend classes
+    // ----------------------------------------
+public:
+    friend class Scene;
 };

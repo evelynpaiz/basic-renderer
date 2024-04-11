@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/Library.h"
 #include "Renderer/Shader/Shader.h"
 #include "Renderer/Texture/Texture.h"
 
@@ -45,8 +46,13 @@ public:
     /// @brief Generate a material with the specified shader file path.
     /// @param filePath The file path to the shader used by the material.
     Material(const std::filesystem::path& filePath)
-        : m_Shader(std::make_shared<Shader>(filePath))
-    {}
+    {
+        // Define the shader for the material
+        std::string name = filePath.stem();
+        auto shader = s_ShaderLibrary->Exists(name) ?
+            s_ShaderLibrary->Get(name) : s_ShaderLibrary->Load(name, filePath);
+        m_Shader = shader;
+    }
     /// @brief Destructor for the material.
     virtual ~Material() = default;
     
@@ -65,7 +71,7 @@ public:
     // ----------------------------------------
     /// @brief Return the shader associated with the material.
     /// @return shader program.
-    std::shared_ptr<Shader>& GetShader() { return m_Shader; }
+    std::shared_ptr<Shader> GetShader() { return m_Shader; }
     /// @brief Defines if the viewing direction should be defined in the shader.
     /// @return `true` if the view direction should be defined.
     bool IsViewDirectionDefined() const { return m_ViewDirection; }
@@ -103,6 +109,9 @@ protected:
     ///< View direction should be defined in the shader.
     bool m_ViewDirection = false;
     
+    ///< Library containing all shader that have been loaded.
+    static inline std::unique_ptr<ShaderLibrary> s_ShaderLibrary = std::make_unique<ShaderLibrary>();
+    
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
@@ -111,4 +120,31 @@ public:
 
     Material& operator=(const Material&) = delete;
     Material& operator=(Material&&) = delete;
+};
+
+/**
+ * A library for managing materials used in rendering.
+ *
+ * The `MaterialLibrary` class provides functionality to add, load, retrieve, and check
+ * for the existence of materials within the library. Each material is associated with
+ * a unique name.
+ */
+class MaterialLibrary : public Library<std::shared_ptr<Material>>
+{
+public:
+    /// @brief Loads a material and adds it to the library.
+    /// @tparam Type The type of object to load.
+    /// @tparam Args The types of arguments to forward to the object constructor.
+    /// @param name The name to associate with the loaded object.
+    /// @param args The arguments to forward to the object constructor.
+    /// @return The material created.
+    template<typename Type, typename... Args>
+    std::shared_ptr<Type> Create(const std::string& name, Args&&... args)
+    {
+        auto material = std::make_shared<Type>(std::forward<Args>(args)...);
+        CORE_ASSERT(std::dynamic_pointer_cast<Material>(material),
+                    "Object '{0}' is not of the specified type!", name);
+        Add(name, material);
+        return material;
+    }
 };

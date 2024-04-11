@@ -86,8 +86,9 @@ inline BufferLayout BufferLayoutGeometry(std::vector<GeoVertexData<glm::vec4, gl
  * @return The generated model with the specified geometry and material.
  */
 template<typename VertexData>
-inline Model<VertexData> GenerateModel(void (*DefineGeometry)(std::vector<VertexData>&, std::vector<unsigned int>&),
-                                       const std::shared_ptr<Material>& material)
+inline std::shared_ptr<Model<VertexData>>
+    GenerateModel(void (*DefineGeometry)(std::vector<VertexData>&,std::vector<unsigned int>&),
+                  const std::shared_ptr<Material>& material)
 {
     std::vector<VertexData> vertices;
     std::vector<unsigned int> indices;
@@ -101,7 +102,7 @@ inline Model<VertexData> GenerateModel(void (*DefineGeometry)(std::vector<Vertex
     if (material)
         mesh.SetMaterial(material);
     
-    return Model<VertexData>(mesh);
+    return std::make_shared<Model<VertexData>>(mesh);
 }
 
 /**
@@ -114,7 +115,8 @@ inline Model<VertexData> GenerateModel(void (*DefineGeometry)(std::vector<Vertex
  * @return The generated model for the plane with the specified material.
  */
 template<typename VertexData>
-inline Model<VertexData> ModelPlane(const std::shared_ptr<Material>& material = nullptr)
+inline std::shared_ptr<Model<VertexData>>
+    ModelPlane(const std::shared_ptr<Material>& material = nullptr)
 {
     return GenerateModel<VertexData>(utils::Geometry::DefinePlaneGeometry, material);
 }
@@ -129,7 +131,8 @@ inline Model<VertexData> ModelPlane(const std::shared_ptr<Material>& material = 
  * @return The generated model for the cube with the specified material.
  */
 template<typename VertexData>
-inline Model<VertexData> ModelCube(const std::shared_ptr<Material>& material = nullptr)
+inline std::shared_ptr<Model<VertexData>>
+    ModelCube(const std::shared_ptr<Material>& material = nullptr)
 {
     return GenerateModel<VertexData>(utils::Geometry::DefineCubeGeometry, material);
 }
@@ -147,7 +150,8 @@ inline Model<VertexData> ModelCube(const std::shared_ptr<Material>& material = n
  * @return The generated model for the sphere with the specified material.
  */
 template<typename VertexData>
-inline Model<VertexData> ModelSphere(const std::shared_ptr<Material>& material = nullptr)
+inline std::shared_ptr<Model<VertexData>>
+    ModelSphere(const std::shared_ptr<Material>& material = nullptr)
 {
     return GenerateModel<VertexData>(utils::Geometry::DefineSphereGeometry, material);
 }

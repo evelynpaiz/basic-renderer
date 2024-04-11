@@ -3,18 +3,32 @@
 
 #include <GL/glew.h>
 
+// ----------------------------------------
+// Shader
+// ----------------------------------------
+
+/**
+ * Generate a shader program.
+ *
+ * @param name The name for the shader.
+ * @param filePath Path to the source file.
+ */
+Shader::Shader(const std::string& name, const std::filesystem::path& filePath)
+    : m_Name(name), m_FilePath(filePath)
+{
+    ShaderProgramSource source = ParseShader(filePath);
+    m_ID = CreateShader(source.VertexSource, source.FragmentSource,
+                        source.GeometrySource);
+}
+
 /**
  * Generate a shader program.
  *
  * @param filePath Path to the source file.
  */
 Shader::Shader(const std::filesystem::path& filePath)
-    : m_FilePath(filePath)
-{
-    ShaderProgramSource source = ParseShader(filePath);
-    m_ID = CreateShader(source.VertexSource, source.FragmentSource, 
-                        source.GeometrySource);
-}
+    : Shader(filePath.stem(), filePath)
+{}
 
 /**
  * Delete the shader program.
@@ -323,4 +337,81 @@ std::string Shader::ReadFile(const std::filesystem::path& filePath)
     std::stringstream buffer;
     buffer << fileStream.rdbuf();
     return buffer.str();
+}
+
+// ----------------------------------------
+// Shader Library
+// ----------------------------------------
+
+/**
+ * Adds a shader to the library.
+ *
+ * @param shader The shader to add.
+ *
+ * @note If a shader with the same name already exists in the library,
+ *       an assertion failure will occur.
+ */
+void ShaderLibrary::Add(const std::shared_ptr<Shader> &shader)
+{
+    auto& name = shader->GetName();
+    CORE_ASSERT(!Exists(name), "Shader already exists!");
+    m_Shaders[name] = shader;
+}
+
+/**
+ * Loads a shader from a file and adds it to the library.
+ *
+ * @param filePath The path to the file containing the shader.
+ *
+ * @return The loaded shader.
+ */
+std::shared_ptr<Shader> ShaderLibrary::Load(const std::filesystem::path& filePath)
+{
+    auto shader = std::make_shared<Shader>(filePath);
+    Add(shader);
+    return shader;
+}
+
+/**
+ * Loads a shader from a file with a specified name and adds it to the library.
+ *
+ * @param name The name to associate with the loaded shader.
+ * @param filePath The path to the file containing the shader.
+ *
+ * @return The loaded shader.
+ */
+std::shared_ptr<Shader> ShaderLibrary::Load(const std::string& name,
+                                            const std::filesystem::path& filePath)
+{
+    auto shader = std::make_shared<Shader>(name, filePath);
+    Add(shader);
+    return shader;
+}
+
+/**
+ * Retrieves a shader from the library by its name.
+ *
+ * @param name The name of the shader to retrieve.
+ *
+ * @return The retrieved shader.
+ *
+ * @note If the shader with the specified name does not exist in the library,
+ *       an assertion failure will occur.
+ */
+std::shared_ptr<Shader> ShaderLibrary::Get(const std::string& name)
+{
+    CORE_ASSERT(Exists(name), "Shader not found!");
+    return m_Shaders[name];
+}
+
+/**
+ * Checks if a shader with a given name exists in the library.
+ *
+ * @param name The name of the shader to check for existence.
+ *
+ * @return True if a shader with the specified name exists in the library, otherwise false.
+ */
+bool ShaderLibrary::Exists(const std::string& name) const
+{
+    return m_Shaders.find(name) != m_Shaders.end();
 }

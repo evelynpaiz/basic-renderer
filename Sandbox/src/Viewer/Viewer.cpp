@@ -6,7 +6,7 @@
  * Define a layer for a 3D viewer.
  */
 Viewer::Viewer(int width, int height)
-    : Layer("Viewer Layer"), m_RenderContext(std::make_unique<RenderContext>(width, height))
+    : Layer("Viewer Layer"), m_Scene(std::make_unique<Scene>(width, height))
 {}
 
 /**
@@ -28,51 +28,13 @@ void Viewer::OnUpdate(Timestep ts)
     // Reset rendering statistics
     Renderer::ResetStats();
     
-    // Shadow mapping: light source
-    //--------------------------------
-    Renderer::BeginScene(m_Environment->GetLightSource()->GetShadowCamera());
-    Renderer::SetFaceCulling(FaceCulling::Front);
+    // Get the models in the scene
+    auto models = m_Scene->GetModels();
     
-    // Render into the lights framebuffer
-    const auto& shadowFramebuffer = m_Environment->GetLightSource()->GetFramebuffer();
-    shadowFramebuffer->Bind();
-    Renderer::Clear(shadowFramebuffer->GetActiveBuffers());
-    
-    const auto& depthMaterial = m_Environment->GetLightSource()->GetDepthMaterial();
-    m_Cube.SetMaterial(depthMaterial);
-    m_Cube.DrawModel();
-    m_Plane.SetMaterial(depthMaterial);
-    m_Plane.DrawModel();
-    
-    shadowFramebuffer->Unbind();
-    
-    Renderer::SetFaceCulling(FaceCulling::Back);
-    Renderer::EndScene();
-    
-    // First pass: scene
-    //--------------------------------
-    Renderer::BeginScene(m_RenderContext->GetCamera());
-    
-    // Render into the framebuffer
-    const auto& viewportFramebuffer = m_RenderContext->GetViewport()->GetFramebuffer();
-    viewportFramebuffer->Bind();
-    
-    Renderer::Clear(glm::vec4(0.93f, 0.93f, 0.93f, 1.0f), viewportFramebuffer->GetActiveBuffers());
-    
-    m_Cube.SetMaterial(m_RenderContext->GetMaterial("PhongTexture"));
-    m_Cube.DrawModel();
-    m_Plane.SetMaterial(m_RenderContext->GetMaterial("PhongColor"));
-    m_Plane.DrawModel();
+    m_Scene->Draw();
     
     // Update the camera
-    m_RenderContext->GetCamera()->OnUpdate(ts);
-    
-    viewportFramebuffer->Unbind();
-    Renderer::EndScene();
-    
-    // Second pass: scene
-    //--------------------------------
-    m_RenderContext->RenderToScreen();
+    m_Scene->GetCamera()->OnUpdate(ts);
 }
 
 /**
@@ -89,7 +51,7 @@ void Viewer::OnEvent(Event &e)
         BIND_EVENT_FN(Viewer::OnWindowResize));
     
     // Handle the events on the camera
-    m_RenderContext->GetCamera()->OnEvent(e);
+    m_Scene->GetCamera()->OnEvent(e);
 }
 
 /**
@@ -97,24 +59,27 @@ void Viewer::OnEvent(Event &e)
  */
 void Viewer::InitializeViewer()
 {
-    int viewportWidth = m_RenderContext->GetViewport()->GetWidth();
-    int viewportHeight = m_RenderContext->GetViewport()->GetHeight();
+    int viewportWidth = m_Scene->GetViewport()->GetWidth();
+    int viewportHeight = m_Scene->GetViewport()->GetHeight();
     
     // Define the environment and its light source
     auto light = std::make_shared<DirectionalLight>(viewportWidth, viewportHeight,
                                                     glm::vec3(1.0f), glm::vec3(0.5f, -0.5f, 0.0f));
-    
-    m_Environment = std::make_shared<EnvironmentLight>(viewportWidth, viewportHeight);
-    m_Environment->SetLightSource(light);
+    light->SetDiffuseStrength(0.8f);
+    light->SetSpecularStrength(0.8f);
+    m_Scene->SetLightSource(light);
     
     // Update the position of the rendering camera
-    m_RenderContext->GetCamera()->SetPosition(glm::vec3(0.0f, 0.0f, 10.0f));
+    m_Scene->GetCamera()->SetPosition(glm::vec3(0.0f, 0.0f, 10.0f));
     
     // Define the material(s) to be used for shading
     DefineMaterials();
     
     // Define the geometry in the scene
     DefineSceneGeometry();
+    
+    // Define the rendering passes during run-time
+    DefineRenderPasses();
 }
 
 /**
@@ -122,19 +87,19 @@ void Viewer::InitializeViewer()
  */
 void Viewer::DefineMaterials()
 {
-    auto cubeMaterial = m_RenderContext->CreateMaterial<PhongTextureMaterial>("PhongTexture", m_Environment,
+    auto& library = Renderer::GetMaterialLibrary();
+    
+    auto cubeMaterial = library.Create<PhongTextureMaterial>("PhongTexture", m_Scene->GetLightSource(),
         "Resources/shaders/phong/PhongTextureShadow.glsl");
     cubeMaterial->SetDiffuseMap(std::make_shared<Texture2DResource>("Resources/textures/diffuse.jpeg"));
     cubeMaterial->SetSpecularMap(std::make_shared<Texture2DResource>("Resources/textures/specular.jpeg"));
-    cubeMaterial->SetShadowMap(m_Environment->GetLightSource()->GetFramebuffer()->GetDepthAttachment());
     cubeMaterial->SetShininess(32.0f);
     
-    auto planeMaterial = m_RenderContext->CreateMaterial<PhongColorMaterial>("PhongColor", m_Environment,
+    auto planeMaterial = library.Create<PhongColorMaterial>("PhongColor", m_Scene->GetLightSource(),
         "Resources/shaders/phong/PhongColorShadow.glsl");
     planeMaterial->SetAmbientColor(glm::vec3(0.8f, 0.2f, 0.4f));
     planeMaterial->SetDiffuseColor(glm::vec3(0.8f, 0.2f, 0.4f));
     planeMaterial->SetSpecularColor(glm::vec3(1.0f));
-    planeMaterial->SetShadowMap(m_Environment->GetLightSource()->GetFramebuffer()->GetDepthAttachment());
     planeMaterial->SetShininess(100.0f);
 }
 
@@ -144,13 +109,53 @@ void Viewer::DefineMaterials()
 void Viewer::DefineSceneGeometry()
 {
     // Define the cube and plane model
-    m_Cube = utils::Geometry::ModelCube<GeoVertexData<glm::vec4, glm::vec2, glm::vec3>>();
-    m_Cube.SetScale(glm::vec3(2.0f));
+    auto cube = utils::Geometry::ModelCube<GeoVertexData<glm::vec4, glm::vec2, glm::vec3>>();
+    cube->SetScale(glm::vec3(2.0f));
+    m_Scene->GetModels().Add("Cube", cube);
     
-    m_Plane = utils::Geometry::ModelPlane<GeoVertexData<glm::vec4, glm::vec3>>();
-    m_Plane.SetPosition(glm::vec3(0.0f, -1.5f, 0.0f));
-    m_Plane.SetScale(glm::vec3(10.0f));
-    m_Plane.SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
+    auto plane = utils::Geometry::ModelPlane<GeoVertexData<glm::vec4, glm::vec3>>();
+    plane->SetPosition(glm::vec3(0.0f, -1.5f, 0.0f));
+    plane->SetScale(glm::vec3(10.0f));
+    plane->SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
+    m_Scene->GetModels().Add("Plane", plane);
+}
+
+/**
+ * Defines the rendering passes.
+ */
+void Viewer::DefineRenderPasses()
+{
+    auto& library = m_Scene->GetRenderPasses();
+    
+    // First pass: shadows
+    //--------------------------------
+    RenderPassSpecification shadowPassSpec;
+    shadowPassSpec.Camera = m_Scene->GetLightSource()->GetShadowCamera();
+    shadowPassSpec.Framebuffer = m_Scene->GetLightSource()->GetFramebuffer();
+    shadowPassSpec.Models = {
+        { "Cube", "Depth"},
+        { "Plane", "Depth" },
+    };
+    shadowPassSpec.PreRenderCode = []() { Renderer::SetFaceCulling(FaceCulling::Front); };
+    shadowPassSpec.PostRenderCode = []() { Renderer::SetFaceCulling(FaceCulling::Back); };
+    library.Add("Shadow", shadowPassSpec);
+    
+    // Second pass: scene
+    //--------------------------------
+    RenderPassSpecification scenePassSpec;
+    scenePassSpec.Camera = m_Scene->GetCamera();
+    scenePassSpec.Framebuffer = m_Scene->GetViewport()->GetFramebuffer();
+    scenePassSpec.Models = {
+        { "Cube", "PhongTexture" },
+        { "Plane", "PhongColor" },
+    };
+    scenePassSpec.Color = glm::vec4(0.93f, 0.93f, 0.93f, 1.0f);
+    library.Add("Scene", scenePassSpec);
+    
+    RenderPassSpecification screenPassSpec;
+    screenPassSpec.Models = { { "Viewport", "Viewport" } };
+    screenPassSpec.Size = { m_Scene->GetViewportWidth(), m_Scene->GetViewportHeight() };
+    library.Add("Viewport", screenPassSpec);
 }
 
 /**
@@ -162,14 +167,14 @@ void Viewer::DefineSceneGeometry()
 bool Viewer::OnWindowResize(WindowResizeEvent &e)
 {
     // Update the viewport size
-    m_RenderContext->GetViewport()->SetWidth(e.GetWidth());
-    m_RenderContext->GetViewport()->SetHeight(e.GetHeight());
+    m_Scene->GetViewport()->SetWidth(e.GetWidth());
+    m_Scene->GetViewport()->SetHeight(e.GetHeight());
     
     // Update the camera size
-    m_RenderContext->GetCamera()->SetViewportSize(e.GetWidth(), e.GetHeight());
+    m_Scene->GetCamera()->SetViewportSize(e.GetWidth(), e.GetHeight());
     
     // Update the screen and the framebuffer
-    m_RenderContext->GetViewport()->Resize(e.GetWidth(), e.GetHeight());
-    m_RenderContext->GetFramebuffer("Shadow")->Resize(e.GetWidth(), e.GetHeight());
+    m_Scene->GetViewport()->Resize(e.GetWidth(), e.GetHeight());
+    m_Scene->GetFrameBufferLibrary().Get("Shadow")->Resize(e.GetWidth(), e.GetHeight());
     return true;
 }

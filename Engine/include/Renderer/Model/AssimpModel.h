@@ -31,9 +31,15 @@ class AssimpModel : public LoadedModel<AssimpVertexData>
 public:
     // Constructor(s)/Destructor
     // ----------------------------------------
-    /// @brief Generate a model.
-    AssimpModel() : LoadedModel<AssimpVertexData>() {}
-    AssimpModel(const std::filesystem::path& filePath);
+    /// @brief Define an assimp model from a file source.
+    /// @param filePath The path to the model file.
+    /// @param primitive The primitive type of the model.
+    AssimpModel(const std::filesystem::path& filePath,
+                const PrimitiveType &primitive = PrimitiveType::Triangles)
+    : LoadedModel<AssimpVertexData>(filePath, primitive)
+    {
+        LoadModel(filePath);
+    }
     
     /// @brief Delete the model.
     virtual ~AssimpModel() override = default;
@@ -47,4 +53,13 @@ private:
     // ----------------------------------------
     void ProcessNode(aiNode *node, const aiScene *scene);
     Mesh<AssimpVertexData> ProcessMesh(aiMesh *mesh);
+    
+    // Disable the copying or moving of this resource
+    // ----------------------------------------
+public:
+    AssimpModel(const AssimpModel&) = delete;
+    AssimpModel(AssimpModel&&) = delete;
+
+    AssimpModel& operator=(const AssimpModel&) = delete;
+    AssimpModel& operator=(AssimpModel&&) = delete;
 };

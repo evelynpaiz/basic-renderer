@@ -12,17 +12,18 @@
  * @param position The position of the light source.
  */
 EnvironmentLight::EnvironmentLight(const unsigned int width, const unsigned int height)
-  {
-      // Define the framebuffer(s) for the environment
-      const static unsigned int scale = 4;
-      InitEnvironmentFramebuffers(scale * width);
-      
-      // Define the material(s) for the environment
-      InitEnvironmentMaterials();
-      
-      // Define 3D model of the light source
-      m_Model = utils::Geometry::ModelCube<GeoVertexData<glm::vec4>>(m_Materials["Environment"]);
-  }
+{
+    // Define the framebuffer(s) for the environment
+    const static unsigned int scale = 4;
+    InitEnvironmentFramebuffers(scale * width);
+
+    // Define the material(s) for the environment
+    InitEnvironmentMaterials();
+
+    // Define 3D model of the light source
+    using VertexData = GeoVertexData<glm::vec4>;
+    m_Model = utils::Geometry::ModelCube<VertexData>(m_Materials.Get("Environment"));
+}
 
 /**
  * Initialize framebuffers for the environment light.
@@ -39,15 +40,15 @@ void EnvironmentLight::InitEnvironmentFramebuffers(const unsigned int cubeSize)
     };
     
     spec.MipMaps = true;
-    m_Framebuffers["Environment"] = std::make_shared<FrameBuffer>(spec);
+    m_Framebuffers.Create("Environment", spec);
     
     spec.SetFrameBufferSize(32, 32);
     spec.MipMaps = false;
-    m_Framebuffers["Irradiance"] = std::make_shared<FrameBuffer>(spec);
+    m_Framebuffers.Create("Irradiance", spec);
     
     spec.SetFrameBufferSize(128, 128);
     spec.MipMaps = true;
-    m_Framebuffers["PreFilter"] = std::make_shared<FrameBuffer>(spec);
+    m_Framebuffers.Create("PreFilter", spec);
 }
 
 /**
@@ -55,30 +56,26 @@ void EnvironmentLight::InitEnvironmentFramebuffers(const unsigned int cubeSize)
  */
 void EnvironmentLight::InitEnvironmentMaterials()
 {
-    auto& environment = m_Framebuffers["Environment"]->GetColorAttachment(0);
+    auto environment = m_Framebuffers.Get("Environment")->GetColorAttachment(0);
     
     // Equirectangular mapping
-    m_Materials["Equirectangular"] = std::make_shared<SimpleTextureMaterial>(
-        "Resources/shaders/environment/EquirectangularMap.glsl"
-    );
+    m_Materials.Create<SimpleTextureMaterial>("Equirectangular",
+        "Resources/shaders/environment/EquirectangularMap.glsl");
     
     // Irradiance mapping
-    m_Materials["Irradiance"] = std::make_shared<SimpleTextureMaterial>(
-        "Resources/shaders/environment/IrradianceMap.glsl"
-    );
-    m_Materials["Irradiance"]->SetTextureMap(environment);
+    auto irradiance = m_Materials.Create<SimpleTextureMaterial>("Irradiance",
+        "Resources/shaders/environment/IrradianceMap.glsl");
+    irradiance->SetTextureMap(environment);
     
     // Pre-filtering mapping
-    m_Materials["PreFilter"] = std::make_shared<SimpleTextureMaterial>(
-        "Resources/shaders/environment/PreFilterMap.glsl"
-    );
-    m_Materials["PreFilter"]->SetTextureMap(environment);
+    auto preFilter = m_Materials.Create<SimpleTextureMaterial>("PreFilter",
+        "Resources/shaders/environment/PreFilterMap.glsl");
+    preFilter->SetTextureMap(environment);
     
     // Cube mapping
-    m_Materials["Environment"] = std::make_shared<SimpleTextureMaterial>(
-        "Resources/shaders/environment/CubeMap.glsl"
-    );
-    m_Materials["Environment"]->SetTextureMap(environment);
+    auto cubeMap = m_Materials.Create<SimpleTextureMaterial>("Environment",
+         "Resources/shaders/environment/CubeMap.glsl");
+    cubeMap->SetTextureMap(environment);
 }
 
 /**
@@ -144,18 +141,20 @@ void EnvironmentLight::UpdateEnvironment()
     };
     
     // Update the current texture representing the environment map
-    m_Materials["Equirectangular"]->SetTextureMap(m_EnvironmentMap);
+    auto equirectangularMaterial = std::dynamic_pointer_cast<SimpleTextureMaterial>(m_Materials.Get("Equirectangular"));
+    if (equirectangularMaterial)
+        equirectangularMaterial->SetTextureMap(m_EnvironmentMap);
     
     // Update the size of the environment (cube) model
-    m_Model.SetScale(glm::vec3(2.0f));
+    m_Model->SetScale(glm::vec3(2.0f));
     
     // Render the environment map into a cube map configuration
-    RenderCubeMap(views, projection, m_Materials["Equirectangular"],
-                  m_Framebuffers["Environment"]);
+    RenderCubeMap(views, projection, m_Materials.Get("Equirectangular"),
+                  m_Framebuffers.Get("Environment"));
     
     // Render the irradiance map
-    RenderCubeMap(views, projection, m_Materials["Irradiance"],
-                  m_Framebuffers["Irradiance"]);
+    RenderCubeMap(views, projection, m_Materials.Get("Irradiance"),
+                  m_Framebuffers.Get("Irradiance"));
     
     // Render the pre-filter map
     static const unsigned int maxMipMapLevel = 5;
@@ -163,23 +162,23 @@ void EnvironmentLight::UpdateEnvironment()
     {
         // Define the roughness
         float roughness = (float)mip / (float)(maxMipMapLevel - 1);
-        m_Materials["PreFilter"]->GetShader()->SetFloat("u_Material.Roughness", roughness);
+        m_Materials.Get("PreFilter")->GetShader()->SetFloat("u_Material.Roughness", roughness);
         
         // reisze framebuffer according to mip-level size.
         unsigned int mipWidth  = 128 * std::pow(0.5, mip);
         unsigned int mipHeight = 128 * std::pow(0.5, mip);
         
         // Render into the cubemap
-        RenderCubeMap(views, projection, m_Materials["PreFilter"],
-                      m_Framebuffers["PreFilter"],
+        RenderCubeMap(views, projection, m_Materials.Get("PreFilter"),
+                      m_Framebuffers.Get("PreFilter"),
                       mipWidth, mipHeight, mip, false);
     }
     
-    m_Framebuffers["PreFilter"]->Unbind(false);
+    m_Framebuffers.Get("PreFilter")->Unbind(false);
     
     // Update the 3D model of the light source with the rendered environment map
-    m_Model.SetMaterial(m_Materials["Environment"]);
-    m_Model.SetScale(glm::vec3(70.0f));
+    m_Model->SetMaterial(m_Materials.Get("Environment"));
+    m_Model->SetScale(glm::vec3(70.0f));
 }
 
 /**
@@ -193,13 +192,13 @@ void EnvironmentLight::UpdateEnvironment()
  * @param genMipMaps A flag indicating whether to generate mipmaps for the resulting cube map.
  */
 void EnvironmentLight::RenderCubeMap(const std::array<glm::mat4, 6>& views, const glm::mat4 &projection,
-                                     const std::shared_ptr<SimpleTextureMaterial>& material,
+                                     const std::shared_ptr<Material>& material,
                                      const std::shared_ptr<FrameBuffer>& framebuffer,
                                      const unsigned int& viewportWidth, const unsigned int& viewportHeight,
                                      const unsigned int &level, const bool &genMipMaps)
 {
     // Set the material for rendering
-        m_Model.SetMaterial(material);
+        m_Model->SetMaterial(material);
 
     // Loop through each face of the cube map
     for (unsigned int i = 0; i < views.size(); ++i)
@@ -218,7 +217,7 @@ void EnvironmentLight::RenderCubeMap(const std::array<glm::mat4, 6>& views, cons
         Renderer::Clear(framebuffer->GetActiveBuffers());
 
         // Draw the model using the specified material
-        m_Model.DrawModel();
+        m_Model->DrawModel();
 
         // End the rendering scene
         Renderer::EndScene();
@@ -238,7 +237,8 @@ void EnvironmentLight::DefineIrradianceMap(const std::shared_ptr<Shader> &shader
                                            const unsigned int slot)
 {
     utils::Texturing::SetTextureMap(shader, "u_Light.IrradianceMap",
-                                    m_Framebuffers["Irradiance"]->GetColorAttachment(0), slot);
+                                    m_Framebuffers.Get("Irradiance")->GetColorAttachment(0),
+                                    slot);
 }
 
 /**
@@ -251,5 +251,6 @@ void EnvironmentLight::DefinePreFilterMap(const std::shared_ptr<Shader> &shader,
                                           const unsigned int slot)
 {
     utils::Texturing::SetTextureMap(shader, "u_Light.PreFilterMap",
-                                    m_Framebuffers["PreFilter"]->GetColorAttachment(0), slot);
+                                    m_Framebuffers.Get("PreFilter")->GetColorAttachment(0),
+                                    slot);
 }

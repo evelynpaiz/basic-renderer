@@ -4,9 +4,9 @@
 #include <GL/glew.h>
 
 // Define the renderer variable(s)
-std::unique_ptr<SceneData> Renderer::s_SceneData = std::make_unique<SceneData>();
+std::unique_ptr<Renderer::SceneData> Renderer::s_SceneData = std::make_unique<Renderer::SceneData>();
 
-static RenderingStatistics g_Stats;
+static Renderer::RenderingStatistics g_Stats;
 
 /**
  * Start the rendering of a scene by defining its general parameters.
@@ -213,7 +213,7 @@ void Renderer::ResetStats()
  *
  * @return The rendering statistics structure containing performance metrics.
  */
-RenderingStatistics Renderer::GetStats()
+Renderer::RenderingStatistics Renderer::GetStats()
 {
     return g_Stats;
 }

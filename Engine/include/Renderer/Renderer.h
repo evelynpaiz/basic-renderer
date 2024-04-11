@@ -4,38 +4,13 @@
 
 #include "Renderer/Buffer/VertexArray.h"
 #include "Renderer/Buffer/IndexBuffer.h"
+#include "Renderer/Buffer/FrameBuffer.h"
 
 #include "Renderer/Material/Material.h"
 
 #include "Camera/Camera.h"
-#include "Light/Light.h"
 
 #include <glm/glm.hpp>
-
-/**
- * Represents the current information of the rendered scene (useful for the shading process).
- */
-struct SceneData
-{
-    ///< View position.
-    glm::vec3 viewPosition = glm::vec3(0.0f);
-    
-    ///< View matrix.
-    glm::mat4 viewMatrix = glm::mat4(1.0f);
-    ///< Projection matrix.
-    glm::mat4 projectionMatrix = glm::mat4(1.0f);
-};
-
-/**
- * Represents the information related to the statistics of the rendering.
- */
-struct RenderingStatistics
-{
-    ///< Number or rendering passes.
-    unsigned int renderPasses = 0;
-    ///< Number of times the draw function is called.
-    unsigned int drawCalls = 0;
-};
 
 /**
  * Responsible for rendering geometry using a specified shader program.
@@ -65,6 +40,10 @@ public:
               const std::shared_ptr<Material>& material,
               const glm::mat4 &transform = glm::mat4(1.0f),
               const PrimitiveType &primitive = PrimitiveType::Triangles);
+    
+    // Getters(s)
+    // ----------------------------------------
+    static MaterialLibrary& GetMaterialLibrary() { return s_MaterialLibrary; }
 
     // Setter(s)
     // ----------------------------------------
@@ -77,10 +56,43 @@ public:
     
     // Statistics
     // ----------------------------------------
+    /**
+     * Represents the information related to the statistics of the rendering.
+     */
+    struct RenderingStatistics
+    {
+        ///< Number or rendering passes.
+        unsigned int renderPasses = 0;
+        ///< Number of times the draw function is called.
+        unsigned int drawCalls = 0;
+    };
+    
     static void ResetStats();
     static RenderingStatistics GetStats();
     
+    // Renderer Structures
+    // ----------------------------------------
+private:
+    /**
+     * Represents the current information of the rendered scene (useful for the shading process).
+     */
+    struct SceneData
+    {
+        ///< View position.
+        glm::vec3 viewPosition = glm::vec3(0.0f);
+        
+        ///< View matrix.
+        glm::mat4 viewMatrix = glm::mat4(1.0f);
+        ///< Projection matrix.
+        glm::mat4 projectionMatrix = glm::mat4(1.0f);
+    };
+    
+    // Renderer variables
+    // ----------------------------------------
 private:
     ///< Scene current general information.
     static std::unique_ptr<SceneData> s_SceneData;
+    
+    ///< Rendering libraries.
+    static inline MaterialLibrary s_MaterialLibrary;
 };

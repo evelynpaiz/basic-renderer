@@ -77,7 +77,5 @@
 // --------------------------------------------
 // Rendering Context & Scene
 // --------------------------------------------
+#include "Scene/Viewport.h"
 #include "Scene/Scene.h"
-
-#include "Context/Viewport.h"
-#include "Context/RenderContext.h"

@@ -21,7 +21,7 @@
  * Copying or moving `EnvironmentLight` objects is disabled to ensure single ownership and prevent
  * unintended duplication of light resources.
  */
-class EnvironmentLight
+class EnvironmentLight : public BaseLight
 {
 public:
     // Constructor(s)/Destructor
@@ -35,20 +35,11 @@ public:
     // ----------------------------------------
     void SetEnvironmentMap(const std::shared_ptr<Texture>& texture);
     
-    void SetLightSource(const std::shared_ptr<Light>& light) { m_Light = light; }
-    
     // Getter(s)
     // ----------------------------------------
-    /// @brief Get the light 3D model representing the environment.
-    /// @return The 3D model.
-    Model<GeoVertexData<glm::vec4>>& GetModel() { return m_Model; }
     /// @brief Get the environment map.
     /// @return The texture describing the environment.
     const std::shared_ptr<Texture>& GetEnvironmentMap() { return m_EnvironmentMap; }
-    
-    /// @brief Get the light source.
-    /// @return The light source.
-    std::shared_ptr<Light>& GetLightSource() { return m_Light; }
     
     // Properties
     // ----------------------------------------
@@ -71,7 +62,7 @@ private:
     // Render
     // ----------------------------------------
     void RenderCubeMap(const std::array<glm::mat4, 6> &views, const glm::mat4 &projection,
-                       const std::shared_ptr<SimpleTextureMaterial> &material,
+                       const std::shared_ptr<Material> &material,
                        const std::shared_ptr<FrameBuffer> &framebuffer,
                        const unsigned int& viewportWidth = 0, const unsigned int& viewportHeight = 0,
                        const unsigned int &level = 0, const bool& genMipMaps = true);
@@ -81,16 +72,11 @@ private:
 private:
     ///< The environment map.
     std::shared_ptr<Texture> m_EnvironmentMap;
-    ///< The lights in the environment.
-    std::shared_ptr<Light> m_Light;
-    
-    ///< 3D model representing the surrounding environment in the scene.
-    Model<GeoVertexData<glm::vec4>> m_Model;
     
     ///< Framebuffer(s) for pre-processing.
-    std::unordered_map<std::string, std::shared_ptr<FrameBuffer>> m_Framebuffers;
+    FrameBufferLibrary m_Framebuffers;
     ///< Material(s) for pre-processing.
-    std::unordered_map<std::string, std::shared_ptr<SimpleTextureMaterial>> m_Materials;
+    MaterialLibrary m_Materials;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

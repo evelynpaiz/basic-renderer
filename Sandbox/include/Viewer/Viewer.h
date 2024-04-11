@@ -31,13 +31,13 @@ public:
     // ----------------------------------------
     /// @brief Get the light source.
     /// @return The light source.
-    const std::shared_ptr<Light>& GetLightSource() { return m_Environment->GetLightSource(); }
+    std::shared_ptr<Light> GetLightSource() { return m_Scene->GetLightSource(); }
     
     // Setters(s)
     // ----------------------------------------
     /// @brief Set the interaction state inside this layer.
     /// @param e Enable/disable the interaction.
-    void EnableInteraction(const bool e) { m_RenderContext->GetCamera()->Enable(e); }
+    void EnableInteraction(const bool e) { m_Scene->GetCamera()->Enable(e); }
     
 private:
     // Initialization
@@ -46,6 +46,7 @@ private:
     
     void DefineMaterials();
     void DefineSceneGeometry();
+    void DefineRenderPasses();
     
     // Events handler(s)
     // ----------------------------------------
@@ -54,15 +55,8 @@ private:
     // Viewer layer variables
     // ----------------------------------------
 private:
-    ///< Context of rendering.
-    std::unique_ptr<RenderContext> m_RenderContext;
-    
-    ///< Environment along with its light source.
-    std::shared_ptr<EnvironmentLight> m_Environment;
-    
-    ///< Model(s).
-    Model<GeoVertexData<glm::vec4, glm::vec2, glm::vec3>> m_Cube;
-    Model<GeoVertexData<glm::vec4, glm::vec3>> m_Plane;
+    ///< Scene to be rendered.
+    std::unique_ptr<Scene> m_Scene;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------
