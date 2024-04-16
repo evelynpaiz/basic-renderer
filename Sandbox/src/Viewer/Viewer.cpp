@@ -63,11 +63,17 @@ void Viewer::InitializeViewer()
     int viewportHeight = m_Scene->GetViewport()->GetHeight();
     
     // Define the environment and its light source
-    auto light = std::make_shared<DirectionalLight>(viewportWidth, viewportHeight,
-                                                    glm::vec3(1.0f), glm::vec3(0.5f, -0.5f, 0.0f));
-    light->SetDiffuseStrength(0.8f);
-    light->SetSpecularStrength(0.8f);
-    m_Scene->SetLightSource(light);
+    auto positional = std::make_shared<PositionalLight>(viewportWidth, viewportHeight,
+                                                        glm::vec3(1.0f), glm::vec3(3.0f, 5.0f, 0.0f));
+    positional->SetDiffuseStrength(0.6f);
+    positional->SetSpecularStrength(0.4f);
+    m_Scene->GetLightSouces().Add("Positional", positional);
+    
+    auto directional = std::make_shared<DirectionalLight>(viewportWidth, viewportHeight,
+                                                          glm::vec3(1.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+    directional->SetDiffuseStrength(0.6f);
+    directional->SetSpecularStrength(0.4f);
+    m_Scene->GetLightSouces().Add("Directional", directional);
     
     // Update the position of the rendering camera
     m_Scene->GetCamera()->SetPosition(glm::vec3(0.0f, 0.0f, 10.0f));
@@ -89,13 +95,13 @@ void Viewer::DefineMaterials()
 {
     auto& library = Renderer::GetMaterialLibrary();
     
-    auto cubeMaterial = library.Create<PhongTextureMaterial>("PhongTexture", m_Scene->GetLightSource(),
-        "Resources/shaders/phong/PhongTextureShadow.glsl");
+    auto cubeMaterial = library.Create<PhongTextureMaterial>("PhongTexture",
+        "Resources/shaders/phong/PhongTexture.glsl");
     cubeMaterial->SetDiffuseMap(std::make_shared<Texture2DResource>("Resources/textures/diffuse.jpeg"));
     cubeMaterial->SetSpecularMap(std::make_shared<Texture2DResource>("Resources/textures/specular.jpeg"));
     cubeMaterial->SetShininess(32.0f);
     
-    auto planeMaterial = library.Create<PhongColorMaterial>("PhongColor", m_Scene->GetLightSource(),
+    auto planeMaterial = library.Create<PhongColorMaterial>("PhongColor",
         "Resources/shaders/phong/PhongColorShadow.glsl");
     planeMaterial->SetAmbientColor(glm::vec3(0.8f, 0.2f, 0.4f));
     planeMaterial->SetDiffuseColor(glm::vec3(0.8f, 0.2f, 0.4f));
@@ -129,16 +135,25 @@ void Viewer::DefineRenderPasses()
     
     // First pass: shadows
     //--------------------------------
-    RenderPassSpecification shadowPassSpec;
-    shadowPassSpec.Camera = m_Scene->GetLightSource()->GetShadowCamera();
-    shadowPassSpec.Framebuffer = m_Scene->GetLightSource()->GetFramebuffer();
-    shadowPassSpec.Models = {
-        { "Cube", "Depth"},
-        { "Plane", "Depth" },
-    };
-    shadowPassSpec.PreRenderCode = []() { Renderer::SetFaceCulling(FaceCulling::Front); };
-    shadowPassSpec.PostRenderCode = []() { Renderer::SetFaceCulling(FaceCulling::Back); };
-    library.Add("Shadow", shadowPassSpec);
+    auto& lights = m_Scene->GetLightSouces();
+    for (auto& pair : lights)
+    {
+        auto light = std::dynamic_pointer_cast<Light>(pair.second);
+        if (!light)
+            continue;
+        
+        RenderPassSpecification shadowPassSpec;
+        shadowPassSpec.Camera = light->GetShadowCamera();
+        shadowPassSpec.Framebuffer = light->GetFramebuffer();
+        shadowPassSpec.Models = {
+            { "Cube", "Depth"},
+            { "Plane", "Depth" },
+        };
+        shadowPassSpec.PreRenderCode = []() { Renderer::SetFaceCulling(FaceCulling::Front); };
+        shadowPassSpec.PostRenderCode = []() { Renderer::SetFaceCulling(FaceCulling::Back); };
+        
+        library.Add("Shadow-" + pair.first, shadowPassSpec);
+    }
     
     // Second pass: scene
     //--------------------------------
@@ -148,6 +163,7 @@ void Viewer::DefineRenderPasses()
     scenePassSpec.Models = {
         { "Cube", "PhongTexture" },
         { "Plane", "PhongColor" },
+        { "Light", "" }
     };
     scenePassSpec.Color = glm::vec4(0.93f, 0.93f, 0.93f, 1.0f);
     library.Add("Scene", scenePassSpec);

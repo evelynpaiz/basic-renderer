@@ -14,6 +14,7 @@
 #include "Resources/shaders/common/material/PhongTextureMaterial.glsl"
 #include "Resources/shaders/common/view/SimpleView.glsl"
 #include "Resources/shaders/common/light/SimpleLight.glsl"
+#include "Resources/shaders/common/light/EnvironmentLight.glsl"
 
 // Include fragment inputs
 #include "Resources/shaders/common/fragment/PTN.fs.glsl"
@@ -34,10 +35,22 @@ void main()
     // Get the specular color (ks) from the SpecularMap texture
     vec3 ks = vec3(texture(u_Material.SpecularMap, v_TextureCoord));
     
-    // Define fragment color using Phong shading
-    // Parameters: Diffuse color (kd), Diffuse color (kd), Specular color (ks), Shadow factor (0.0f)
-    vec3 result = calculateColor(kd, kd, ks, 0.0f, 0.045f, 0.0075f, 0.7f);
+    // Define the initial reflectance
+    vec3 reflectance = vec3(0.0f);
+    
+    // Shade based on each light source in the scene
+    for(int i = 0; i < NUMBER_LIGHTS; i++)
+    {
+        // Define fragment color using Phong shading
+        reflectance += calculateColor(v_Position, v_Normal, u_View.Position, u_Light[i].Vector,
+                                      u_Light[i].Color, kd * u_Light[i].Ld, ks * u_Light[i].Ls,
+                                      u_Material.Shininess, 0.0f, 0.045f, 0.0075f, 0.7f);
+    }
+    
+    // Calculate the ambient light
+    vec3 ambient = ks * u_Environment.La;
     
     // Set the fragment color with the calculated result and material's alpha
+    vec3 result = reflectance + ambient;
     color = vec4(result, u_Material.Alpha);
 }

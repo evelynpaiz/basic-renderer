@@ -7,7 +7,6 @@ struct Light {
     
     vec3 Color;      ///< Color/intensity of the light.
     
-    float La;        ///< Ambient light intensity.
     float Ld;        ///< Diffuse light intensity.
     float Ls;        ///< Specular light intensity.
 };

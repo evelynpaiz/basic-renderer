@@ -2,6 +2,7 @@
 #version 330 core
 
 // Include transformation matrices
+#include "Resources/shaders/common/light/CompleteLight.glsl"
 #include "Resources/shaders/common/matrix/CompleteMatrix.glsl"
 
 // Include vertex shader
@@ -13,7 +14,8 @@
 // Include material, view and light properties
 #include "Resources/shaders/common/material/PhongColorMaterial.glsl"
 #include "Resources/shaders/common/view/SimpleView.glsl"
-#include "Resources/shaders/common/light/ShadowLight.glsl"
+#include "Resources/shaders/common/light/CompleteLight.glsl"
+#include "Resources/shaders/common/light/EnvironmentLight.glsl"
 
 // Include fragment inputs
 #include "Resources/shaders/common/fragment/PN.fs.glsl"
@@ -33,23 +35,34 @@
 // Entry point of the fragment shader
 void main()
 {
-    // Calculate the normalized surface normal
-    vec3 normal = normalize(v_Normal);
+    // Define the initial reflectance
+    vec3 reflectance = vec3(0.0f);
     
-    // Calculate the normalized light direction vector
-    vec3 lightDirection = u_Light.Vector.w == 1.0f ?
-                            normalize(u_Light.Vector.xyz - v_Position)      // positional light (.w = 1)
-                            : normalize(-u_Light.Vector.xyz);               // directional light (.w = 0)
+    // Shade based on each light source in the scene
+    for(int i = 0; i < NUMBER_LIGHTS; i++)
+    {
+        // Calculate the normalized surface normal
+        vec3 normal = normalize(v_Normal);
+        
+        // Calculate the normalized light direction vector
+        vec3 lightDirection = u_Light[i].Vector.w == 1.0f ?
+                              normalize(u_Light[i].Vector.xyz - v_Position) :   // positional light (.w = 1)
+                              normalize(-u_Light[i].Vector.xyz);                // directional light (.w = 0)
+                              
+        // Calculate shadow factor
+        float bias = calculateBias(normal, lightDirection, 0.005f, 0.01f);
+        float shadow = calculateShadow(u_Light[i].ShadowMap, v_LightSpacePosition[i], bias, 11, 1.0f);
+        
+        // Calculate shading result using Phong shading model with shadows
+        reflectance += calculateColor(v_Position, v_Normal, u_View.Position, u_Light[i].Vector, u_Light[i].Color,
+                                      u_Material.Kd * u_Light[i].Ld, u_Material.Ks * u_Light[i].Ls,
+                                      u_Material.Shininess, shadow, 0.045f, 0.0075f, 0.7f);
+    }
     
-    // Calculate shadow factor
-    float bias = calculateBias(normal, lightDirection, 0.005f, 0.01f);
-    float shadow = calculateShadow(u_Light.ShadowMap, v_LightSpacePosition, bias, 3, 1.0f);
-    
-    // Calculate shading result using Phong shading model with shadows
-    // Parameters: Ambient reflection (ka), Diffuse reflection (kd),
-    // Specular reflection (ks), Shadow factor (calculated above)
-    vec3 result = calculateColor(u_Material.Ka, u_Material.Kd, u_Material.Ks, shadow, 0.045f, 0.0075f, 0.7f);
+    // Calculate the ambient light
+    vec3 ambient = u_Material.Ka * u_Environment.La;
     
     // Set the fragment color with the calculated result and material's alpha
+    vec3 result = reflectance + ambient;
     color = vec4(result, u_Material.Alpha);
 }

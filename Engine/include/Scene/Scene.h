@@ -104,13 +104,9 @@ public:
     /// @brief Get the camera used currently to render the scene.
     /// @return The active camera.
     const std::shared_ptr<Camera>& GetCamera() const { return m_Camera; }
-    /// @brief Get the light in the scene.
-    /// @return The light source.
-    const std::shared_ptr<Light>& GetLightSource() const { return m_Light; }
-    ///< @brief Get the surrounding environment light around the scene.
-    ///< @return The environment light.
-    const std::shared_ptr<EnvironmentLight>& GetEnvironment() const { return m_Environment; }
-    
+    /// @brief Get the light sources defined in the scene.
+    /// @return The scene's lights.
+    LightLibrary& GetLightSouces() { return m_Lights; }
     /// @brief Get the models defined in the scene.
     /// @return The scene's models.
     ModelLibrary& GetModels() { return m_Models; }
@@ -123,26 +119,17 @@ public:
     /// @return The defined render passes with its specifications.
     RenderPassLibrary& GetRenderPasses() { return m_RenderPasses; }
     
-    // Setter(s)
-    // ----------------------------------------
-    ///< @brief Define the light source in the scene.
-    ///< @param light The light source.
-    void SetLightSource(const std::shared_ptr<Light>& light) 
-    {
-        m_Light = light;
-        
-        if (m_Models.Exists("Light"))
-            m_Models.Get("Light") = m_Light->GetModel();
-        else
-            m_Models.Add("Light", m_Light->GetModel());
-    }
-    
     // Render
     // ----------------------------------------
     void Draw();
     
 private:
     void Draw(const RenderPassSpecification& pass);
+    void DrawLight();
+    
+    // Setters
+    // ----------------------------------------
+    void DefineShadowProperties(const std::shared_ptr<Material>& material);
     
     // Scene variables
     // ----------------------------------------
@@ -153,9 +140,7 @@ private:
     ///< Main camera.
     std::shared_ptr<Camera> m_Camera;
     ///< Light sources in the scene.
-    std::shared_ptr<Light> m_Light;
-    std::shared_ptr<EnvironmentLight> m_Environment;
-    
+    LightLibrary m_Lights;
     ///< Set of objects in the scene.
     ModelLibrary m_Models;
     

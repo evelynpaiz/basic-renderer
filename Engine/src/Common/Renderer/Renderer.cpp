@@ -1,12 +1,21 @@
 #include "enginepch.h"
 #include "Renderer/Renderer.h"
 
+#include "Renderer/Material/LightedMaterial.h"
+
 #include <GL/glew.h>
 
 // Define the renderer variable(s)
 std::unique_ptr<Renderer::SceneData> Renderer::s_SceneData = std::make_unique<Renderer::SceneData>();
 
 static Renderer::RenderingStatistics g_Stats;
+
+static const glm::mat4 g_TextureMatrix = glm::mat4(
+    0.5f, 0.0f, 0.0f, 0.0f,
+    0.0f, 0.5f, 0.0f, 0.0f,
+    0.0f, 0.0f, 0.5f, 0.0f,
+    0.5f, 0.5f, 0.5f, 1.0f
+);
 
 /**
  * Start the rendering of a scene by defining its general parameters.
@@ -15,10 +24,10 @@ static Renderer::RenderingStatistics g_Stats;
  */
 void Renderer::BeginScene()
 {
-    s_SceneData->viewPosition = glm::vec3(0.0);
+    s_SceneData->ViewPosition = glm::vec3(0.0);
     
-    s_SceneData->viewMatrix = glm::mat4(1.0f);
-    s_SceneData->projectionMatrix = glm::mat4(1.0f);
+    s_SceneData->ViewMatrix = glm::mat4(1.0f);
+    s_SceneData->ProjectionMatrix = glm::mat4(1.0f);
 }
 
 /**
@@ -28,10 +37,10 @@ void Renderer::BeginScene()
  */
 void Renderer::BeginScene(const std::shared_ptr<Camera> &camera)
 {
-    s_SceneData->viewPosition = camera->GetPosition();
+    s_SceneData->ViewPosition = camera->GetPosition();
     
-    s_SceneData->viewMatrix = camera->GetViewMatrix();
-    s_SceneData->projectionMatrix = camera->GetProjectionMatrix();
+    s_SceneData->ViewMatrix = camera->GetViewMatrix();
+    s_SceneData->ProjectionMatrix = camera->GetProjectionMatrix();
 }
 
 /**
@@ -44,10 +53,10 @@ void Renderer::BeginScene(const std::shared_ptr<Camera> &camera)
 void Renderer::BeginScene(const glm::mat4 &view, const glm::mat4 &projection,
                           const glm::vec3& position)
 {
-    s_SceneData->viewPosition = position;
+    s_SceneData->ViewPosition = position;
     
-    s_SceneData->viewMatrix = view;
-    s_SceneData->projectionMatrix = projection;
+    s_SceneData->ViewMatrix = view;
+    s_SceneData->ProjectionMatrix = projection;
 }
 
 /**
@@ -106,6 +115,7 @@ void Renderer::Draw(const std::shared_ptr<VertexArray>& vao, const PrimitiveType
  * @param primitive The type of primitive to be drawn (e.g., Points, Lines, Triangles).
  * @param useIndexBuffer Whether to use the index buffer for rendering or not.
  */
+
 void Renderer::Draw(const std::shared_ptr<VertexArray>& vao, const std::shared_ptr<Material>& material,
                     const glm::mat4 &transform, const PrimitiveType &primitive)
 {
@@ -113,18 +123,32 @@ void Renderer::Draw(const std::shared_ptr<VertexArray>& vao, const std::shared_p
     // it for the shading
     material->Bind();
     
+    // Set the model, view, and projection matrices in the shader
     material->GetShader()->SetMat4("u_Transform.Model", transform);
-    material->GetShader()->SetMat4("u_Transform.View", s_SceneData->viewMatrix);
-    material->GetShader()->SetMat4("u_Transform.Projection", s_SceneData->projectionMatrix);
+    material->GetShader()->SetMat4("u_Transform.View", s_SceneData->ViewMatrix);
+    material->GetShader()->SetMat4("u_Transform.Projection", s_SceneData->ProjectionMatrix);
 
-    if (material->IsNormalMatrixDefined())
+    // Check the flags for the material
+    auto& flags = material->GetMaterialFlags();
+    if (flags.ViewDirection)
+        material->GetShader()->SetVec3("u_View.Position", s_SceneData->ViewPosition);
+    if (flags.NormalMatrix)
         material->GetShader()->SetMat3("u_Transform.Normal", glm::mat3(glm::transpose(glm::inverse(transform))));
     
-    if (material->IsViewDirectionDefined())
-        material->GetShader()->SetVec3("u_View.Position", s_SceneData->viewPosition);
+    auto lightedMaterial = std::dynamic_pointer_cast<LightedMaterial>(material);
+    if (lightedMaterial)
+    {
+        // Check the flags for the lighted material
+        auto& lightFlags = lightedMaterial->GetLightFlags();
+        if (lightFlags.ShadowProperties)
+            material->GetShader()->SetMat4("u_Transform.Texture", g_TextureMatrix);
+    }
     
     // Render the geometry
     Draw(vao, primitive);
+    
+    // Unbind the material
+    material->Unbind();
 }
 
 /**

@@ -12,6 +12,8 @@
 
 #include <glm/glm.hpp>
 
+class LightLibrary;
+
 /**
  * Responsible for rendering geometry using a specified shader program.
  *
@@ -79,12 +81,12 @@ private:
     struct SceneData
     {
         ///< View position.
-        glm::vec3 viewPosition = glm::vec3(0.0f);
+        glm::vec3 ViewPosition = glm::vec3(0.0f);
         
         ///< View matrix.
-        glm::mat4 viewMatrix = glm::mat4(1.0f);
+        glm::mat4 ViewMatrix = glm::mat4(1.0f);
         ///< Projection matrix.
-        glm::mat4 projectionMatrix = glm::mat4(1.0f);
+        glm::mat4 ProjectionMatrix = glm::mat4(1.0f);
     };
     
     // Renderer variables

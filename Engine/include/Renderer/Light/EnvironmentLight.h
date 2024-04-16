@@ -33,20 +33,43 @@ public:
     
     // Setter(s)
     // ----------------------------------------
+    /// @brief Set the strength of the ambient light.
+    /// @param s The strength of the ambient component (a value between 0 and 1).
+    void SetAmbientStrength(float s) { m_AmbientStrength = s; }
+    
     void SetEnvironmentMap(const std::shared_ptr<Texture>& texture);
     
     // Getter(s)
     // ----------------------------------------
+    /// @brief Get the ambient light strength.
+    /// @return The ambient strength.
+    float GetAmbientStrength() const { return m_AmbientStrength; }
+    
     /// @brief Get the environment map.
     /// @return The texture describing the environment.
     const std::shared_ptr<Texture>& GetEnvironmentMap() { return m_EnvironmentMap; }
     
+    const std::shared_ptr<Texture>& GetIrradianceMap();
+    const std::shared_ptr<Texture>& GetPreFilterMap();
+    
     // Properties
     // ----------------------------------------
-    void DefineIrradianceMap(const std::shared_ptr<Shader> &shader,
-                             const unsigned int slot);
-    void DefinePreFilterMap(const std::shared_ptr<Shader> &shader,
-                            const unsigned int slot);
+    void DefineLightProperties(const std::shared_ptr<Shader>& shader,
+                               const LightFlags& flags,
+                               unsigned int& slot) override;
+    
+    // Render
+    // ----------------------------------------
+    /// @brief Renders the 3D model that represents the light source.
+    void DrawLight() override
+    {
+        if (m_Model && m_EnvironmentMap)
+        {
+            Renderer::SetDepthFunction(DepthFunction::LEqual);
+            m_Model->DrawModel();
+            Renderer::SetDepthFunction(DepthFunction::Less);
+        }
+    }
     
 private:
     // Initialization
@@ -70,6 +93,8 @@ private:
     // Environment variables
     // ----------------------------------------
 private:
+    ///< The ambient light intensity.
+    float m_AmbientStrength = 0.2f;
     ///< The environment map.
     std::shared_ptr<Texture> m_EnvironmentMap;
     

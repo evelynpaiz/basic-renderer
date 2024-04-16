@@ -1,44 +1,51 @@
 /**
- * Calculate the final color using Phong shading model with shadow consideration.
+ * Calculate the final color using the Phong shading model with consideration for shadows.
  *
- * @param ka Ambient reflection coefficient.
- * @param kd Diffuse reflection coefficient.
- * @param ks Specular reflection coefficient.
- * @param shadow Shadow factor (0.0 - 1.0), where 0.0 means fully lit and 1.0 means fully shadowed.
+ * @param position          Position of the surface point.
+ * @param normal            Normal vector at the surface point.
+ * @param viewPosition      Position of the viewer/camera.
+ * @param lightVector       Vector pointing towards the light source (directional or positional).
+ * @param lightColor        Color of the light source.
+ * @param kd                Diffuse reflection coefficient.
+ * @param ks                Specular reflection coefficient.
+ * @param shininess         Shininess of the material (exponent for specular highlights).
+ * @param shadow            Shadow factor, ranging from 0.0 to 1.0, indicating the amount of shadowing.
+ *                          0.0 represents fully lit, while 1.0 represents fully shadowed.
+ * @param lightLinear       Linear attenuation factor for the light source.
+ * @param lightQuadratic    Quadratic attenuation factor for the light source.
+ * @param maxAttenuation    Maximum attenuation distance for the light source.
  *
- * @return Calculated color using Phong shading model with shadow.
+ * @return Calculated color using the Phong shading model with shadows taken into account.
  */
-vec3 calculateColor(vec3 ka, vec3 kd, vec3 ks, float shadow,
+vec3 calculateColor(vec3 position, vec3 normal, vec3 viewPosition, vec4 lightVector,
+                    vec3 lightColor, vec3 kd, vec3 ks, float shininess, float shadow,
                     float lightLinear, float lightQuadratic, float maxAttenuation)
 {
     // Calculate the surface vector(s)
-    vec3 normal = normalize(v_Normal);
+    normal = normalize(normal);
     
     // Calculate the direction vectors
-    vec3 lightDirection = u_Light.Vector.w == 1.0f ?
-                            normalize(u_Light.Vector.xyz - v_Position)      // positional light (.w = 1)
-                            : normalize(-u_Light.Vector.xyz);               // directional light (.w = 0)
-    vec3 viewDirection = normalize(u_View.Position - v_Position);
+    vec3 lightDirection = lightVector.w == 1.0f ?
+                          normalize(lightVector.xyz - position)      // positional light (.w = 1)
+                          : normalize(-lightVector.xyz);               // directional light (.w = 0)
+    vec3 viewDirection = normalize(viewPosition - position);
     vec3 reflectionDirection = normalize(2.0 * dot(lightDirection, normal) * normal - lightDirection);
     
     // Calculate the light radiance
-    vec3 radiance = u_Light.Color * calculateAttenuation(v_Position, u_Light.Vector, lightLinear, lightQuadratic, maxAttenuation);
-    
-    // Calculate the ambient reflection component by scaling the ambient color
-    vec3 ambient = u_Light.La * ka;
+    vec3 radiance = lightColor * calculateAttenuation(position, lightVector,
+                                                      lightLinear, lightQuadratic, maxAttenuation);
     
     // Calculate the diffuse reflection component using the Lambertian cosine law
     float cosTheta = saturate(dot(normal, lightDirection));
-    vec3 diffuse = u_Light.Ld * cosTheta * kd;
+    vec3 diffuse = cosTheta * kd;
     
     // Calculate the specular reflection component using the Phong specular reflection formula
     vec3 specular = cosTheta > 0.0f ? calculateSpecular(viewDirection, reflectionDirection,
-        ks, u_Material.Shininess) : vec3(0.0f);
-    specular *= u_Light.Ls;
+        ks, shininess) : vec3(0.0f);
     
     // Calculate the final color by combining ambient, diffuse, and specular components,
     // and modulating with the shadow factor
-    vec3 result = ambient + radiance * (1.0 - shadow) * (diffuse + specular);
+    vec3 result = radiance * (1.0 - shadow) * (diffuse + specular);
     
     return result;
 }

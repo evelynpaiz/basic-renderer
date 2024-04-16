@@ -28,6 +28,18 @@ inline void SetTextureMap(const std::shared_ptr<Shader>& shader, const std::stri
 } // namespace utils
 
 /**
+ * @brief Flags representing properties of a material.
+ */
+struct MaterialFlags
+{
+    ///< Boolean flag indicating whether view direction is used in the shader.
+    bool ViewDirection = false;
+    
+    ///< Boolean flag indicating whether the normal matrix is used in the shader.
+    bool NormalMatrix = false;
+};
+
+/**
  * Base class representing a material used for rendering.
  *
  * The `Material` class provides a base interface for defining materials used in rendering.
@@ -65,36 +77,27 @@ public:
         SetMaterialProperties();
     }
     /// @brief Unbinds the material's associated shader.
-    virtual void Unbind() { m_Shader -> Unbind(); }
+    virtual void Unbind() 
+    {
+        m_Shader -> Unbind();
+        m_Slot = 0;
+    }
     
     // Getter(s)
     // ----------------------------------------
     /// @brief Return the shader associated with the material.
     /// @return shader program.
     std::shared_ptr<Shader> GetShader() { return m_Shader; }
-    /// @brief Defines if the viewing direction should be defined in the shader.
-    /// @return `true` if the view direction should be defined.
-    bool IsViewDirectionDefined() const { return m_ViewDirection; }
-    /// @brief Defines if the normal matrix should be defined in the shader.
-    /// @return `true` if the normal matrix should be defined.
-    bool IsNormalMatrixDefined() const { return m_NormalMatrix; }
     
-    // Setter(s)
-    // ----------------------------------------
-    /// @brief Defines if the viewing direction should be defined in the shader.
-    /// @param v The view direction is defined or not in the shader.
-    void SetViewDirection(bool v) { m_ViewDirection = v; }
-    /// @brief Defines if the normal matrix should be defined in the shader.
-    /// @param n The normal matrix is defined or not in the shader.
-    void SetNormalMatrix(bool n) { m_NormalMatrix = n; }
+    /// @brief Returns the active flags for the material.
+    /// @return Shading flags.
+    MaterialFlags& GetMaterialFlags() { return m_Flags; }
     
     // Properties
     // ----------------------------------------
     /// @brief Set the material properties.
     virtual void SetMaterialProperties()
-    {
-        m_Slot = 0;
-    }
+    {}
     
     // Material variables
     // ----------------------------------------
@@ -104,10 +107,8 @@ protected:
     
     ///< Texture unit index.
     unsigned int m_Slot = 0;
-    ///< Normal matrix should be defined in the shader.
-    bool m_NormalMatrix = false;
-    ///< View direction should be defined in the shader.
-    bool m_ViewDirection = false;
+    ///< Flags for shading.
+    MaterialFlags m_Flags;
     
     ///< Library containing all shader that have been loaded.
     static inline std::unique_ptr<ShaderLibrary> s_ShaderLibrary = std::make_unique<ShaderLibrary>();
@@ -133,17 +134,17 @@ class MaterialLibrary : public Library<std::shared_ptr<Material>>
 {
 public:
     /// @brief Loads a material and adds it to the library.
-    /// @tparam Type The type of object to load.
-    /// @tparam Args The types of arguments to forward to the object constructor.
-    /// @param name The name to associate with the loaded object.
-    /// @param args The arguments to forward to the object constructor.
+    /// @tparam Type The type of material to create.
+    /// @tparam Args The types of arguments to forward to the material constructor.
+    /// @param name The name to associate with the loaded material.
+    /// @param args The arguments to forward to the material constructor.
     /// @return The material created.
     template<typename Type, typename... Args>
     std::shared_ptr<Type> Create(const std::string& name, Args&&... args)
     {
         auto material = std::make_shared<Type>(std::forward<Args>(args)...);
         CORE_ASSERT(std::dynamic_pointer_cast<Material>(material),
-                    "Object '{0}' is not of the specified type!", name);
+                    "Material '{0}' is not of the specified type!", name);
         Add(name, material);
         return material;
     }

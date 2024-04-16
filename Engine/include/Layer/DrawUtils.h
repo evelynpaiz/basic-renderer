@@ -187,6 +187,9 @@ inline bool TextureLoader(std::shared_ptr<Texture2DResource> &texture,
     ImGui::Text("%s", label);
     ImGui::SameLine();
     TextDisplay(label, filePath.filename().string().c_str());
+
+    if (ImGui::Button("Clear"))
+        texture = nullptr;
     ImGui::Columns(1);
     
     return updated;

@@ -1,8 +1,10 @@
 #pragma once
 
 #include "Renderer/Material/Material.h"
-#include "Renderer/Light/Light.h"
 #include "Renderer/Buffer/FrameBuffer.h"
+
+#include "Renderer/Light/Light.h"
+#include "Renderer/Light/EnvironmentLight.h"
 
 /**
  * A base class for materials that are affected by lighting.
@@ -24,64 +26,44 @@ public:
     /// @brief Generate a (lighted) material with the specified shader file path.
     /// @param light The light source to be used for shading.
     /// @param filePath The file path to the shader used by the material.
-    LightedMaterial(const std::shared_ptr<Light>& light,
-                    const std::filesystem::path& filePath)
+    LightedMaterial(const std::filesystem::path& filePath)
         : Material(filePath)
     {
-        SetLightSource(light);
+        // Get the file name from the path
+        std::string filename = filePath.filename().string();
+
+        // Convert the filename to lowercase for case-insensitive comparison
+        std::transform(filename.begin(), filename.end(), filename.begin(), ::tolower);
+
+        // Check if the filename contains the word "shadow"
+        if (filename.find("shadow") != std::string::npos)
+            m_LightFlags.ShadowProperties = true;
     }
+    
     /// @brief Destructor for the (lighted) material.
     virtual ~LightedMaterial() = default;
     
-    // Setter(s)
-    // ----------------------------------------
-    /// @brief Set the light source used for shading.
-    /// @param light The light source.
-    void SetEnvironment(const std::shared_ptr<Light>& light) { m_Light = light; }
-    
-    /// @brief Set the light source used for shading.
-    /// @param light The light source.
-    void SetLightSource(const std::shared_ptr<Light>& light)
-    {
-        m_Light = light;
-        m_ShadowMap = light->GetShadowMap();
-    }
-    
     // Getter(s)
     // ----------------------------------------
-    /// @brief Get the light source used for shading.
-    /// @return The light source.
-    //const std::shared_ptr<Light>& GetLight() { return m_Light; }
+    /// @brief Returns the active flags for the lighted material.
+    /// @return Light flags.
+    LightFlags& GetLightFlags() { return m_LightFlags; }
     
-protected:
     // Properties
     // ----------------------------------------
-    /// @brief Define the shadow properties (from the light) into the uniforms of the shader program.
-    /// @param slot Next texture slot available.
-    void DefineShadowProperties()
+    /// @brief Define the light properties linked to the material.
+    /// @param param light The light object containing the light properties.
+    virtual void DefineLightProperties(const std::shared_ptr<BaseLight>& light)
     {
-        if (!m_ShadowMap)
-            return;
-        
-        m_Light->DefineTranformProperties(m_Shader);
-        utils::Texturing::SetTextureMap(m_Shader, "u_Light.ShadowMap", m_ShadowMap, m_Slot++);
-    }
-    /// @brief Set the material properties.
-    void SetMaterialProperties() override
-    {
-        Material::SetMaterialProperties();
-        m_Light->DefineLightProperties(m_Shader);
-        DefineShadowProperties();
+        m_Shader->Bind();
+        light->DefineLightProperties(m_Shader, m_LightFlags, m_Slot);
     }
     
     // Lighted color variables
     // ----------------------------------------
 protected:
-    ///< Light source.
-    std::shared_ptr<Light> m_Light;
-    
-    ///< The light map.
-    std::shared_ptr<Texture> m_ShadowMap;
+    ///< Flags for shading.
+    LightFlags m_LightFlags;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

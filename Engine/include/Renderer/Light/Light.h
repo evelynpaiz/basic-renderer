@@ -10,6 +10,23 @@
 #include <glm/glm.hpp>
 
 /**
+ * @brief Flags representing properties of a lighted object.
+ *
+ * The `LightFlags` struct defines various flags indicating properties of a lighted object,
+ * such as whether general properties, transformation properties, ambient lighting, diffuse
+ * lighting, and specular lighting are enabled.
+ */
+struct LightFlags
+{
+    bool GeneralProperties = true;          ///< Indicates whether general properties are enabled.
+    bool ShadowProperties = false;          ///< Indicates whether shadows properties are enabled.
+    
+    bool AmbientLighting = true;            ///< Indicates whether ambient lighting is enabled.
+    bool DiffuseLighting = true;            ///< Indicates whether diffuse lighting is enabled.
+    bool SpecularLighting = true;           ///< Indicates whether specular lighting is enabled.
+};
+
+/**
  * Base class for light.
  *
  * Copying or moving `BaseLight` objects is disabled to ensure single ownership and prevent unintended
@@ -27,7 +44,23 @@ public:
     // ----------------------------------------
     /// @brief Get the light 3D model representing the light.
     /// @return The light 3D model.
-    virtual const std::shared_ptr<BaseModel>& GetModel() { return m_Model; }
+    const std::shared_ptr<BaseModel>& GetModel() { return m_Model; }
+    
+    // Render
+    // ----------------------------------------
+    /// @brief Renders the 3D model that represents the light source.
+    virtual void DrawLight()
+    {
+        if (m_Model)
+            m_Model->DrawModel();
+    }
+    
+    /// @brief Define light properties into the uniforms of the shader program.
+    /// @param shader The shader program.
+    /// @param flags The flags indicating which light properties should be defined.
+    virtual void DefineLightProperties(const std::shared_ptr<Shader>& shader,
+                                       const LightFlags& flags,
+                                       unsigned int& slot) = 0;
     
 protected:
     // Constructor(s)
@@ -82,9 +115,6 @@ public:
     /// @param color The color of the light source.
     void SetColor(const glm::vec3 &color) { m_Color = color; }
     
-    /// @brief Set the strength of the ambient component of the light source.
-    /// @param s The strength of the ambient component (a value between 0 and 1).
-    void SetAmbientStrength(float s) { m_AmbientStrength = s; }
     /// @brief Set the strength of the diffuse component of the light source.
     /// @param s The strength of the diffuse component (a value between 0 and 1).
     void SetDiffuseStrength(float s) { m_DiffuseStrength = s; }
@@ -94,13 +124,13 @@ public:
     
     // Getter(s)
     // ----------------------------------------
+    ///< @brief Get the ID of the light source.
+    ///< @return Light ID number.
+    unsigned int GetID() const { return m_ID; }
     /// @brief Get the color of the light source.
     /// @return The color of the light source.
     glm::vec3 GetColor() const { return m_Color; }
     
-    /// @brief Get the ambient strength of the light source.
-    /// @return The ambient strength of the light source.
-    float GetAmbientStrength() const { return m_AmbientStrength; }
     /// @brief Get the diffuse strength of the light source.
     /// @return The diffuse strength of the light source.
     float GetDiffuseStrength() const { return m_DiffuseStrength; }
@@ -128,43 +158,49 @@ public:
     /// @param shader Shader program to be used.
     void DefineGeneralProperties(const std::shared_ptr<Shader> &shader)
     {
-        shader->SetVec3("u_Light.Color", m_Color);
-        shader->SetVec4("u_Light.Vector", m_Vector);
+        shader->SetVec3("u_Light[" + std::to_string(m_ID) + "].Color", m_Color);
+        shader->SetVec4("u_Light[" + std::to_string(m_ID) + "].Vector", m_Vector);
     }
     /// @brief Define the strength properties (from the light) into the uniforms of the shader program.
     /// @param shader Shader program to be used.
-    void DefineStrenghtProperties(const std::shared_ptr<Shader> &shader)
+    void DefineStrenghtProperties(const std::shared_ptr<Shader> &shader,
+                                  const LightFlags& flags)
     {
-        if (m_AmbientStrength > 0.0)
-            shader->SetFloat("u_Light.La", m_AmbientStrength);
-        if (m_DiffuseStrength > 0.0)
-            shader->SetFloat("u_Light.Ld", m_DiffuseStrength);
-        if (m_SpecularStrength > 0.0)
-            shader->SetFloat("u_Light.Ls", m_SpecularStrength);
+        if (flags.DiffuseLighting)
+            shader->SetFloat("u_Light[" + std::to_string(m_ID) + "].Ld", m_DiffuseStrength);
+        if (flags.SpecularLighting)
+            shader->SetFloat("u_Light[" + std::to_string(m_ID) + "].Ls", m_SpecularStrength);
     }
     /// @brief Define the transformation properties (from the light) into the uniforms of the shader program.
     /// @param shader Shader program to be used.
     void DefineTranformProperties(const std::shared_ptr<Shader> &shader)
     {
-        const static glm::mat4 textureMatrix = glm::mat4(
-            0.5f, 0.0f, 0.0f, 0.0f,
-            0.0f, 0.5f, 0.0f, 0.0f,
-            0.0f, 0.0f, 0.5f, 0.0f,
-            0.5f, 0.5f, 0.5f, 1.0f
-        );
-        
-        shader->SetMat4("u_Transform.Light",
+        shader->SetMat4("u_Light[" + std::to_string(m_ID) + "].Transform",
                         m_ShadowCamera->GetProjectionMatrix() *
                         m_ShadowCamera->GetViewMatrix());
-        shader->SetMat4("u_Transform.Texture", textureMatrix);
     }
     
     /// @brief Define light properties into the uniforms of the shader program.
     /// @param shader The shader program.
-    void DefineLightProperties(const std::shared_ptr<Shader> &shader)
+    /// @param flags The flags indicating which light properties should be defined.
+    void DefineLightProperties(const std::shared_ptr<Shader>& shader,
+                               const LightFlags& flags,
+                               unsigned int& slot) override
     {
-        DefineGeneralProperties(shader);
-        DefineStrenghtProperties(shader);
+        // Define general light properties if specified by the flags
+        if (flags.GeneralProperties)
+            DefineGeneralProperties(shader);
+        
+        // Define strength properties for the light
+        DefineStrenghtProperties(shader, flags);
+        
+        // Define transformation properties if specified by the flags
+        if (flags.ShadowProperties)
+        {
+            DefineTranformProperties(shader);
+            utils::Texturing::SetTextureMap(shader, "u_Light[" + std::to_string(GetID()) + "].ShadowMap",
+                                            GetShadowMap(), slot++);
+        }
     }
     
 protected:
@@ -174,7 +210,7 @@ protected:
     /// @param color The color of the light source.
     Light(const glm::vec4 &vector,
           const glm::vec3 &color = glm::vec3(1.0f))
-        : BaseLight(), m_Vector(vector), m_Color(color)
+        : BaseLight(), m_ID(s_IndexCount++), m_Vector(vector), m_Color(color)
     {};
     /// @brief Initialize the shadow map framebuffer.
     /// @param width Framebuffer's width.
@@ -190,6 +226,9 @@ protected:
 protected:
     // Light variables
     // ----------------------------------------
+    ///< The index id of the light source.
+    unsigned int m_ID;
+    
     ///< The position of the light if .w is defined as 1.0f, or
     ///< the direction of the light if .w is defined as 0.0f.
     glm::vec4 m_Vector;
@@ -198,7 +237,6 @@ protected:
     glm::vec3 m_Color;
     
     ///< The light intensities.
-    float m_AmbientStrength = 0.2f;
     float m_DiffuseStrength = 0.6f;
     float m_SpecularStrength = 0.4f;
     
@@ -206,6 +244,8 @@ protected:
     std::shared_ptr<Camera> m_ShadowCamera;
     ///< Framebuffer to render into the shadow map.
     std::shared_ptr<FrameBuffer> m_Framebuffer;
+    
+    static inline unsigned int s_IndexCount = 0;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------
@@ -215,4 +255,31 @@ public:
 
     Light& operator=(const Light&) = delete;
     Light& operator=(Light&&) = delete;
+};
+
+/**
+ * A library for managing lights used in rendering.
+ *
+ * The `LightLibrary` class provides functionality to add, load, retrieve, and check
+ * for the existence of lights within the library. Each light is associated with
+ * a unique name.
+ */
+class LightLibrary : public Library<std::shared_ptr<BaseLight>>
+{
+public:
+    /// @brief Loads a material and adds it to the library.
+    /// @tparam Type The type of the light to create.
+    /// @tparam Args The types of arguments to forward to the light constructor.
+    /// @param name The name to associate with the loaded light.
+    /// @param args The arguments to forward to the light constructor.
+    /// @return The light created.
+    template<typename Type, typename... Args>
+    std::shared_ptr<Type> Create(const std::string& name, Args&&... args)
+    {
+        auto light = std::make_shared<Type>(std::forward<Args>(args)...);
+        CORE_ASSERT(std::dynamic_pointer_cast<BaseLight>(light),
+                    "Light '{0}' is not of the specified type!", name);
+        Add(name, light);
+        return light;
+    }
 };

@@ -1,6 +1,9 @@
 #include "enginepch.h"
 #include "Renderer/Light/EnvironmentLight.h"
 
+#include "Renderer/Texture/Texture.h"
+#include "Renderer/Texture/TextureCube.h"
+
 #include "Renderer/Light/PositionalLight.h"
 
 /**
@@ -95,6 +98,56 @@ void EnvironmentLight::SetEnvironmentMap(const std::shared_ptr<Texture>& texture
     // Update the environment information
     UpdateEnvironment();
     UpdateLight();
+}
+
+/**
+ * Get the irradiance map of the environment light.
+ *
+ * @return A shared pointer to the irradiance map texture.
+ */
+const std::shared_ptr<Texture>& EnvironmentLight::GetIrradianceMap()
+{
+    return m_Framebuffers.Get("Irradiance")->GetColorAttachment(0);
+}
+
+/**
+ * Get the pre-filter map of the environment light.
+ *
+ * @return A shared pointer to the pre-filter map texture.
+ */
+const std::shared_ptr<Texture>& EnvironmentLight::GetPreFilterMap()
+{
+    return m_Framebuffers.Get("PreFilter")->GetColorAttachment(0);
+}
+
+/**
+ * @brief Define light properties into the uniforms of the shader program.
+ *
+ * @param shader The shader program.
+ * @param flags The flags indicating which light properties should be defined.
+ * @param slot The texture slot to bind the environment map to.
+ */
+void EnvironmentLight::DefineLightProperties(const std::shared_ptr<Shader> &shader,
+                                             const LightFlags &flags,
+                                             unsigned int& slot)
+{
+    // Define the environment map strength
+    if (flags.AmbientLighting)
+        shader->SetFloat("u_Environment.La", m_AmbientStrength);
+    
+    // Check if an environment map is available
+    if (GetEnvironmentMap())
+    {
+        // Set the irradiance map uniform to the environment's irradiance map
+        utils::Texturing::SetTextureMap(shader, "u_Environment.IrradianceMap",
+                                        GetIrradianceMap(), slot++);
+    }
+    else
+    {
+        // Set the irradiance map uniform to a white texture cube
+        utils::Texturing::SetTextureMap(shader, "u_Environment.IrradianceMap",
+                                        utils::Texturing::WhiteTexture<TextureCube>(), slot++);
+    }
 }
 
 /**
@@ -225,32 +278,4 @@ void EnvironmentLight::RenderCubeMap(const std::array<glm::mat4, 6>& views, cons
 
     // Unbind the framebuffer and optionally generate mipmaps
     framebuffer->Unbind(genMipMaps);
-}
-
-/**
- * Define in the shader the irradiance map computed from the environment.
- *
- * @param shader The shader program.
- * @param slot The texture slot.
- */
-void EnvironmentLight::DefineIrradianceMap(const std::shared_ptr<Shader> &shader,
-                                           const unsigned int slot)
-{
-    utils::Texturing::SetTextureMap(shader, "u_Light.IrradianceMap",
-                                    m_Framebuffers.Get("Irradiance")->GetColorAttachment(0),
-                                    slot);
-}
-
-/**
- * Define in the shader the pre-filter map computed from the environment.
- *
- * @param shader The shader program.
- * @param slot The texture slot.
- */
-void EnvironmentLight::DefinePreFilterMap(const std::shared_ptr<Shader> &shader,
-                                          const unsigned int slot)
-{
-    utils::Texturing::SetTextureMap(shader, "u_Light.PreFilterMap",
-                                    m_Framebuffers.Get("PreFilter")->GetColorAttachment(0),
-                                    slot);
 }

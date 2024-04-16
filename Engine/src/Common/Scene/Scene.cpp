@@ -1,6 +1,7 @@
 #include "enginepch.h"
 #include "Scene/Scene.h"
 
+#include "Renderer/Material/LightedMaterial.h"
 #include "Renderer/Material/SimpleMaterial.h"
 #include "Renderer/Light/PositionalLight.h"
 
@@ -18,8 +19,7 @@ Scene::Scene(int width, int height,
     m_Camera = std::make_shared<PerspectiveCamera>(width, height);
     
     // Define the lights
-    m_Environment = std::make_shared<EnvironmentLight>(width, height);
-    m_Models.Add("Environment", m_Environment->GetModel());
+    m_Lights.Create<EnvironmentLight>("Environment", width, height);
     
     // Define the viewport
     m_Viewport = std::make_shared<Viewport>(width, height, viewportShader);
@@ -66,25 +66,29 @@ void Scene::Draw(const RenderPassSpecification &pass)
     // Render each model with its associated material
     for (auto& pair : pass.Models)
     {
+        // Check if the model is the light sources and render it separately
+        if (pair.first == "Light")
+        {
+            DrawLight(); // Render the light source
+            continue;   // Move to the next iteration of the loop
+        }
+            
+        // Retrieve the model associated with the current pair
         auto& model = m_Models.Get(pair.first);
         
-        // Check that the model has been defined
+        // Check if the model is valid
         if (model)
         {
+            // If a material is specified for the model, set it
             if (!pair.second.empty())
-                model->SetMaterial(Renderer::GetMaterialLibrary().Get(pair.second));
-            
-            // Draw the environment with a different configuration
-            if (pair.first == "Environment" &&
-                m_Environment->GetEnvironmentMap())
             {
-                Renderer::SetDepthFunction(DepthFunction::LEqual);
-                model->DrawModel();
-                Renderer::SetDepthFunction(DepthFunction::Less);
+                auto& material = Renderer::GetMaterialLibrary().Get(pair.second);
+                DefineShadowProperties(material);
+                model->SetMaterial(material);
             }
+            
             // Draw the model
-            else
-                model->DrawModel();
+            model->DrawModel();
         }
     }
         
@@ -101,6 +105,18 @@ void Scene::Draw(const RenderPassSpecification &pass)
 }
 
 /**
+ * Draws the scene lights.
+ */
+void Scene::DrawLight()
+{
+    for (auto& pair : m_Lights)
+    {
+        auto& light = pair.second;
+        light->DrawLight();
+    }
+}
+
+/**
  * Draws the scene according to the specified render passes.
  */
 void Scene::Draw()
@@ -110,5 +126,26 @@ void Scene::Draw()
         auto& pass = m_RenderPasses.Get(name);
         if (pass.Active);
             Draw(pass);
+    }
+}
+
+/**
+ * Define shadow properties for a given material.
+ *
+ * @param baseMaterial The base material to define shadow properties for.
+ * @note If the "Shadow" render pass does not exist in the scene, no shadows maps will be defined.
+ */
+void Scene::DefineShadowProperties(const std::shared_ptr<Material>& baseMaterial)
+{
+    // Attempt to cast the base material to a LightedMaterial
+    auto material = std::dynamic_pointer_cast<LightedMaterial>(baseMaterial);
+    if (!material)
+        return; // Base material is not a LightedMaterial, so return early
+
+    // Iterate through each light in the scene
+    for (auto& pair : m_Lights)
+    {
+        // Define shadow properties for the material using the current light
+        material->DefineLightProperties(pair.second);
     }
 }

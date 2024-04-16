@@ -27,12 +27,6 @@ public:
     void OnUpdate(Timestep ts) override;
     void OnEvent(Event& e) override;
     
-    // Getter(s)
-    // ----------------------------------------
-    /// @brief Get the light source.
-    /// @return The light source.
-    std::shared_ptr<Light> GetLightSource() { return m_Scene->GetLightSource(); }
-    
     // Setters(s)
     // ----------------------------------------
     /// @brief Set the interaction state inside this layer.
