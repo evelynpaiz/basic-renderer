@@ -66,10 +66,6 @@ private:
     ///< Layers to be rendered.
     LayerStack m_LayerStack;
     
-protected:
-    ///< Window size.
-    int m_Width, m_Height;
-    
 private:
     ///< Pointer to this application.
     static Application* s_Instance;

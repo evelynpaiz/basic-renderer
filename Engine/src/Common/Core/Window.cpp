@@ -265,8 +265,6 @@ void Window::Init()
 #endif
     
     // Create a windowed mode window and its OpenGL context
-    CORE_INFO("Creating '{0}' window ({1} x {2})", m_Data.Title,
-              m_Data.Width, m_Data.Height);
     m_Window = glfwCreateWindow(m_Data.Width, m_Data.Height,
                                 m_Data.Title.c_str(), nullptr, nullptr);
     CORE_ASSERT(m_Window, "Failed to create a GLFW window!");
@@ -297,6 +295,12 @@ void Window::Init()
     glfwSetMouseButtonCallback(m_Window, MouseButtonCallback);
     glfwSetScrollCallback(m_Window, MouseScrolledCallback);
     glfwSetCursorPosCallback(m_Window, MouseMovedCallback);
+    
+    glfwGetFramebufferSize(m_Window, &m_Data.Width, &m_Data.Height);
+    
+    // Show window created message
+    CORE_INFO("Creating '{0}' window ({1} x {2})", m_Data.Title,
+              m_Data.Width, m_Data.Height);
 }
 
 /**

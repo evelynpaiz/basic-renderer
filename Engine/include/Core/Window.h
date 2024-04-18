@@ -14,7 +14,7 @@ struct WindowData
     ///< Window title.
     std::string Title;
     ///< Window size.
-    unsigned int Width, Height;
+    int Width, Height;
     ///< Vertical synchronization with the monitor.
     bool VerticalSync;
     

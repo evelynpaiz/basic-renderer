@@ -182,15 +182,11 @@ void Viewer::DefineRenderPasses()
  */
 bool Viewer::OnWindowResize(WindowResizeEvent &e)
 {
-    // Update the viewport size
-    m_Scene->GetViewport()->SetWidth(e.GetWidth());
-    m_Scene->GetViewport()->SetHeight(e.GetHeight());
-    
-    // Update the camera size
+    // Update the camera
     m_Scene->GetCamera()->SetViewportSize(e.GetWidth(), e.GetHeight());
     
-    // Update the screen and the framebuffer
+    // Update the viewport
     m_Scene->GetViewport()->Resize(e.GetWidth(), e.GetHeight());
-    m_Scene->GetFrameBufferLibrary().Get("Shadow")->Resize(e.GetWidth(), e.GetHeight());
+    m_Scene->GetRenderPasses().Get("Viewport").Size = { e.GetWidth(), e.GetHeight() };
     return true;
 }
