@@ -132,8 +132,7 @@ void EnvironmentLight::DefineLightProperties(const std::shared_ptr<Shader> &shad
                                              unsigned int& slot)
 {
     // Define the environment map strength
-    if (flags.AmbientLighting)
-        shader->SetFloat("u_Environment.La", m_AmbientStrength);
+    shader->SetFloat("u_Environment.La", m_AmbientStrength);
     
     // Check if an environment map is available
     if (GetEnvironmentMap())

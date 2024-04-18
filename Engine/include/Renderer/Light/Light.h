@@ -21,7 +21,6 @@ struct LightFlags
     bool GeneralProperties = true;          ///< Indicates whether general properties are enabled.
     bool ShadowProperties = false;          ///< Indicates whether shadows properties are enabled.
     
-    bool AmbientLighting = true;            ///< Indicates whether ambient lighting is enabled.
     bool DiffuseLighting = true;            ///< Indicates whether diffuse lighting is enabled.
     bool SpecularLighting = true;           ///< Indicates whether specular lighting is enabled.
 };
@@ -267,6 +266,24 @@ public:
 class LightLibrary : public Library<std::shared_ptr<BaseLight>>
 {
 public:
+    // Add/Create
+    // ----------------------------------------
+    /// @brief Adds an object to the library.
+    /// @param name The name to associate with the object.
+    /// @param object The object to add.
+    /// @note If an object with the same name already exists in the library, an assertion failure
+    /// will occur.
+    void Add(const std::string& name,
+             const std::shared_ptr<BaseLight>& light) override
+    {
+        // Add the light to the library
+        Library::Add(name, light);
+        
+        // Count it as light caster if necessary
+        if (std::dynamic_pointer_cast<Light>(light))
+            m_Casters++;
+    }
+    
     /// @brief Loads a material and adds it to the library.
     /// @tparam Type The type of the light to create.
     /// @tparam Args The types of arguments to forward to the light constructor.
@@ -282,4 +299,14 @@ public:
         Add(name, light);
         return light;
     }
+    
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Get the number of direct lights (light casters)
+    /// @return The counter of lights.
+    int GetLightCastersNumber() const { return m_Casters; }
+    
+private:
+    ///< Number of light casters in the library.
+    int m_Casters;
 };

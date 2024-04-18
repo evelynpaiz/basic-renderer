@@ -5,8 +5,8 @@ layout (location = 0) out vec4 color;
 uniform View u_View;                        // View information
 uniform Material u_Material;                // Material properties
 
-#define NUMBER_LIGHTS 3
-uniform Light u_Light[NUMBER_LIGHTS];       // Light information
+#define MAX_NUMBER_LIGHTS 4
+uniform Light u_Light[MAX_NUMBER_LIGHTS];    // Light information
 uniform Environment u_Environment;           // Environment properties
 
 // Input variables from the vertex shader

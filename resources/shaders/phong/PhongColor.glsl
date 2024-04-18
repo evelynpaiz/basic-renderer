@@ -33,7 +33,7 @@ void main()
     vec3 reflectance = vec3(0.0f);
     
     // Shade based on each light source in the scene
-    for(int i = 0; i < NUMBER_LIGHTS; i++)
+    for(int i = 0; i < u_Environment.LightsNumber; i++)
     {
         // Calculate the shading result using Phong shading model
         reflectance += calculateColor(v_Position, v_Normal, u_View.Position, u_Light[i].Vector, u_Light[i].Color,

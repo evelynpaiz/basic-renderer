@@ -142,10 +142,6 @@ void Scene::DefineShadowProperties(const std::shared_ptr<Material>& baseMaterial
     if (!material)
         return; // Base material is not a LightedMaterial, so return early
 
-    // Iterate through each light in the scene
-    for (auto& pair : m_Lights)
-    {
-        // Define shadow properties for the material using the current light
-        material->DefineLightProperties(pair.second);
-    }
+    // Define the properties of the material related to the light sources
+    material->DefineLightProperties(m_Lights);
 }

@@ -3,6 +3,7 @@
 
 // Include transformation matrices
 #include "Resources/shaders/common/light/CompleteLight.glsl"
+#include "Resources/shaders/common/light/EnvironmentLight.glsl"
 #include "Resources/shaders/common/matrix/CompleteMatrix.glsl"
 
 // Include vertex shader
@@ -45,7 +46,7 @@ void main()
     vec3 reflectance = vec3(0.0f);
     
     // Shade based on each light source in the scene
-    for(int i = 0; i < NUMBER_LIGHTS; i++)
+    for(int i = 0; i < u_Environment.LightsNumber; i++)
     {
         // Calculate the normalized surface normal
         vec3 normal = normalize(v_Normal);

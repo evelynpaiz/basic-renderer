@@ -1,19 +1,20 @@
 // Input vertex attributes
-layout (location = 0) in vec4 a_Position;       // Vertex position in object space
-layout (location = 1) in vec2 a_TextureCoord;  // Texture coordinates
-layout (location = 2) in vec3 a_Normal;        // Vertex normal in object space
+layout (location = 0) in vec4 a_Position;           // Vertex position in object space
+layout (location = 1) in vec2 a_TextureCoord;       // Texture coordinates
+layout (location = 2) in vec3 a_Normal;             // Vertex normal in object space
 
 // Uniform buffer block containing transformation matrices
 uniform Transform u_Transform;
 
-#define NUMBER_LIGHTS 3
-uniform Light u_Light[NUMBER_LIGHTS];
+uniform Environment u_Environment;
+#define MAX_NUMBER_LIGHTS 4
+uniform Light u_Light[MAX_NUMBER_LIGHTS];
 
 // Output to fragment shader
-out vec3 v_Position;                            // Vertex position in world space
-out vec2 v_TextureCoord;                        // Texture coordinates
-out vec3 v_Normal;                              // Vertex normal in world space
-out vec4 v_LightSpacePosition[NUMBER_LIGHTS];   // Vertex position in light space
+out vec3 v_Position;                                // Vertex position in world space
+out vec2 v_TextureCoord;                            // Texture coordinates
+out vec3 v_Normal;                                  // Vertex normal in world space
+out vec4 v_LightSpacePosition[MAX_NUMBER_LIGHTS];   // Vertex position in light space
 
 // Entry point of the vertex shader
 void main()
@@ -29,7 +30,7 @@ void main()
     // Pass the input texture coordinates to the fragment shader
     v_TextureCoord = a_TextureCoord;
     // Pass the vertex position in light space to the fragment shader
-    for(int i = 0; i < NUMBER_LIGHTS; i++)
+    for(int i = 0; i < u_Environment.LightsNumber; i++)
     {
         v_LightSpacePosition[i] = u_Transform.Texture * u_Light[i].Transform * worldPosition;
     }

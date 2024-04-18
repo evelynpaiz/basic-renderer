@@ -52,10 +52,22 @@ public:
     // Properties
     // ----------------------------------------
     /// @brief Define the light properties linked to the material.
-    /// @param param light The light object containing the light properties.
-    virtual void DefineLightProperties(const std::shared_ptr<BaseLight>& light)
+    /// @param lights The set of lights in the scene.
+    void DefineLightProperties(LightLibrary& lights)
     {
         m_Shader->Bind();
+        m_Shader->SetInt("u_Environment.LightsNumber", lights.GetLightCastersNumber());
+        
+        // Iterate through each light in the scene
+        for (auto& pair : lights)
+            DefineLightProperties(pair.second);
+    }
+    
+protected:
+    /// @brief Define the light properties linked to the material.
+    /// @param light The light object containing the light properties.
+    virtual void DefineLightProperties(const std::shared_ptr<BaseLight>& light)
+    {
         light->DefineLightProperties(m_Shader, m_LightFlags, m_Slot);
     }
     

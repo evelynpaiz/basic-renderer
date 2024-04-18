@@ -52,12 +52,6 @@ public:
     const std::shared_ptr<Texture>& GetIrradianceMap();
     const std::shared_ptr<Texture>& GetPreFilterMap();
     
-    // Properties
-    // ----------------------------------------
-    void DefineLightProperties(const std::shared_ptr<Shader>& shader,
-                               const LightFlags& flags,
-                               unsigned int& slot) override;
-    
     // Render
     // ----------------------------------------
     /// @brief Renders the 3D model that represents the light source.
@@ -70,6 +64,13 @@ public:
             Renderer::SetDepthFunction(DepthFunction::Less);
         }
     }
+    
+private:
+    // Properties
+    // ----------------------------------------
+    void DefineLightProperties(const std::shared_ptr<Shader>& shader,
+                               const LightFlags& flags,
+                               unsigned int& slot) override;
     
 private:
     // Initialization
@@ -94,7 +95,7 @@ private:
     // ----------------------------------------
 private:
     ///< The ambient light intensity.
-    float m_AmbientStrength = 0.2f;
+    float m_AmbientStrength = 0.4f;
     ///< The environment map.
     std::shared_ptr<Texture> m_EnvironmentMap;
     

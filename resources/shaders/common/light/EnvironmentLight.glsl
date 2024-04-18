@@ -4,6 +4,7 @@
 struct Environment
 {
     float La;                       ///< Ambient light intensity.
+    int LightsNumber;               ///< Number of lights in the environment.
     
     samplerCube IrradianceMap;      ///< Irradiance map for (diffuse) indirect lighting.
     

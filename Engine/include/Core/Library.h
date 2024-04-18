@@ -21,7 +21,7 @@ public:
     /// @brief Delete the library.
     virtual ~Library() = default;
     
-    // Add/Load
+    // Add
     // ----------------------------------------
     /// @brief Adds an object to the library.
     /// @param name The name to associate with the object.
