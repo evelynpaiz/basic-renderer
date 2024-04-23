@@ -92,10 +92,10 @@ public:
     // ----------------------------------------
     /// @brief Get the size (width) of the viewport.
     /// @return The width size.
-    const int GetViewportWidth() const { return m_Viewport->m_Width; };
+    int GetViewportWidth() const { return m_Viewport->m_Width; };
     /// @brief Get the size (height) of the viewport.
     /// @return The height size.
-    const int GetViewportHeight() const { return m_Viewport->m_Height; };
+    int GetViewportHeight() const { return m_Viewport->m_Height; };
     
     /// @brief Get the viewport where the scene is being rendered.
     /// @return The viewport.

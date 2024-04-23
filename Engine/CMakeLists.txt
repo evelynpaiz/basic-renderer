@@ -76,6 +76,13 @@ target_link_libraries(Engine
     Renderer::Resources spdlog::spdlog OpenGL::GL glfw::glfw glew::glew glm::glm stb::stb assimp::assimp imgui::imgui
 )
 
+# Link metal if apple device is used
+if (APPLE)
+    target_link_libraries(Engine
+        ${APPLE_FWK_FOUNDATION} ${APPLE_FWK_QUARTZ_CORE} ${APPLE_FWK_METAL} Metal::Cpp
+    )
+endif()
+
 # Define pre-compiled header
 target_precompile_headers(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/enginepch.h)
 

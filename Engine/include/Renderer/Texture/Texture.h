@@ -43,7 +43,7 @@ struct TextureSpecification
     /// @param format The texture format.
     /// @param type The type of the texture.
     TextureSpecification(const TextureFormat& format, const TextureType& type) :
-        Format(format), Type(type)
+        Type(type), Format(format)
     { }
     /// @brief Define a texture with a specific format.
     /// @param format The texture format.
@@ -60,6 +60,7 @@ struct TextureSpecification
     {
         Width = width;
         Height = height;
+        Depth = depth;
     }
     
     // Texture specification variables

@@ -299,7 +299,7 @@ protected:
     /// @param primitive The primitive type of the model.
     LoadedModel(const std::filesystem::path& filePath,
                 const PrimitiveType &primitive)
-        : m_FilePath(filePath), Model<VertexData>(primitive)
+        : Model<VertexData>(primitive), m_FilePath(filePath)
     {}
     
     // Model variables

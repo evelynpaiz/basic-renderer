@@ -14,10 +14,8 @@ namespace utils { namespace Draw {
  *
  * @param id  A unique identifier for the input field.
  * @param text The text to display in the input field.
- * @param distance The relative width of the input field (default is 0.78f).
  */
-inline void TextDisplay(const char *id, const char *text,
-                        float distance = 0.78f)
+inline void TextDisplay(const char *id, const char *text)
 {
     ImGui::PushID(id);
     char buffer[256];
