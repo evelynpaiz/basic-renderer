@@ -1,5 +1,5 @@
 #include "enginepch.h"
-#include "Renderer/Buffer/VertexBuffer.h"
+#include "Common/Renderer/Buffer/VertexBuffer.h"
 
 #include <GL/glew.h>
 

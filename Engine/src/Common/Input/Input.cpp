@@ -1,10 +1,10 @@
 #include "enginepch.h"
-#include "Input/Input.h"
+#include "Common/Input/Input.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "Core/Application.h"
+#include "Common/Core/Application.h"
 
 /**
  * Check if a specific keyboard key is currently pressed.

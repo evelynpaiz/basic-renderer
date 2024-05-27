@@ -5,25 +5,35 @@ file(
     GLOB_RECURSE sources
     LIST_DIRECTORIES false
     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-    src/Common/*.cpp src/src/Common/*.mm src/src/Common/*.h
+    src/Common/*.cpp src/Common/*.mm
 )
 
 # Find platform-specific source files
 if(WIN32)
-    set(PLATFORM_DIR "Platform/OS/Windows")
+    set(PLATFORM_OS_DIR "Platform/OS/Windows")
+    set(PLATFORM_API_METAL_DIR "Platform/API/Generic")
 elseif(APPLE)
-    set(PLATFORM_DIR "Platform/OS/MacOS")
+    set(PLATFORM_OS_DIR "Platform/OS/MacOS")
+    set(PLATFORM_API_METAL_DIR "Platform/API/Metal")
 else()
-    set(PLATFORM_DIR "Platform/OS/Generic")
+    set(PLATFORM_OS_DIR "Platform/OS/Generic")
+    set(PLATFORM_API_METAL_DIR "Platform/API/Generic")
 endif()
+
+set(PLATFORM_API_OPENGL_DIR "Platform/API/OpenGL")
 
 file(
     GLOB_RECURSE platform_sources
     LIST_DIRECTORIES false
     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-    src/${PLATFORM_DIR}/*.cpp
-    src/${PLATFORM_DIR}/*.mm
-    src/${PLATFORM_DIR}/*.h
+    src/${PLATFORM_OS_DIR}/*.cpp
+    src/${PLATFORM_OS_DIR}/*.mm
+    
+    src/${PLATFORM_API_OPENGL_DIR}/*.cpp
+    src/${PLATFORM_API_OPENGL_DIR}/*.mm
+    
+    src/${PLATFORM_API_METAL_DIR}/*.cpp
+    src/${PLATFORM_API_METAL_DIR}/*.mm
 )
 
 # Find header files

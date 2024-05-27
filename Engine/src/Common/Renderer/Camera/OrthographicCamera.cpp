@@ -1,12 +1,12 @@
 #include "enginepch.h"
-#include "Renderer/Camera/OrthographicCamera.h"
+#include "Common/Renderer/Camera/OrthographicCamera.h"
 
-#include "Input/Input.h"
-#include "Input/KeyCodes.h"
-#include "Input/MouseCodes.h"
+#include "Common/Input/Input.h"
+#include "Common/Input/KeyCodes.h"
+#include "Common/Input/MouseCodes.h"
 
-#include "Event/MouseEvent.h"
-#include "Event/KeyEvent.h"
+#include "Common/Event/MouseEvent.h"
+#include "Common/Event/KeyEvent.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>

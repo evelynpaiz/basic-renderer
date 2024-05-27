@@ -1,8 +1,8 @@
 #include "enginepch.h"
-#include "Layer/GuiLayer.h"
+#include "Common/Layer/GuiLayer.h"
 
-#include "Core/Application.h"
-#include "Renderer/Renderer.h"
+#include "Common/Core/Application.h"
+#include "Common/Renderer/Renderer.h"
 
 #include <GLFW/glfw3.h>
 

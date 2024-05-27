@@ -2,8 +2,8 @@
 
 #include "Engine.h"
 
-#include "Viewer.h"
-#include "ViewerGui.h"
+#include "Viewer/Viewer.h"
+#include "Viewer/ViewerGui.h"
 
 /**
  * Handles a 3D viewer application.

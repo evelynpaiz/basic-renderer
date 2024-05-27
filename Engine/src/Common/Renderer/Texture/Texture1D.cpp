@@ -1,5 +1,5 @@
 #include "enginepch.h"
-#include "Renderer/Texture/Texture1D.h"
+#include "Common/Renderer/Texture/Texture1D.h"
 
 #include <GL/glew.h>
 #include <stb_image.h>

@@ -1,12 +1,12 @@
 #include "enginepch.h"
-#include "Core/Window.h"
+#include "Common/Core/Window.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "Event/WindowEvent.h"
-#include "Event/KeyEvent.h"
-#include "Event/MouseEvent.h"
+#include "Common/Event/WindowEvent.h"
+#include "Common/Event/KeyEvent.h"
+#include "Common/Event/MouseEvent.h"
 
 // --------------------------------------------
 // Variable initialization
@@ -219,7 +219,7 @@ Window::~Window()
 void Window::OnUpdate() const
 {
     // Swap front and back buffers
-    glfwSwapBuffers(m_Window);
+    m_Context->SwapBuffers();
     
     // Poll for and process events
     glfwPollEvents();
@@ -233,11 +233,7 @@ void Window::OnUpdate() const
  */
 void Window::SetVerticalSync(bool enabled)
 {
-    if (enabled)
-        glfwSwapInterval(1);
-    else
-        glfwSwapInterval(0);
-
+    m_Context->SetVerticalSync(enabled);
     m_Data.VerticalSync = enabled;
 }
 
@@ -255,33 +251,21 @@ void Window::Init()
         glfwSetErrorCallback(ErrorCallback);
     }
     
-    // Configure GLFW
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
+    // Define the window hints for on the graphics context
+    GraphicsContext::SetWindowHints();
     
     // Create a windowed mode window and its OpenGL context
     m_Window = glfwCreateWindow(m_Data.Width, m_Data.Height,
                                 m_Data.Title.c_str(), nullptr, nullptr);
     CORE_ASSERT(m_Window, "Failed to create a GLFW window!");
-    
-    // Make the window's context current
-    glfwMakeContextCurrent(m_Window);
     ++g_WindowCount;
+    
+    // Initialize the rendering context
+    m_Context = GraphicsContext::Create(m_Window);
+    m_Context->Init();
     
     // Set a vertical synchronization
     SetVerticalSync(true);
-    
-    // Initialize GLEW
-    CORE_ASSERT(glewInit() == GLEW_OK, "Failed to initialize GLEW!");
-    
-    // Display the version of OpenGL
-    CORE_INFO("Using OpenGL version {0}",
-              (const char*)glGetString(GL_VERSION));
     
     // Set the pointer to the window data
     glfwSetWindowUserPointer(m_Window, &m_Data);

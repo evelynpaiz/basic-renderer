@@ -1,5 +1,5 @@
 #include "enginepch.h"
-#include "Renderer/Buffer/IndexBuffer.h"
+#include "Common/Renderer/Buffer/IndexBuffer.h"
 
 #include <GL/glew.h>
 

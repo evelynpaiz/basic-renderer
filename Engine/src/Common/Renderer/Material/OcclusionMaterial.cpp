@@ -1,7 +1,7 @@
 #include "enginepch.h"
-#include "Renderer/Material/OcclusionMaterial.h"
+#include "Common/Renderer/Material/OcclusionMaterial.h"
 
-#include "Renderer/Texture/Texture2D.h"
+#include "Common/Renderer/Texture/Texture2D.h"
 
 /**
  * Generate an occlusion material object with the specified shader file path.

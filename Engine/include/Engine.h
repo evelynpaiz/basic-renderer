@@ -3,79 +3,79 @@
 // --------------------------------------------
 // Logger
 // --------------------------------------------
-#include "Core/Log.h"
-#include "Core/Assert.h"
+#include "Common/Core/Log.h"
+#include "Common/Core/Assert.h"
 
 // --------------------------------------------
 // Application
 // --------------------------------------------
-#include "Core/Window.h"
-#include "Core/Application.h"
+#include "Common/Core/Window.h"
+#include "Common/Core/Application.h"
 
 // --------------------------------------------
 // Inputs
 // --------------------------------------------
-#include "Input/Input.h"
-#include "Input/KeyCodes.h"
-#include "Input/MouseCodes.h"
+#include "Common/Input/Input.h"
+#include "Common/Input/KeyCodes.h"
+#include "Common/Input/MouseCodes.h"
 
 // --------------------------------------------
 // Events
 // --------------------------------------------
-#include "Event/Event.h"
-#include "Event/KeyEvent.h"
-#include "Event/MouseEvent.h"
-#include "Event/WindowEvent.h"
+#include "Common/Event/Event.h"
+#include "Common/Event/KeyEvent.h"
+#include "Common/Event/MouseEvent.h"
+#include "Common/Event/WindowEvent.h"
 
 // --------------------------------------------
 // Base Layer(s)
 // --------------------------------------------
-#include "Layer/Layer.h"
-#include "Layer/GuiLayer.h"
+#include "Common/Layer/Layer.h"
+#include "Common/Layer/GuiLayer.h"
 
-#include "Layer/DrawUtils.h"
+#include "Common/Layer/DrawUtils.h"
 
 // --------------------------------------------
 // Renderer
 // --------------------------------------------
-#include "Renderer/Buffer/VertexBuffer.h"
-#include "Renderer/Buffer/IndexBuffer.h"
-#include "Renderer/Buffer/VertexArray.h"
-#include "Renderer/Buffer/FrameBuffer.h"
+#include "Common/Renderer/Buffer/VertexBuffer.h"
+#include "Common/Renderer/Buffer/IndexBuffer.h"
+#include "Common/Renderer/Buffer/VertexArray.h"
+#include "Common/Renderer/Buffer/FrameBuffer.h"
 
-#include "Renderer/Shader/Shader.h"
-#include "Renderer/Texture/Texture.h"
-#include "Renderer/Texture/Texture1D.h"
-#include "Renderer/Texture/Texture2D.h"
-#include "Renderer/Texture/Texture3D.h"
-#include "Renderer/Texture/TextureCube.h"
+#include "Common/Renderer/Shader/Shader.h"
+#include "Common/Renderer/Texture/Texture.h"
+#include "Common/Renderer/Texture/Texture1D.h"
+#include "Common/Renderer/Texture/Texture2D.h"
+#include "Common/Renderer/Texture/Texture3D.h"
+#include "Common/Renderer/Texture/TextureCube.h"
 
-#include "Renderer/Light/ShadowCamera.h"
-#include "Renderer/Light/Light.h"
-#include "Renderer/Light/PositionalLight.h"
-#include "Renderer/Light/DirectionalLight.h"
-#include "Renderer/Light/EnvironmentLight.h"
+#include "Common/Renderer/Light/ShadowCamera.h"
+#include "Common/Renderer/Light/Light.h"
+#include "Common/Renderer/Light/PositionalLight.h"
+#include "Common/Renderer/Light/DirectionalLight.h"
+#include "Common/Renderer/Light/EnvironmentLight.h"
 
-#include "Renderer/Material/Material.h"
-#include "Renderer/Material/LightedMaterial.h"
-#include "Renderer/Material/OcclusionMaterial.h"
-#include "Renderer/Material/SimpleMaterial.h"
-#include "Renderer/Material/PhongMaterial.h"
+#include "Common/Renderer/Material/Material.h"
+#include "Common/Renderer/Material/LightedMaterial.h"
+#include "Common/Renderer/Material/OcclusionMaterial.h"
+#include "Common/Renderer/Material/SimpleMaterial.h"
+#include "Common/Renderer/Material/PhongMaterial.h"
 
-#include "Renderer/Mesh/Mesh.h"
-#include "Renderer/Model/Model.h"
-#include "Renderer/Model/AssimpModel.h"
+#include "Common/Renderer/Mesh/Mesh.h"
+#include "Common/Renderer/Model/Model.h"
+#include "Common/Renderer/Model/AssimpModel.h"
 
-#include "Renderer/Mesh/MeshUtils.h"
-#include "Renderer/Model/ModelUtils.h"
+#include "Common/Renderer/Mesh/MeshUtils.h"
+#include "Common/Renderer/Model/ModelUtils.h"
 
-#include "Renderer/Camera/PerspectiveCamera.h"
-#include "Renderer/Camera/OrthographicCamera.h"
+#include "Common/Renderer/Camera/PerspectiveCamera.h"
+#include "Common/Renderer/Camera/OrthographicCamera.h"
 
-#include "Renderer/Renderer.h"
+#include "Common/Renderer/Renderer.h"
 
 // --------------------------------------------
 // Rendering Context & Scene
 // --------------------------------------------
-#include "Scene/Viewport.h"
-#include "Scene/Scene.h"
+#include "Common/Scene/Viewport.h"
+#include "Common/Scene/Scene.h"

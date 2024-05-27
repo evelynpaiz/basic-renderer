@@ -1,10 +1,10 @@
 #include "enginepch.h"
-#include "Renderer/Light/EnvironmentLight.h"
+#include "Common/Renderer/Light/EnvironmentLight.h"
 
-#include "Renderer/Texture/Texture.h"
-#include "Renderer/Texture/TextureCube.h"
+#include "Common/Renderer/Texture/Texture.h"
+#include "Common/Renderer/Texture/TextureCube.h"
 
-#include "Renderer/Light/PositionalLight.h"
+#include "Common/Renderer/Light/PositionalLight.h"
 
 /**
  * Generate an environment light source in the world space.

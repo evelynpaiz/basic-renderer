@@ -1,5 +1,5 @@
 #include "enginepch.h"
-#include "Renderer/Camera/Camera.h"
+#include "Common/Renderer/Camera/Camera.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>

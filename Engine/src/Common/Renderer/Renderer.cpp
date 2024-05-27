@@ -1,7 +1,8 @@
 #include "enginepch.h"
-#include "Renderer/Renderer.h"
+#include "Common/Renderer/Renderer.h"
 
-#include "Renderer/Material/LightedMaterial.h"
+#include "Common/Renderer/RendererCommand.h"
+#include "Common/Renderer/Material/LightedMaterial.h"
 
 #include <GL/glew.h>
 
@@ -16,6 +17,14 @@ static const glm::mat4 g_TextureMatrix = glm::mat4(
     0.0f, 0.0f, 0.5f, 0.0f,
     0.5f, 0.5f, 0.5f, 1.0f
 );
+
+/**
+ * Initialize the renderer.
+ */
+void Renderer::Init()
+{
+    RendererCommand::Init();
+}
 
 /**
  * Start the rendering of a scene by defining its general parameters.

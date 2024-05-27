@@ -1,9 +1,9 @@
 #include "enginepch.h"
-#include "Scene/Scene.h"
+#include "Common/Scene/Scene.h"
 
-#include "Renderer/Material/LightedMaterial.h"
-#include "Renderer/Material/SimpleMaterial.h"
-#include "Renderer/Light/PositionalLight.h"
+#include "Common/Renderer/Material/LightedMaterial.h"
+#include "Common/Renderer/Material/SimpleMaterial.h"
+#include "Common/Renderer/Light/PositionalLight.h"
 
 /**
  * Define a scene to be rendered.

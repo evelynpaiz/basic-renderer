@@ -1,5 +1,5 @@
 #include "enginepch.h"
-#include "Core/FileDialogs.h"
+#include "Common/Core/FileDialogs.h"
 
 /**
  * Placeholder (select directory) function for unsupported platforms.

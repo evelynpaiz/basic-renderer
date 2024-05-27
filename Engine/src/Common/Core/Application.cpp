@@ -1,13 +1,13 @@
 #include "enginepch.h"
-#include "Core/Application.h"
+#include "Common/Core/Application.h"
 
-#include "Event/Event.h"
-#include "Event/WindowEvent.h"
+#include "Common/Event/Event.h"
+#include "Common/Event/WindowEvent.h"
 
-#include "Core/Timestep.h"
+#include "Common/Core/Timer.h"
+#include "Common/Core/Timestep.h"
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include "Common/Renderer/Renderer.h"
 
 // Define static variables
 Application* Application::s_Instance = nullptr;
@@ -30,6 +30,9 @@ Application::Application(const std::string& name, const int width,
     m_Window = std::make_unique<Window>(name, width, height);
     // Define the event callback function for the application
     m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
+    
+    // Initialize the renderer
+    Renderer::Init();
 }
 
 /**
@@ -77,15 +80,15 @@ void Application::PopOverlay(const std::shared_ptr<Layer>& overlay)
  */
 void Application::Run()
 {
-    static float lastFrame = glfwGetTime();
+    
+    static Timer timer;
     
     // Run until the user quits
     while (m_Running)
     {
         // Per-frame time logic
-        float currentFrame = glfwGetTime();
-        Timestep deltaTime = (float)(currentFrame - lastFrame);
-        lastFrame = currentFrame;
+        Timestep deltaTime = (float)(timer.Elapsed());
+        timer.Reset();
         
         // Render layers (from bottom to top)
         for (std::shared_ptr<Layer>& layer : m_LayerStack)

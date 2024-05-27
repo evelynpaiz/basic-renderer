@@ -1,10 +1,10 @@
 #include "enginepch.h"
-#include "Renderer/Buffer/FrameBuffer.h"
+#include "Common/Renderer/Buffer/FrameBuffer.h"
 
-#include "Renderer/Texture/Texture1D.h"
-#include "Renderer/Texture/Texture2D.h"
-#include "Renderer/Texture/Texture3D.h"
-#include "Renderer/Texture/TextureCube.h"
+#include "Common/Renderer/Texture/Texture1D.h"
+#include "Common/Renderer/Texture/Texture2D.h"
+#include "Common/Renderer/Texture/Texture3D.h"
+#include "Common/Renderer/Texture/TextureCube.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>

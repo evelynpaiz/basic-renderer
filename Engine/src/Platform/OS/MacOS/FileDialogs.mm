@@ -1,7 +1,7 @@
 #include "enginepch.h"
-#include "Core/FileDialogs.h"
+#include "Common/Core/FileDialogs.h"
 
-#include "Core/Application.h"
+#include "Common/Core/Application.h"
 
 #include <GLFW/glfw3.h>
 #define GLFW_EXPOSE_NATIVE_COCOA
