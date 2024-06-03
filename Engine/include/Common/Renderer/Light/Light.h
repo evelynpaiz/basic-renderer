@@ -266,6 +266,11 @@ public:
 class LightLibrary : public Library<std::shared_ptr<BaseLight>>
 {
 public:
+    // Constructor
+    // ----------------------------------------
+    /// @brief Create a new light library.
+    LightLibrary() : Library("Light") {}
+    
     // Add/Create
     // ----------------------------------------
     /// @brief Adds an object to the library.
@@ -294,8 +299,10 @@ public:
     std::shared_ptr<Type> Create(const std::string& name, Args&&... args)
     {
         auto light = std::make_shared<Type>(std::forward<Args>(args)...);
-        CORE_ASSERT(std::dynamic_pointer_cast<BaseLight>(light),
-                    "Light '{0}' is not of the specified type!", name);
+        
+        std::string message = GetName() + " " + name + " is not of the specified type!";
+        CORE_ASSERT(std::dynamic_pointer_cast<BaseLight>(light), message);
+        
         Add(name, light);
         return light;
     }
@@ -306,6 +313,8 @@ public:
     /// @return The counter of lights.
     int GetLightCastersNumber() const { return m_Casters; }
     
+    // Library variables
+    // ----------------------------------------
 private:
     ///< Number of light casters in the library.
     int m_Casters;

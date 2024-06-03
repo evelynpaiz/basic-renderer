@@ -17,7 +17,7 @@ public:
     // Constructor/Destructor
     // ----------------------------------------
     /// @brief Create a new library.
-    Library() = default;
+    Library(const std::string& name = "Object") : m_ObjectsName(name) {}
     /// @brief Delete the library.
     virtual ~Library() = default;
     
@@ -31,7 +31,8 @@ public:
     virtual void Add(const std::string& name,
                      const ObjectType& object)
     {
-        CORE_ASSERT(!Exists(name), "Object already exists!");
+        std::string message = GetName() + " already exists!";
+        CORE_ASSERT(!Exists(name), message);
         m_Objects[name] = object;
     }
     
@@ -44,7 +45,8 @@ public:
     /// failure will occur.
     ObjectType& Get(const std::string& name)
     {
-        CORE_ASSERT(Exists(name), "Object not found!");
+        std::string message = GetName() + " not found!";
+        CORE_ASSERT(Exists(name), message);
         return m_Objects[name];
     }
     /// @brief Updates the object with the specific name.
@@ -55,7 +57,8 @@ public:
     void Update(const std::string& name,
                 const ObjectType& object)
     {
-        CORE_ASSERT(Exists(name), "Object not found!");
+        std::string message = GetName() + " not found!";
+        CORE_ASSERT(Exists(name), message);
         m_Objects[name] = object;
     }
     /// @brief Checks if an object with a given name exists in the library.
@@ -93,9 +96,19 @@ public:
         return m_Objects.end();
     }
     
+protected:
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Get the name of the objects that are contained in the library.
+    /// @return The name of the objects.
+    const std::string& GetName() const { return m_ObjectsName; }
+    
     // Library variables
     // ----------------------------------------
 private:
     ///< A map of object names to their corresponding objects.
     std::unordered_map<std::string, ObjectType> m_Objects;
+    
+    ///< The name of the objects contained in the library.
+    std::string m_ObjectsName;
 };

@@ -148,6 +148,13 @@ public:
 class ModelLibrary : public Library<std::shared_ptr<BaseModel>>
 {
 public:
+    // Constructor
+    // ----------------------------------------
+    /// @brief Create a new model library.
+    ModelLibrary() : Library("Model") {}
+    
+    // Create
+    // ----------------------------------------
     /// @brief Loads a model and adds it to the library.
     /// @tparam Type The type of object to load.
     /// @tparam Args The types of arguments to forward to the object constructor.
@@ -158,8 +165,10 @@ public:
     std::shared_ptr<Type> Create(const std::string& name, Args&&... args)
     {
         auto model = std::make_shared<Type>(std::forward<Args>(args)...);
-        CORE_ASSERT(std::dynamic_pointer_cast<BaseModel>(model),
-                    "Object '{0}' is not of the specified type!", name);
+        
+        std::string message = GetName() + " " + name + " is not of the specified type!";
+        CORE_ASSERT(std::dynamic_pointer_cast<BaseModel>(model), message);
+        
         Add(name, model);
         return model;
     }

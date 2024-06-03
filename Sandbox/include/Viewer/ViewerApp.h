@@ -2,6 +2,7 @@
 
 #include "Engine.h"
 
+#include "Viewer/Simple.h"
 #include "Viewer/Viewer.h"
 #include "Viewer/ViewerGui.h"
 

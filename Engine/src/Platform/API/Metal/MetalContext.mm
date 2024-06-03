@@ -52,9 +52,10 @@ void MetalContext::Init()
     m_State->Queue = [m_State->Device newCommandQueue];
     CORE_ASSERT(m_State->Queue, "Metal initialization failed: Could not create command queue!");
 
-    // Log the Metal device name for debugging and information
+    // Display the Metal general information
+    CORE_INFO("Using Metal:");
     NSString *deviceName = [m_State->Device name];
-    CORE_INFO("Using Metal ({0})", std::string([deviceName UTF8String]));
+    CORE_INFO("  Device: {0}", std::string([deviceName UTF8String]));
 
     // Create the Metal swap chain for presenting rendered frames to the screen
     m_State->SwapChain = [CAMetalLayer layer];
@@ -70,6 +71,16 @@ void MetalContext::Init()
     
     // Get the surface to output the render result
     m_State->Surface = [m_State->SwapChain nextDrawable];
+}
+
+/**
+ * Get the defqult system Metql device (GPU).
+ * 
+ * @return The metal device as a void pointer, or nullptr if the device was not found. 
+ */
+void* MetalContext::GetDevice() const
+{
+    return reinterpret_cast<void*>(m_State->Device);
 }
 
 /**

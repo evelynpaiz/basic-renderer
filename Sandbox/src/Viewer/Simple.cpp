@@ -1,6 +1,7 @@
 #include "Viewer/Simple.h"
 
 #include "Common/Renderer/RendererCommand.h"
+#include "Common/Renderer/Shader/Shader.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 

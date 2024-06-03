@@ -234,6 +234,13 @@ public:
 class FrameBufferLibrary : public Library<std::shared_ptr<FrameBuffer>>
 {
 public:
+    // Constructor
+    // ----------------------------------------
+    /// @brief Create a new framebuffer library.
+    FrameBufferLibrary() : Library("Frame buffer") {}
+    
+    // Create
+    // ----------------------------------------
     /// @brief Loads a framebuffer and adds it to the library.
     /// @tparam Type The type of object to load.
     /// @tparam Args The types of arguments to forward to the object constructor.

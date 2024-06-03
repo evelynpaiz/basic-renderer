@@ -31,8 +31,11 @@ void OpenGLContext::Init()
     // Initialize GLEW
     CORE_ASSERT(glewInit() == GLEW_OK, "Failed to initialize GLEW!");
 
-    // Display the version of OpenGL
-    CORE_INFO("Using OpenGL version {0}", (const char*)glGetString(GL_VERSION));
+    // Display the OpenGL general information
+    CORE_INFO("Using OpenGL:");
+    CORE_INFO("  Vendor: {0}", (const char*)glGetString(GL_VENDOR));
+    CORE_INFO("  Renderer: {0}", (const char*)glGetString(GL_RENDERER));
+    CORE_INFO("  Version: {0}", (const char*)glGetString(GL_VERSION));
 }
 
 /**

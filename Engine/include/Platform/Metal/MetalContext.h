@@ -14,6 +14,9 @@ struct GLFWwindow;
 class MetalContext : public GraphicsContext
 {
 public:
+    struct MetalState;
+    
+public:
     // Constructor(s)
     // ----------------------------------------
     MetalContext(GLFWwindow* windowHandle);
@@ -21,6 +24,10 @@ public:
     // Initialization
     // ----------------------------------------
     virtual void Init() override;
+    
+    // Getter(s)
+    // ----------------------------------------
+    void* GetDevice() const;
     
     // Setter(s)
     // ----------------------------------------
@@ -43,6 +50,5 @@ private:
     GLFWwindow* m_WindowHandle;
     
     ///< Holds the core Metal objects required for rendering.
-    struct MetalState;
     std::shared_ptr<MetalState> m_State;
 };

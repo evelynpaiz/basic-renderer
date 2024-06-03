@@ -46,6 +46,11 @@ struct RenderPassSpecification
 class RenderPassLibrary : public Library<RenderPassSpecification>
 {
 public:
+    // Constructor
+    // ----------------------------------------
+    /// @brief Create a new model library.
+    RenderPassLibrary() : Library("Render pass") {}
+    
     // Constructor/Destructor
     // ----------------------------------------
     /// @brief Delete the library.

@@ -133,6 +133,13 @@ public:
 class MaterialLibrary : public Library<std::shared_ptr<Material>>
 {
 public:
+    // Constructor
+    // ----------------------------------------
+    /// @brief Create a new material library.
+    MaterialLibrary() : Library("Material") {}
+    
+    // Create
+    // ----------------------------------------
     /// @brief Loads a material and adds it to the library.
     /// @tparam Type The type of material to create.
     /// @tparam Args The types of arguments to forward to the material constructor.
@@ -143,8 +150,10 @@ public:
     std::shared_ptr<Type> Create(const std::string& name, Args&&... args)
     {
         auto material = std::make_shared<Type>(std::forward<Args>(args)...);
-        CORE_ASSERT(std::dynamic_pointer_cast<Material>(material),
-                    "Material '{0}' is not of the specified type!", name);
+        
+        std::string message = GetName() + " " + name + " is not of the specified type!";
+        CORE_ASSERT(std::dynamic_pointer_cast<Material>(material), message);
+        
         Add(name, material);
         return material;
     }
