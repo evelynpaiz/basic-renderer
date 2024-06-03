@@ -66,8 +66,10 @@ void main()
                                       u_Material.Shininess, shadow, 0.045f, 0.0075f, 0.7f);
     }
     
+    // Calculate the irradiance value
+    vec3 irradiance = texture(u_Environment.IrradianceMap, v_Normal).rgb;
     // Calculate the ambient light
-    vec3 ambient = ks * u_Environment.La;
+    vec3 ambient = kd * u_Environment.La * irradiance;
     
     // Set the fragment color with the calculated result and material's alpha
     vec3 result = reflectance + ambient;

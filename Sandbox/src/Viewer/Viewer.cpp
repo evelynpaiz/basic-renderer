@@ -96,7 +96,7 @@ void Viewer::DefineMaterials()
     auto& library = Renderer::GetMaterialLibrary();
     
     auto cubeMaterial = library.Create<PhongTextureMaterial>("PhongTexture",
-        "Resources/shaders/phong/PhongTexture.glsl");
+        "Resources/shaders/phong/PhongTextureShadow.glsl");
     cubeMaterial->SetDiffuseMap(std::make_shared<Texture2DResource>("Resources/textures/diffuse.jpeg"));
     cubeMaterial->SetSpecularMap(std::make_shared<Texture2DResource>("Resources/textures/specular.jpeg"));
     cubeMaterial->SetShininess(32.0f);

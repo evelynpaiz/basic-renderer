@@ -84,7 +84,7 @@ std::string Shader::ReadFile(const std::filesystem::path& filePath)
  */
 std::shared_ptr<Shader> ShaderLibrary::Load(const std::filesystem::path& filePath)
 {
-    return ShaderLibrary::Load(filePath.stem(), filePath);
+    return ShaderLibrary::Load(filePath.stem().string(), filePath);
 }
 
 /**

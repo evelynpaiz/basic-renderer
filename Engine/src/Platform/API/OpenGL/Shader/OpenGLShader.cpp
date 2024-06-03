@@ -24,7 +24,7 @@ OpenGLShader::OpenGLShader(const std::string& name, const std::filesystem::path&
  * @param filePath Path to the source file.
  */
 OpenGLShader::OpenGLShader(const std::filesystem::path& filePath)
-    : OpenGLShader(filePath.stem(), filePath)
+    : OpenGLShader(filePath.stem().string(), filePath)
 {}
 
 /**

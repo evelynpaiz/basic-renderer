@@ -269,7 +269,7 @@ public:
     // Constructor
     // ----------------------------------------
     /// @brief Create a new light library.
-    LightLibrary() : Library("Light") {}
+    LightLibrary() : Library("Light"), m_Casters(0) {}
     
     // Add/Create
     // ----------------------------------------

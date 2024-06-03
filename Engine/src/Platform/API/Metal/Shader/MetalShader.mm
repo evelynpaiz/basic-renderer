@@ -40,7 +40,7 @@ MetalShader::MetalShader(const std::string& name, const std::filesystem::path& f
  * @param filePath Path to the source file.
  */
 MetalShader::MetalShader(const std::filesystem::path& filePath)
-    : MetalShader(filePath.stem(), filePath)
+    : MetalShader(filePath.stem().string(), filePath)
 {}
 
 /**

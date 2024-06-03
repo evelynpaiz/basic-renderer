@@ -60,7 +60,7 @@ public:
     Material(const std::filesystem::path& filePath)
     {
         // Define the shader for the material
-        std::string name = filePath.stem();
+        std::string name = filePath.stem().string();
         auto shader = s_ShaderLibrary->Exists(name) ?
             s_ShaderLibrary->Get(name) : s_ShaderLibrary->Load(name, filePath);
         m_Shader = shader;
