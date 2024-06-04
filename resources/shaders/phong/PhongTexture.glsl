@@ -31,13 +31,11 @@ void main()
 {
     // Get the diffuse color (kd) from the DiffuseMap texture
     vec3 kd = vec3(texture(u_Material.DiffuseMap, v_TextureCoord));
-    
     // Get the specular color (ks) from the SpecularMap texture
     vec3 ks = vec3(texture(u_Material.SpecularMap, v_TextureCoord));
     
     // Define the initial reflectance
     vec3 reflectance = vec3(0.0f);
-    
     // Shade based on each light source in the scene
     for(int i = 0; i < u_Environment.LightsNumber; i++)
     {
@@ -47,10 +45,9 @@ void main()
                                       u_Material.Shininess, 0.0f, 0.045f, 0.0075f, 0.7f);
     }
     
-	// Calculate the irradiance value
-    vec3 irradiance = texture(u_Environment.IrradianceMap, v_Normal).rgb;
     // Calculate the ambient light
-    vec3 ambient = kd * u_Environment.La * irradiance;
+    vec3 irradiance = texture(u_Environment.IrradianceMap, normalize(v_Normal)).rgb;
+    vec3 ambient = irradiance * u_Environment.La * kd;
     
     // Set the fragment color with the calculated result and material's alpha
     vec3 result = reflectance + ambient;

@@ -80,7 +80,7 @@ public:
     virtual void Unbind() 
     {
         m_Shader -> Unbind();
-        m_Slot = 0;
+        m_Slot = 1;
     }
     
     // Getter(s)
@@ -106,7 +106,7 @@ protected:
     std::shared_ptr<Shader> m_Shader;
     
     ///< Texture unit index.
-    unsigned int m_Slot = 0;
+    unsigned int m_Slot = 1;
     ///< Flags for shading.
     MaterialFlags m_Flags;
     
