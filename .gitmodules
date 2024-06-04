@@ -19,9 +19,3 @@
 [submodule "3rdparty/assimp"]
 	path = 3rdparty/assimp
 	url = https://github.com/assimp/assimp.git
-[submodule "metal"]
-	path = metal
-	url = https://github.com/bkaradzic/metal-cpp.git
-[submodule "3rdparty/metal"]
-	path = 3rdparty/metal
-	url = https://github.com/bkaradzic/metal-cpp.git

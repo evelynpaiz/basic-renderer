@@ -6,17 +6,6 @@ set(SPDLOG_BUILD_ONLY_HEADERS ON CACHE BOOL "" FORCE)
 add_subdirectory(3rdparty/spdlog)
 add_library(spdlog::spdlog ALIAS spdlog_header_only)
 
-## Metal
-if(APPLE)
-    add_library(metal INTERFACE)
-    target_include_directories(metal
-        INTERFACE
-        ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/metal/
-    )
-
-    add_library(Metal::Cpp ALIAS metal)
-endif()
-
 ## GLFW
 set(GLFW_MAPPING OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
