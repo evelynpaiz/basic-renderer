@@ -104,6 +104,9 @@ private:
     ///< Material(s) for pre-processing.
     MaterialLibrary m_Materials;
     
+    /// Environment map orientation (pitch, yaw, and roll angles).
+    glm::vec3 m_Rotation = glm::vec3(0.0f, -90.0f, 0.0f);
+    
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:

@@ -160,7 +160,7 @@ protected:
     
     ///< Camera position (x, y, z).
     glm::vec3 m_Position = glm::vec3(0.0f);
-    /// Camera orientation (yaw, pitch and roll angles).
+    /// Camera orientation (pitch, yaw, and roll angles).
     glm::vec3 m_Rotation = glm::vec3(0.0f);
     
     ///< View matrix.

@@ -180,18 +180,29 @@ void EnvironmentLight::UpdateLight()
  */
 void EnvironmentLight::UpdateEnvironment()
 {
+    // Define the views to render each face of the cube
+    static const glm::mat4 POSITIVE_X_VIEW = glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f));
+    static const glm::mat4 NEGATIVE_X_VIEW = glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f));
+    
+    static const glm::mat4 POSITIVE_Y_VIEW = glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f));
+    static const glm::mat4 NEGATIVE_Y_VIEW = glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f));
+    
+    static const glm::mat4 POSITIVE_Z_VIEW = glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f));
+    static const glm::mat4 NEGATIVE_Z_VIEW = glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f));
+    
     // Define the tranformation matrices
-    static const glm::mat4 projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
-    static const std::array<glm::mat4, 6>& views =
+    const glm::mat4 projectionMatrix = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+    const std::array<glm::mat4, 6>& viewMatrix =
     {
-       glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-       glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-       glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
-       glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
-       glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-       glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
+        POSITIVE_X_VIEW, NEGATIVE_X_VIEW, POSITIVE_Y_VIEW, NEGATIVE_Y_VIEW, POSITIVE_Z_VIEW, NEGATIVE_Z_VIEW
     };
     
+    // Apply rotation to each view matrix
+    glm::mat4 rotation = glm::toMat4(glm::quat(glm::radians(m_Rotation)));
+    std::array<glm::mat4, 6> sceneViewMatrix;
+    for (size_t i = 0; i < viewMatrix.size(); ++i)
+        sceneViewMatrix[i] = viewMatrix[i] * rotation;
+
     // Update the current texture representing the environment map
     auto equirectangularMaterial = std::dynamic_pointer_cast<SimpleTextureMaterial>(m_Materials.Get("Equirectangular"));
     if (equirectangularMaterial)
@@ -201,11 +212,11 @@ void EnvironmentLight::UpdateEnvironment()
     m_Model->SetScale(glm::vec3(2.0f));
     
     // Render the environment map into a cube map configuration
-    RenderCubeMap(views, projection, m_Materials.Get("Equirectangular"),
+    RenderCubeMap(sceneViewMatrix, projectionMatrix, m_Materials.Get("Equirectangular"),
                   m_Framebuffers.Get("Environment"));
     
     // Render the irradiance map
-    RenderCubeMap(views, projection, m_Materials.Get("Irradiance"),
+    RenderCubeMap(viewMatrix, projectionMatrix, m_Materials.Get("Irradiance"),
                   m_Framebuffers.Get("Irradiance"));
     
     // Render the pre-filter map
@@ -221,7 +232,7 @@ void EnvironmentLight::UpdateEnvironment()
         unsigned int mipHeight = 128 * std::pow(0.5, mip);
         
         // Render into the cubemap
-        RenderCubeMap(views, projection, m_Materials.Get("PreFilter"),
+        RenderCubeMap(viewMatrix, projectionMatrix, m_Materials.Get("PreFilter"),
                       m_Framebuffers.Get("PreFilter"),
                       mipWidth, mipHeight, mip, false);
     }
@@ -250,7 +261,7 @@ void EnvironmentLight::RenderCubeMap(const std::array<glm::mat4, 6>& views, cons
                                      const unsigned int &level, const bool &genMipMaps)
 {
     // Set the material for rendering
-        m_Model->SetMaterial(material);
+    m_Model->SetMaterial(material);
 
     // Loop through each face of the cube map
     for (unsigned int i = 0; i < views.size(); ++i)
