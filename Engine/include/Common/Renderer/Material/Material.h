@@ -80,7 +80,11 @@ public:
     virtual void Unbind() 
     {
         m_Shader -> Unbind();
+#ifdef __APPLE__
+        m_Slot = 0;
+#else
         m_Slot = 1;
+#endif
     }
     
     // Getter(s)
@@ -106,7 +110,12 @@ protected:
     std::shared_ptr<Shader> m_Shader;
     
     ///< Texture unit index.
+    // TODO: fix the issue related to starting slot number.
+#ifdef __APPLE__
+    unsigned int m_Slot = 0;
+#else
     unsigned int m_Slot = 1;
+#endif
     ///< Flags for shading.
     MaterialFlags m_Flags;
     
