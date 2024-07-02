@@ -1,9 +1,11 @@
 #pragma once
 
 #include "Common/Core/Library.h"
+
+#include "Common/Renderer/Buffer/Buffer.h"
+
 #include "Common/Renderer/Texture/TextureUtils.h"
 #include "Common/Renderer/Texture/Texture.h"
-#include "Common/Renderer/Buffer/BufferState.h"
 
 /**
  * Defines the specification for framebuffer attachments.

@@ -18,6 +18,11 @@ struct MetalContext::MetalState {
     ///< The command queue for submitting rendering commands to the GPU.
     id<MTLCommandQueue> Queue;
     
+    ///< The command buffer holding the rendering commands.
+    id<MTLCommandBuffer> CommandBuffer;
+    ///< The render command encoder to encode rendering commands into the buffer.
+    id<MTLRenderCommandEncoder> Encoder;
+    
     ///< The Metal-backed layer that manages the presentation of rendered frames to the screen.
     CAMetalLayer* SwapChain;
     
@@ -60,7 +65,7 @@ void MetalContext::Init()
     // Create the Metal swap chain for presenting rendered frames to the screen
     m_State->SwapChain = [CAMetalLayer layer];
     m_State->SwapChain.device = m_State->Device; // Associate the swap chain with the Metal device
-    m_State->SwapChain.opaque = YES;            // Set the swap chain to opaque (no alpha blending)
+    m_State->SwapChain.opaque = YES;             // Set the swap chain to opaque (no alpha blending)
 
     // Get the NSWindow associated with the GLFW window handle for platform integration
     NSWindow* parentWindow = (NSWindow*)glfwGetCocoaWindow(m_WindowHandle);
@@ -71,16 +76,28 @@ void MetalContext::Init()
     
     // Get the surface to output the render result
     m_State->Surface = [m_State->SwapChain nextDrawable];
+    // Clear the buffer for the next frame
+    Clear();
 }
 
 /**
- * Get the defqult system Metql device (GPU).
- * 
- * @return The metal device as a void pointer, or nullptr if the device was not found. 
+ * Get the default system Metal device (GPU).
+ *
+ * @return The metal device as a void pointer, or `nullptr` if the device was not found.
  */
 void* MetalContext::GetDevice() const
 {
     return reinterpret_cast<void*>(m_State->Device);
+}
+
+/**
+ * @brief Get the command encoder associated with the Metal context.
+ *
+ * @return A pointer to the command encoder, or `nullptr` if no command queue is available.
+ */
+void* MetalContext::GetEncoder() const
+{
+    return reinterpret_cast<void*>(m_State->Encoder);
 }
 
 /**
@@ -115,56 +132,47 @@ void MetalContext::SetVerticalSync(bool enabled)
 }
 
 /**
- *  Swaps the front and back buffers. This presents the rendered frame to the screen.
- */
-void MetalContext::SwapBuffers()
-{
-    // Get the surface to output the render result
-    m_State->Surface = [m_State->SwapChain nextDrawable];
-}
-
-/**
- * Clear the buffers to preset values.
+ * Clears the current render pass with the specified color.
  *
- * @param buffersActive State of the buffers.
+ * @param color The color to clear the render pass with.
  */
-void MetalContext::Clear(const BufferState& buffersActive)
-{
-    Clear(glm::vec4(glm::vec3(0.0f), 1.0f), buffersActive);
-}
-
-/**
- * Clear the buffers to preset values.
- *
- * @param color Background color.
- * @param buffersActive State of the buffers.
- */
-void MetalContext::Clear(const glm::vec4& color, const BufferState& buffersActive) 
+void MetalContext::Clear(const glm::vec4& color)
 {
     // Define the clear color using the provided color
     MTLClearColor clearColor = MTLClearColorMake(color.r, color.g, color.b, color.a);
-
+    
     // Create a render pass descriptor (defines how the render pass should be performed)
     MTLRenderPassDescriptor *pass = [MTLRenderPassDescriptor renderPassDescriptor];
-
+    
     // Configure the color attachment
     pass.colorAttachments[0].clearColor = clearColor;            // Set the clear color for this attachment
     pass.colorAttachments[0].loadAction  = MTLLoadActionClear;   // Clear the attachment to the clear color at the start
     pass.colorAttachments[0].storeAction = MTLStoreActionStore;  // Store the rendered results in the attachment
     pass.colorAttachments[0].texture = m_State->Surface.texture; // Specify the texture to use for this attachment
 
-    // Create a new command buffer. This buffer will hold the rendering commands
-    id<MTLCommandBuffer> buffer = [m_State->Queue commandBuffer];
+    // Create a new command buffer for the next frame
+    m_State->CommandBuffer = [m_State->Queue commandBuffer];
 
     // Create a render command encoder to encode rendering commands into the buffer
-    id<MTLRenderCommandEncoder> encoder = [buffer renderCommandEncoderWithDescriptor:pass];
-    [encoder endEncoding];
+    m_State->Encoder = [m_State->CommandBuffer renderCommandEncoderWithDescriptor:pass];
+}
 
+/**
+ *  Swaps the front and back buffers. This presents the rendered frame to the screen.
+ */
+void MetalContext::SwapBuffers()
+{
+    // End encoding in the command encoder
+    [m_State->Encoder endEncoding];
+    
     // Present the drawable to the screen. This schedules the presentation
-    // of the current framebuffer (which has now been cleared) to the display.
-    [buffer presentDrawable:m_State->Surface];
+    // of the current framebuffer to the display
+    [m_State->CommandBuffer presentDrawable:m_State->Surface];
+    
+    // Commit the command buffer. This submits all the commands in the buffer
+    // for execution by the GPU
+    [m_State->CommandBuffer commit];
 
-    // Commit the command buffer to the GPU. This sends the commands
-    // (in this case, just the clear command) to be executed by the GPU
-    [buffer commit];
+    // Get the next drawable for the next frame
+    m_State->Surface = [m_State->SwapChain nextDrawable];
 }

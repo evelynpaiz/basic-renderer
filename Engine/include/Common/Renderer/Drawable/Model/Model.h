@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Common/Core/Library.h"
-#include "Common/Renderer/Mesh/Mesh.h"
+#include "Common/Renderer/Drawable/Mesh/Mesh.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

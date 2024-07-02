@@ -1,6 +1,8 @@
 #include "enginepch.h"
 #include "Common/Renderer/Light/EnvironmentLight.h"
 
+#include "Common/Renderer/RendererCommand.h"
+
 #include "Common/Renderer/Texture/Texture.h"
 #include "Common/Renderer/Texture/TextureCube.h"
 
@@ -266,22 +268,20 @@ void EnvironmentLight::RenderCubeMap(const std::array<glm::mat4, 6>& views, cons
     // Loop through each face of the cube map
     for (unsigned int i = 0; i < views.size(); ++i)
     {
-        // Begin rendering scene with the specified view and projection matrices
-        Renderer::BeginScene(views[i], projection);
-
         // Bind the framebuffer for drawing to the current cube map face and mip level
         framebuffer->BindForDrawAttachmentCube(0, i, level);
 
         // Set the viewport dimensions if provided
         if (viewportWidth > 0 && viewportHeight > 0)
-            Renderer::SetViewport(0, 0, viewportWidth, viewportHeight);
+            RendererCommand::SetViewport(0, 0, viewportWidth, viewportHeight);
 
         // Clear the active buffers in the framebuffer
-        Renderer::Clear(framebuffer->GetActiveBuffers());
-
+        RendererCommand::Clear(framebuffer->GetActiveBuffers());
+        
+        // Begin rendering scene with the specified view and projection matrices
+        Renderer::BeginScene(views[i], projection);
         // Draw the model using the specified material
         m_Model->DrawModel();
-
         // End the rendering scene
         Renderer::EndScene();
     }

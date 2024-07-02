@@ -28,20 +28,17 @@ public:
     // Getter(s)
     // ----------------------------------------
     void* GetDevice() const;
+    void* GetEncoder() const;
     
     // Setter(s)
     // ----------------------------------------
     static void SetWindowHints();
     void SetVerticalSync(bool enabled) override;
     
-    // Buffers
+    // Draw
     // ----------------------------------------
+    void Clear(const glm::vec4& color = glm::vec4(0.0f));
     void SwapBuffers() override;
-    
-    // Clear
-    // ----------------------------------------
-    void Clear(const BufferState& buffersActive = {}) override;
-    void Clear(const glm::vec4& color, const BufferState& buffersActive = {}) override;
     
     // Graphics context variables
     // ----------------------------------------

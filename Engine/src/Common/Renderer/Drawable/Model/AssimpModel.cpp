@@ -1,5 +1,5 @@
 #include "enginepch.h"
-#include "Common/Renderer/Model/AssimpModel.h"
+#include "Common/Renderer/Drawable/Model/AssimpModel.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>

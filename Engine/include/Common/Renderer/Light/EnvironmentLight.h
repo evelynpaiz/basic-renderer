@@ -6,8 +6,8 @@
 
 #include "Common/Renderer/Material/SimpleMaterial.h"
 
-#include "Common/Renderer/Mesh/MeshUtils.h"
-#include "Common/Renderer/Model/ModelUtils.h"
+#include "Common/Renderer/Drawable/Mesh/MeshUtils.h"
+#include "Common/Renderer/Drawable/Model/ModelUtils.h"
 
 #include <glm/glm.hpp>
 

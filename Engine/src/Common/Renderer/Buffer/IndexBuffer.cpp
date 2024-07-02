@@ -1,43 +1,38 @@
 #include "enginepch.h"
 #include "Common/Renderer/Buffer/IndexBuffer.h"
 
-#include <GL/glew.h>
+#include "Common/Renderer/Renderer.h"
+
+#include "Platform/OpenGL/Buffer/OpenGLIndexBuffer.h"
+#include "Platform/Metal/Buffer/MetalIndexBuffer.h"
 
 /**
- * Generate an index buffer and link it to the input indices.
+ * Create a vertex buffer based on the active rendering API.
  *
  * @param indices Index information for the vertices.
  * @param count Number of indices.
+ *
+ * @return A shared pointer to the created index buffer, or nullptr if the API
+ *         is not supported or an error occurs.
  */
-IndexBuffer::IndexBuffer(const unsigned int *indices, const unsigned int count)
-    : m_Count(count)
+std::shared_ptr<IndexBuffer> IndexBuffer::Create(const uint32_t *indices,
+                                                 const uint32_t count)
 {
-    glGenBuffers(1, &m_ID);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)(count * sizeof(unsigned int)),
-        indices, GL_STATIC_DRAW);
-}
-
-/**
- * Delete the index buffer.
- */
-IndexBuffer::~IndexBuffer()
-{
-    glDeleteBuffers(1, &m_ID);
-}
-
-/**
- * Bind the index buffer.
- */
-void IndexBuffer::Bind() const
-{
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID);
-}
-
-/**
- * Unbind the index buffer.
- */
-void IndexBuffer::Unbind() const
-{
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    switch (Renderer::GetAPI())
+    {
+        case RendererAPI::API::None:
+            CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+            return nullptr;
+            
+        case RendererAPI::API::OpenGL:
+            return std::make_shared<OpenGLIndexBuffer>(indices, count);
+             
+    #ifdef __APPLE__
+        case RendererAPI::API::Metal:
+             return std::make_shared<MetalIndexBuffer>(indices, count);
+    #endif
+    }
+    
+    CORE_ASSERT(false, "Unknown Renderer API!");
+    return nullptr;
 }

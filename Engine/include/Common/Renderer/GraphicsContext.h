@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Common/Renderer/Buffer/BufferState.h"
-
 #include <glm/glm.hpp>
 
 /**
@@ -35,11 +33,6 @@ public:
     // ----------------------------------------
     static void SetWindowHints();
     virtual void SetVerticalSync(bool enabled) = 0;
-    
-    // Clear
-    // ----------------------------------------
-    virtual void Clear(const BufferState& buffersActive = {}) = 0;
-    virtual void Clear(const glm::vec4& color, const BufferState& buffersActive = {}) = 0;
     
     // Buffers
     // ----------------------------------------

@@ -4,6 +4,8 @@
 #include "Common/Renderer/RendererCommand.h"
 #include "Common/Renderer/Material/LightedMaterial.h"
 
+#include "Platform/OpenGL/Buffer/OpenGLVertexArray.h"
+
 #include <GL/glew.h>
 
 // Define the renderer variable(s)
@@ -77,59 +79,31 @@ void Renderer::EndScene()
 }
 
 /**
- * Clear the buffers to preset values.
- */
-void Renderer::Clear(const BufferState& buffersActive)
-{
-    // Clear buffers
-    glClear(utils::OpenGL::BufferStateToOpenGLMask(buffersActive));
-    // Activate depth testing if the depth buffer is active
-    SetDepthTesting(buffersActive.depthBufferActive);
-}
-
-/**
- * Clear the buffers to preset values.
+ * Render primitives from a drawable object using the specified primitive type.
  *
- * @param color Background color.
- */
-void Renderer::Clear(const glm::vec4& color, const BufferState& buffersActive)
-{
-    glClearColor(color.r, color.g, color.b, color.a);
-    Clear(buffersActive);
-}
-
-/**
- * Render primitives from array data using the specified vertex array.
- *
- * @param vao The VertexArray containing the vertex and index buffers for rendering.
+ * @param drawable The drawable object containing the data for rendering.
  * @param primitive The type of primitive to be drawn (e.g., Points, Lines, Triangles).
- * @param useIndexBuffer Whether to use the index buffer for rendering or not.
  */
-void Renderer::Draw(const std::shared_ptr<VertexArray>& vao, const PrimitiveType &primitive)
+void Renderer::Draw(const std::shared_ptr<Drawable>& drawable, const PrimitiveType &primitive)
 {
-    vao->Bind();
-    vao->GetIndexBuffer()->Bind();
-    glDrawElements(utils::OpenGL::PrimitiveTypeToOpenGLType(primitive),
-                   vao->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
-    
+    // Render the geometry
+    RendererCommand::Draw(drawable, primitive);
+    // Add the drawing count
     g_Stats.drawCalls++;
 }
 
 /**
- * Render primitives from array data using the specified vertex array.
+ * Render primitives from a drawable object using the specified primitive type.
  *
- * @param vao The VertexArray containing the vertex and index buffers for rendering.
+ * @param drawable The drawable object containing the data for rendering.
  * @param shader The shader program.
  * @param transform The transformation matrix of the geometry (model matrix).
  * @param primitive The type of primitive to be drawn (e.g., Points, Lines, Triangles).
- * @param useIndexBuffer Whether to use the index buffer for rendering or not.
  */
-
-void Renderer::Draw(const std::shared_ptr<VertexArray>& vao, const std::shared_ptr<Material>& material,
+void Renderer::Draw(const std::shared_ptr<Drawable>& drawable, const std::shared_ptr<Material>& material,
                     const glm::mat4 &transform, const PrimitiveType &primitive)
 {
-    // Bind the material and set the corresponding information into
-    // it for the shading
+    // Bind the material and set the corresponding information into it for the shading
     material->Bind();
     
     // Set the model, view, and projection matrices in the shader
@@ -154,36 +128,10 @@ void Renderer::Draw(const std::shared_ptr<VertexArray>& vao, const std::shared_p
     }
     
     // Render the geometry
-    Draw(vao, primitive);
+    Draw(drawable, primitive);
     
     // Unbind the material
     material->Unbind();
-}
-
-/**
- * Set the viewport for rendering.
- *
- * @param x The x-coordinate of the lower-left corner of the viewport.
- * @param y The y-coordinate of the lower-left corner of the viewport.
- * @param width The width of the viewport.
- * @param height The height of the viewport.
- */
-void Renderer::SetViewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
-{
-    glViewport(x, y, width, height);
-}
-
-/**
- * Set the depth buffer flag when rendering. If enabled, depth testing is enabled too.
- *
- * @param enable Enable or not the depth testing.
- */
-void Renderer::SetDepthTesting(bool enabled)
-{
-    if (enabled)
-        glEnable(GL_DEPTH_TEST);
-    else
-        glDisable(GL_DEPTH_TEST);
 }
 
 /**

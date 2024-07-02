@@ -21,9 +21,9 @@ public:
     // ----------------------------------------
     static std::shared_ptr<Shader> Create(const std::string& name, const std::filesystem::path& filePath);
     static std::shared_ptr<Shader> Create(const std::filesystem::path& filePath);
-    
     // Destructor
     // ----------------------------------------
+    /// @brief Delete the shader.
     virtual ~Shader() = default;
     
     // Usage

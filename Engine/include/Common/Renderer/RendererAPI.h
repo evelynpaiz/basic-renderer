@@ -1,6 +1,9 @@
 #pragma once
 
-#include "Common/Renderer/Buffer/BufferState.h"
+#include "Common/Renderer/Drawable/Drawable.h"
+#include "Common/Renderer/Material/Material.h"
+
+#include "Common/Renderer/RendererUtils.h"
 
 #include <glm/glm.hpp>
 
@@ -41,8 +44,20 @@ public:
     
     // Clear
     // ----------------------------------------
-    void Clear(const BufferState& buffersActive = {});
-    void Clear(const glm::vec4& color, const BufferState& buffersActive = {});
+    virtual void Clear(const BufferState& buffersActive = {}) = 0;
+    virtual void Clear(const glm::vec4& color, const BufferState& buffersActive = {}) = 0;
+    
+    // Draw
+    // ----------------------------------------
+    virtual void Draw(const std::shared_ptr<Drawable>& drawable,
+                      const PrimitiveType &primitive = PrimitiveType::Triangles) = 0;
+    
+    // Setter(s)
+    // ----------------------------------------
+    virtual void SetViewport(unsigned int x, unsigned int y,
+                            unsigned int width, unsigned int height) = 0;
+    
+    virtual void SetDepthTesting(const bool enabled) = 0;
     
     // Getter(s)
     // ----------------------------------------

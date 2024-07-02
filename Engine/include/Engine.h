@@ -40,7 +40,6 @@
 // --------------------------------------------
 #include "Common/Renderer/Buffer/VertexBuffer.h"
 #include "Common/Renderer/Buffer/IndexBuffer.h"
-#include "Common/Renderer/Buffer/VertexArray.h"
 #include "Common/Renderer/Buffer/FrameBuffer.h"
 
 #include "Common/Renderer/Shader/Shader.h"
@@ -62,12 +61,13 @@
 #include "Common/Renderer/Material/SimpleMaterial.h"
 #include "Common/Renderer/Material/PhongMaterial.h"
 
-#include "Common/Renderer/Mesh/Mesh.h"
-#include "Common/Renderer/Model/Model.h"
-#include "Common/Renderer/Model/AssimpModel.h"
+#include "Common/Renderer/Drawable/Drawable.h"
+#include "Common/Renderer/Drawable/Mesh/Mesh.h"
+#include "Common/Renderer/Drawable/Model/Model.h"
+#include "Common/Renderer/Drawable/Model/AssimpModel.h"
 
-#include "Common/Renderer/Mesh/MeshUtils.h"
-#include "Common/Renderer/Model/ModelUtils.h"
+#include "Common/Renderer/Drawable/Mesh/MeshUtils.h"
+#include "Common/Renderer/Drawable/Model/ModelUtils.h"
 
 #include "Common/Renderer/Camera/PerspectiveCamera.h"
 #include "Common/Renderer/Camera/OrthographicCamera.h"

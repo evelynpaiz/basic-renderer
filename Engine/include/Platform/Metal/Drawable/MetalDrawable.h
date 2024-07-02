@@ -1,0 +1,85 @@
+#pragma once
+
+#include "Common/Renderer/Drawable/Drawable.h"
+
+/**
+ * Represents a drawable object designed for rendering using Apple's Metal framework.
+ *
+ * This class inherits from `Drawable` and provides a higher-level interface
+ * for drawing geometry using Metal. It manages the creation, configuration,
+ * and binding of Metal-specific rendering resources, such as pipeline states,
+ * vertex buffers, and shaders.
+ *
+ * Copying or moving `MetalDrawable` objects is disabled to ensure single ownership
+ * and prevent unintended buffer duplication.
+ */
+class MetalDrawable : public Drawable
+{
+public:
+    struct DrawableState;
+    
+public:
+    // Constructor(s)/Destructor
+    // ----------------------------------------
+    MetalDrawable();
+    virtual ~MetalDrawable() override;
+    
+    // Usage
+    // ----------------------------------------
+    void Bind() const override;
+    void Unbind() const override {};
+    
+    // Setter(s)
+    // ----------------------------------------
+    /// @brief Sets the shader used for shading.
+    /// @param shader The shader program.
+    void SetShader(const std::shared_ptr<Shader>& shader) override
+    {
+        m_Shader = shader;
+        SetPipelineState();
+    }
+    
+    // Getter(s)
+    // ----------------------------------------
+    void* GetPipelineState() const;
+    
+private:
+    // Setter(s)
+    // ----------------------------------------
+    void SetVertexAttributes(const std::shared_ptr<VertexBuffer>& vbo) override;
+    void SetPipelineState() const;
+    
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Gets the index of a vertex buffer in the internal list.
+    /// @param  vbo  A shared pointer to the `VertexBuffer` to search for.
+    /// @return The index of the vertex buffer if found, -1 otherwise.
+    int GetVertexBufferIndex(const std::shared_ptr<VertexBuffer>& vbo) const
+    {
+        // Search for the vertex buffer
+        auto it = std::find(m_VertexBuffers.begin(), m_VertexBuffers.end(), vbo);
+
+        // Check if the vertex buffer was found
+        if (it != m_VertexBuffers.end()) {
+            // Calculate and return the index
+            return static_cast<int>(std::distance(m_VertexBuffers.begin(), it));
+        }
+        // Vertex buffer not found, returns -1
+        return -1;
+    }
+    
+    // Metal drawable variables
+    // ----------------------------------------
+private:
+    ///< Holds the core Metal drawable object to render a geometry.
+    std::shared_ptr<DrawableState> m_State;
+    
+    // Disable the copying or moving of this resource
+    // ----------------------------------------
+public:
+    MetalDrawable(const MetalDrawable&) = delete;
+    MetalDrawable(MetalDrawable&&) = delete;
+
+    MetalDrawable& operator=(const MetalDrawable&) = delete;
+    MetalDrawable& operator=(MetalDrawable&&) = delete;
+};

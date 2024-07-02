@@ -1,7 +1,9 @@
 #pragma once
 
-#include "Common/Renderer/Model/Model.h"
-#include "Common/Renderer/Model/ModelUtils.h"
+#include "Common/Renderer/RendererCommand.h"
+
+#include "Common/Renderer/Drawable/Model/Model.h"
+#include "Common/Renderer/Drawable/Model/ModelUtils.h"
 
 #include "Common/Renderer/Material/SimpleMaterial.h"
 
@@ -80,9 +82,10 @@ public:
     /// @param material Viewport material.
     void Render()
     {
+        RendererCommand::SetViewport(0, 0, m_Width, m_Height);
+        RendererCommand::Clear();
+        
         Renderer::BeginScene();
-        Renderer::SetViewport(0, 0, m_Width, m_Height);
-        Renderer::Clear();
         m_Geometry->SetMaterial(m_Material);
         m_Geometry->DrawModel();
         Renderer::EndScene();
@@ -95,8 +98,9 @@ public:
     {
         framebuffer->Bind();
         
+        RendererCommand::Clear(framebuffer->GetActiveBuffers());
+        
         Renderer::BeginScene();
-        Renderer::Clear(framebuffer->GetActiveBuffers());
         m_Geometry->SetMaterial(material);
         m_Geometry->DrawModel();
         Renderer::EndScene();

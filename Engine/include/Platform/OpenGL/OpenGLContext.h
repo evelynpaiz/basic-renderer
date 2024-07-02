@@ -30,11 +30,6 @@ public:
     // ----------------------------------------
     void SwapBuffers() override;
     
-    // Clear
-    // ----------------------------------------
-    void Clear(const BufferState& buffersActive = {}) override;
-    void Clear(const glm::vec4& color, const BufferState& buffersActive = {}) override;
-    
     // Graphics context variables
     // ----------------------------------------
 private:

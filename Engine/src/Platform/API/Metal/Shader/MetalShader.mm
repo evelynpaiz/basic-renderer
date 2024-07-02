@@ -10,6 +10,9 @@
  */
 struct MetalShader::MetalShaderSource
 {
+    ///< Shading library
+    id<MTLLibrary> Library;
+    
     ///< Compiled Metal vertex function.
     id<MTLFunction> VertexFunction;
     ///< Compiled Metal fragment function.
@@ -53,17 +56,13 @@ MetalShader::~MetalShader()
  * Activate the shader.
  */
 void MetalShader::Bind() const
-{
-    CORE_WARN("Shader::Method not yet defined!");
-}
+{}
 
 /**
  * Deactivate the shader.
  */
 void MetalShader::Unbind() const
-{
-    CORE_WARN("Shader::Method not yet defined!");
-}
+{}
 
 /**
  * Gets the compiled Metal vertex function.
@@ -205,10 +204,10 @@ void MetalShader::CompileShader(const std::filesystem::path& filePath)
     
     // Compile the shader source code into a Metal library
     NSError* error = nil;
-    id<MTLLibrary> library = [device newLibraryWithSource:sourceCode options:nil error:&error];
+    m_ShaderSource->Library = [device newLibraryWithSource:sourceCode options:nil error:&error];
     CORE_ASSERT(!error, "Failed to compiled shader!");
     
     // Define the shader functions
-    m_ShaderSource->VertexFunction = [library newFunctionWithName:@"vertex_main"];
-    m_ShaderSource->FragmentFunction = [library newFunctionWithName:@"fragment_main"];
+    m_ShaderSource->VertexFunction = [m_ShaderSource->Library newFunctionWithName:@"vertex_main"];
+    m_ShaderSource->FragmentFunction = [m_ShaderSource->Library newFunctionWithName:@"fragment_main"];
 }

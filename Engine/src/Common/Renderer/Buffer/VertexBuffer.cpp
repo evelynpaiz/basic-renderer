@@ -1,43 +1,39 @@
 #include "enginepch.h"
 #include "Common/Renderer/Buffer/VertexBuffer.h"
 
-#include <GL/glew.h>
+#include "Common/Renderer/Renderer.h"
+
+#include "Platform/OpenGL/Buffer/OpenGLVertexBuffer.h"
+#include "Platform/Metal/Buffer/MetalVertexBuffer.h"
 
 /**
- * Generate a vertex buffer and link it to the input vertex data.
+ * Create a vertex buffer based on the active rendering API.
  *
  * @param vertices Vertices to be rendered.
  * @param size Size of vertices in bytes.
+ * @param count Number of vertices.
+ *
+ * @return A shared pointer to the created vertex buffer, or nullptr if the API
+ *         is not supported or an error occurs.
  */
-VertexBuffer::VertexBuffer(const void *vertices, const unsigned int size,
-                           const unsigned int count)
-    : m_Count(count)
+std::shared_ptr<VertexBuffer> VertexBuffer::Create(const void* vertices, const uint32_t size,
+                                                   const uint32_t count)
 {
-    glGenBuffers(1, &m_ID);
-    glBindBuffer(GL_ARRAY_BUFFER, m_ID);
-    glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
-}
-
-/**
- * Delete the vertex buffer.
- */
-VertexBuffer::~VertexBuffer()
-{
-    glDeleteBuffers(1, &m_ID);
-}
-
-/**
- * Bind the vertex buffer.
- */
-void VertexBuffer::Bind() const
-{
-    glBindBuffer(GL_ARRAY_BUFFER, m_ID);
-}
-
-/**
- * Unbind the vertex buffer.
- */
-void VertexBuffer::Unbind() const
-{
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    switch (Renderer::GetAPI())
+    {
+        case RendererAPI::API::None:
+            CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+            return nullptr;
+            
+        case RendererAPI::API::OpenGL:
+            return std::make_shared<OpenGLVertexBuffer>(vertices, size, count);
+             
+    #ifdef __APPLE__
+        case RendererAPI::API::Metal:
+             return std::make_shared<MetalVertexBuffer>(vertices, size, count);
+    #endif
+    }
+    
+    CORE_ASSERT(false, "Unknown Renderer API!");
+    return nullptr;
 }

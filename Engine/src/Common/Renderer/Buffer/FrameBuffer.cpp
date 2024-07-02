@@ -6,6 +6,8 @@
 #include "Common/Renderer/Texture/Texture3D.h"
 #include "Common/Renderer/Texture/TextureCube.h"
 
+#include "Platform/OpenGL/Buffer/OpenGLBufferUtils.h"
+
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
@@ -169,7 +171,7 @@ void FrameBuffer::Blit(const std::shared_ptr<FrameBuffer>& src,
     CORE_ASSERT(src && dst, "Trying to blit undefined framebuffer(s)");
     
     // Determine the mask based on selected buffer components
-    GLbitfield mask = utils::OpenGL::BufferStateToOpenGLMask(buffersActive);
+    GLbitfield mask = utils::data::OpenGL::BufferStateToOpenGLMask(buffersActive);
     
     // Bind the source framebuffer for reading and the destination framebuffer for drawing
     glBindFramebuffer(GL_READ_FRAMEBUFFER, src->m_ID);

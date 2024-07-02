@@ -7,7 +7,7 @@
 #include "Platform/Metal/MetalRendererAPI.h"
 
 // Define static variables
-RendererAPI::API RendererAPI::s_API = RendererAPI::API::OpenGL;
+RendererAPI::API RendererAPI::s_API = RendererAPI::API::Metal;
 
 /**
  * Creates a new Renderer API instance based on the selected API.
@@ -33,25 +33,4 @@ std::unique_ptr<RendererAPI> RendererAPI::Create()
     
     CORE_ASSERT(false, "Unknown Renderer API!");
     return nullptr;
-}
-
-/**
- * Clear the buffers to preset values.
- *
- * @param buffersActive State of the buffers.
- */
-void RendererAPI::Clear(const BufferState& buffersActive)
-{
-    GraphicsContext::Get().Clear(buffersActive);
-}
-
-/**
- * Clear the buffers to preset values.
- *
- * @param color Background color.
- * @param buffersActive State of the buffers.
- */
-void RendererAPI::Clear(const glm::vec4& color, const BufferState& buffersActive)
-{
-    GraphicsContext::Get().Clear(color, buffersActive);
 }

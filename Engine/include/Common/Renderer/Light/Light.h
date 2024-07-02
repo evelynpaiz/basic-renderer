@@ -5,7 +5,7 @@
 #include "Common/Renderer/Buffer/FrameBuffer.h"
 
 #include "Common/Renderer/Light/ShadowCamera.h"
-#include "Common/Renderer/Model/Model.h"
+#include "Common/Renderer/Drawable/Model/Model.h"
 
 #include <glm/glm.hpp>
 

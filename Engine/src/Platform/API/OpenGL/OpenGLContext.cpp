@@ -71,32 +71,6 @@ void OpenGLContext::SetVerticalSync(bool enabled)
 }
 
 /**
- * Clear the buffers to preset values.
- * 
- * @param buffersActive State of the buffers.
- */
-void OpenGLContext::Clear(const BufferState& buffersActive)
-{
-    // Clear buffers
-    glClear(utils::OpenGL::BufferStateToOpenGLMask(buffersActive));
-    
-    // TODO: Activate depth testing if the depth buffer is active
-    //SetDepthTesting(buffersActive.depthBufferActive);
-}
-
-/**
- * Clear the buffers to preset values.
- *
- * @param color Background color.
- * @param buffersActive State of the buffers.
- */
-void OpenGLContext::Clear(const glm::vec4& color, const BufferState& buffersActive)
-{
-    glClearColor(color.r, color.g, color.b, color.a);
-    Clear(buffersActive);
-}
-
-/**
  *  Swaps the front and back buffers. This presents the rendered frame to the screen.
  */
 void OpenGLContext::SwapBuffers()

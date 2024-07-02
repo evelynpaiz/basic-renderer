@@ -1,7 +1,5 @@
 #pragma once
 
-#include <GL/glew.h>
-
 /**
  * Enumeration of vertex attribute data types.
  *
@@ -15,8 +13,7 @@ enum class DataType
     Mat2, Mat3, Mat4
 };
 
-namespace utils { namespace OpenGL
-{
+namespace utils { namespace data {
 /**
  * Get the component count of a data type.
  *
@@ -69,35 +66,7 @@ inline unsigned int GetSizeOfType(DataType type)
     return 0;
 }
 
-/**
- * Convert the data type to its corresponding OpenGL type.
- *
- * @param type Data type.
- *
- * @return OpenGL data type.
- *
- * @note If the input DataType value is not recognized, the function will assert with an error.
- */
-inline GLenum DataTypeToOpenGLType(DataType type)
-{
-    switch (type)
-    {
-        case DataType::Bool: return GL_BOOL;
-        case DataType::Int: return GL_INT;
-        case DataType::Float: return GL_FLOAT;
-        case DataType::Vec2: return GL_FLOAT;
-        case DataType::Vec3: return GL_FLOAT;
-        case DataType::Vec4: return GL_FLOAT;
-        case DataType::Mat2: return GL_FLOAT;
-        case DataType::Mat3: return GL_FLOAT;
-        case DataType::Mat4: return GL_FLOAT;
-    }
-    
-    CORE_ASSERT(false, "Unknown vertex data type!");
-    return 0;
-}
-
-} // namespace OpenGL
+} // namespace data
 } // namespace utils
 
 /**
@@ -125,7 +94,7 @@ struct BufferElement
     /// @param type Data type of the element.
     /// @param normalized Normalize the data.
     BufferElement(const std::string& name, DataType type, bool normalized = false)
-        : Name(name), Type(type), Size(utils::OpenGL::GetSizeOfType(type)), Offset(0),
+        : Name(name), Type(type), Size(utils::data::GetSizeOfType(type)), Offset(0),
         Normalized(normalized)
     {}
     /// @brief Delete the buffer element.
@@ -210,4 +179,26 @@ private:
     std::vector<BufferElement> m_Elements;
     ///< Space between consecutive vertex attributes.
     unsigned int m_Stride = 0;
+};
+
+/**
+ * Structure to represent the state of color, depth, and stencil buffers.
+ */
+struct BufferState
+{
+    // Constructor(s)
+    // ----------------------------------------
+    /// @brief Generate a buffer state with predefined buffer activation states.
+    /// @param color Whether the color buffer is active (default: true).
+    /// @param depth Whether the depth buffer is active (default: false).
+    /// @param stencil Whether the stencil buffer is active (default: false).
+    BufferState(bool color = true, bool depth = false, bool stencil = false)
+        : colorBufferActive(color), depthBufferActive(depth), stencilBufferActive(stencil)
+    {}
+    
+    // Buffer state variables
+    // ----------------------------------------
+    bool colorBufferActive;     ///< Indicates whether the color buffer is active.
+    bool depthBufferActive;     ///< Indicates whether the depth buffer is active.
+    bool stencilBufferActive;   ///< Indicates whether the stencil buffer is active.
 };

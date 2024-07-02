@@ -44,24 +44,25 @@ void Scene::Draw(const RenderPassSpecification &pass)
     if (pass.Framebuffer)
         pass.Framebuffer->Bind();
     
+    // Update the viewport size
+    if(pass.Size.has_value())
+        RendererCommand::SetViewport(0, 0, pass.Size.value().x, pass.Size.value().y);
+    
+    // Clear the framebuffer with the specified color (if provided), or clear it with the active buffers
+    if (pass.Framebuffer && pass.Color.has_value())
+        RendererCommand::Clear(pass.Color.value(), pass.Framebuffer->GetActiveBuffers());
+    else if (pass.Framebuffer)
+        RendererCommand::Clear(pass.Framebuffer->GetActiveBuffers());
+    else if (pass.Color.has_value())
+        RendererCommand::Clear(pass.Color.value());
+    else
+        RendererCommand::Clear();
+    
     // Begin the scene with the provided camera, or without a camera if none is provided
     if (pass.Camera)
         Renderer::BeginScene(pass.Camera);
     else
         Renderer::BeginScene();
-    
-    if(pass.Size.has_value())
-        Renderer::SetViewport(0, 0, pass.Size.value().x, pass.Size.value().y);
-    
-    // Clear the framebuffer with the specified color (if provided), or clear it with the active buffers
-    if (pass.Framebuffer && pass.Color.has_value())
-        Renderer::Clear(pass.Color.value(), pass.Framebuffer->GetActiveBuffers());
-    else if (pass.Framebuffer)
-        Renderer::Clear(pass.Framebuffer->GetActiveBuffers());
-    else if (pass.Color.has_value())
-        Renderer::Clear(pass.Color.value());
-    else
-        Renderer::Clear();
     
     // Render each model with its associated material
     for (auto& pair : pass.Models)

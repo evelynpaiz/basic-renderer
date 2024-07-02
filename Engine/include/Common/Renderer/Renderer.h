@@ -3,9 +3,9 @@
 #include "Common/Renderer/RendererAPI.h"
 #include "Common/Renderer/RendererUtils.h"
 
-#include "Common/Renderer/Buffer/VertexArray.h"
 #include "Common/Renderer/Buffer/IndexBuffer.h"
 #include "Common/Renderer/Buffer/FrameBuffer.h"
+#include "Common/Renderer/Drawable/Drawable.h"
 
 #include "Common/Renderer/Material/Material.h"
 
@@ -37,14 +37,12 @@ public:
     
     // Render
     // ----------------------------------------
-    static void Clear(const BufferState& buffersActive = {});
-    static void Clear(const glm::vec4& color, const BufferState& buffersActive = {});
-    static void Draw(const std::shared_ptr<VertexArray>& vao,
+    static void Draw(const std::shared_ptr<Drawable>& drawable,
                      const PrimitiveType &primitive = PrimitiveType::Triangles);
-    static void Draw(const std::shared_ptr<VertexArray>& vao,
-              const std::shared_ptr<Material>& material,
-              const glm::mat4 &transform = glm::mat4(1.0f),
-              const PrimitiveType &primitive = PrimitiveType::Triangles);
+    static void Draw(const std::shared_ptr<Drawable>& drawable,
+                     const std::shared_ptr<Material>& material,
+                     const glm::mat4 &transform = glm::mat4(1.0f),
+                     const PrimitiveType &primitive = PrimitiveType::Triangles);
     
     // Getters(s)
     // ----------------------------------------
@@ -54,9 +52,7 @@ public:
 
     // Setter(s)
     // ----------------------------------------
-    static void SetViewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height);
-    
-    static void SetDepthTesting(const bool enabled);
+    // TODO: move to renderer command
     static void SetDepthFunction(const DepthFunction depth);
     static void SetFaceCulling(const FaceCulling culling);
     static void SetCubeMapSeamless(const bool enabled);

@@ -10,6 +10,15 @@
 // Shader
 // ----------------------------------------
 
+/**
+ * Create a shader based on the active rendering API.
+ *
+ * @param name The name to assign to the shader.
+ * @param filePath The path to the shader source file.
+ *
+ * @return A shared pointer to the created shader, or nullptr if the API
+ *         is not supported or an error occurs.
+ */
 std::shared_ptr<Shader> Shader::Create(const std::string &name, const std::filesystem::path &filePath)
 {
     switch (Renderer::GetAPI())
@@ -32,6 +41,14 @@ std::shared_ptr<Shader> Shader::Create(const std::string &name, const std::files
     return nullptr;
 }
 
+/**
+ * Create a shader based on the active rendering API.
+ *
+ * @param filePath The path to the shader source file.
+ *
+ * @return A shared pointer to the created Shader object, or nullptr if the API
+ *         is not supported or an error occurs.
+ */
 std::shared_ptr<Shader> Shader::Create(const std::filesystem::path &filePath)
 {
     switch (Renderer::GetAPI())

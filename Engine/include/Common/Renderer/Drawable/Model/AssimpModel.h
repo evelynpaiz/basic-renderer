@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Common/Renderer/Mesh/Mesh.h"
-#include "Common/Renderer/Model/Model.h"
+#include "Common/Renderer/Drawable/Mesh/Mesh.h"
+#include "Common/Renderer/Drawable/Model/Model.h"
 
 #include <glm/glm.hpp>
 

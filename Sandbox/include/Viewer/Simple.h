@@ -22,6 +22,10 @@ private:
     // ----------------------------------------
     bool OnWindowResize(WindowResizeEvent &e);
     
+private:
+    ///< Set of objects in the scene.
+    ModelLibrary m_Models;
+    
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
