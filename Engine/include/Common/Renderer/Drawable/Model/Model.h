@@ -191,12 +191,12 @@ public:
     // ----------------------------------------
     /// @brief Define a model.
     /// @param primitive The primitive type of the model.
-    Model(const PrimitiveType &primitive = PrimitiveType::Triangles) : BaseModel(primitive) {};
+    Model(const PrimitiveType &primitive = PrimitiveType::Triangle) : BaseModel(primitive) {};
     /// @brief Define with a specific mesh.
     /// @param mesh The set of meshes defining the model.
     /// @param primitive The primitive type of the model.
     Model(const Mesh<VertexData>& mesh,
-          const PrimitiveType &primitive = PrimitiveType::Triangles)
+          const PrimitiveType &primitive = PrimitiveType::Triangle)
     : BaseModel(primitive)
     {
         m_Meshes.push_back(mesh);

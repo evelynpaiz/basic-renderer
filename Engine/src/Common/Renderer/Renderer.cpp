@@ -6,6 +6,9 @@
 
 #include "Platform/OpenGL/Buffer/OpenGLVertexArray.h"
 
+// TODO: remove opengl definitions
+#include "Platform/OpenGL/OpenGLRendererUtils.h"
+
 #include <GL/glew.h>
 
 // Define the renderer variable(s)
@@ -144,7 +147,7 @@ void Renderer::Draw(const std::shared_ptr<Drawable>& drawable, const std::shared
  */
 void Renderer::SetDepthFunction(const DepthFunction depth)
 {
-    glDepthFunc(utils::OpenGL::DepthToOpenGLType(depth));
+    glDepthFunc(utils::graphics::gl::ToOpenGLDepthFunc(depth));
 }
 
 /**
@@ -157,7 +160,7 @@ void Renderer::SetDepthFunction(const DepthFunction depth)
  */
 void Renderer::SetFaceCulling(const FaceCulling culling)
 {
-    glCullFace(utils::OpenGL::CullingToOpenGLType(culling));
+    glCullFace(utils::graphics::gl::ToOpenGLCulling(culling));
 }
 
 /**

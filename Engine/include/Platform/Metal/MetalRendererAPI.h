@@ -23,7 +23,7 @@ public:
     // Draw
     // ----------------------------------------
     void Draw(const std::shared_ptr<Drawable>& drawable,
-              const PrimitiveType &primitive = PrimitiveType::Triangles) override;
+              const PrimitiveType &primitive = PrimitiveType::Triangle) override;
     
     // Setter(s)
     // ----------------------------------------

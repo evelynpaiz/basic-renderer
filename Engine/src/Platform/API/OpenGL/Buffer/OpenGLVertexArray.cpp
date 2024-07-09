@@ -1,7 +1,7 @@
 #include "enginepch.h"
 #include "Platform/OpenGL/Buffer/OpenGLVertexArray.h"
 
-#include "Platform/OpenGL/Buffer/OpenGLBufferUtils.h"
+#include "Platform/OpenGL/OpenGLRendererUtils.h"
 
 #include <GL/glew.h>
 
@@ -57,8 +57,8 @@ void OpenGLVertexArray::SetVertexAttributes(const std::shared_ptr<VertexBuffer>&
     const auto& layout = vbo->GetLayout();
     for (const auto& element : layout)
     {
-        glVertexAttribPointer(index, utils::data::GetCompCountOfType(element.Type),
-            utils::data::OpenGL::DataTypeToOpenGLType(element.Type), element.Normalized,
+        glVertexAttribPointer(index, utils::data::GetComponentCount(element.Type),
+            utils::graphics::gl::ToOpenGLType(element.Type), element.Normalized,
             layout.GetStride(), (const void*)(size_t)element.Offset);
         glEnableVertexAttribArray(index);
         index++;

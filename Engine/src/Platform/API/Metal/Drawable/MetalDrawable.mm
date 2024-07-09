@@ -2,9 +2,10 @@
 #include "Platform/Metal/Drawable/MetalDrawable.h"
 
 #include "Platform/Metal/MetalContext.h"
+#include "Platform/Metal/MetalRendererUtils.h"
+
 #include "Platform/Metal/Buffer/MetalVertexBuffer.h"
 #include "Platform/Metal/Buffer/MetalIndexBuffer.h"
-#include "Platform/Metal/Buffer/MetalBufferUtils.h"
 
 #include "Platform/Metal/Shader/MetalShader.h"
 
@@ -18,7 +19,7 @@ struct MetalDrawable::DrawableState {
     ///< The compiled Metal render pipeline state.
     id<MTLRenderPipelineState> PipelineState;
     
-    ///< Descriptor used to create the `PipelineState`.
+    ///< Describes the rendering pipeline.
     MTLRenderPipelineDescriptor* PipelineDescriptor;
     ///< Describes the layout of vertex data.
     MTLVertexDescriptor* VertexDescriptor;
@@ -134,8 +135,7 @@ void MetalDrawable::SetVertexAttributes(const std::shared_ptr<VertexBuffer> &vbo
     {
         // Access the attribute information
         auto *attribute = m_State->VertexDescriptor.attributes[m_Index];
-        
-        attribute.format = utils::data::Metal::DataTypeToMetalFormat(element.Type);
+        attribute.format = utils::graphics::mtl::ToMetalFormat(element.Type);
         attribute.offset = element.Offset;
         attribute.bufferIndex = indexVertexBuffer;
         m_Index++;

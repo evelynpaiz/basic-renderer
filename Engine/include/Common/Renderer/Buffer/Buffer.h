@@ -9,21 +9,20 @@
 enum class DataType
 {
     Bool, Int, Float,
-    Vec2, Vec3, Vec4,
-    Mat2, Mat3, Mat4
+    Vec2, Vec3, Vec4
 };
 
 namespace utils { namespace data {
 /**
  * Get the component count of a data type.
  *
- * @param type Data type.
+ * @param dataType The data type.
  *
  * @return The number of components that the data has.
  */
-inline unsigned int GetCompCountOfType(DataType type)
+inline unsigned int GetComponentCount(DataType dataType)
 {
-    switch (type)
+    switch (dataType)
     {
         case DataType::Bool: return 1;
         case DataType::Int: return 1;
@@ -31,9 +30,6 @@ inline unsigned int GetCompCountOfType(DataType type)
         case DataType::Vec2: return 2;
         case DataType::Vec3: return 3;
         case DataType::Vec4: return 4;
-        case DataType::Mat2: return 2;
-        case DataType::Mat3: return 3;
-        case DataType::Mat4: return 4;
     }
     
     CORE_ASSERT(false, "Unknown vertex data type!");
@@ -43,13 +39,13 @@ inline unsigned int GetCompCountOfType(DataType type)
 /**
  * Get the size (in bytes) of the data depending on its type.
  *
- * @param type Data type.
+ * @param dataType The data type.
  *
  * @return The size of the data (in bytes).
  */
-inline unsigned int GetSizeOfType(DataType type)
+inline unsigned int GetDataSize(DataType dataType)
 {
-    switch (type)
+    switch (dataType)
     {
         case DataType::Bool: return 1;
         case DataType::Int: return 4;
@@ -57,9 +53,6 @@ inline unsigned int GetSizeOfType(DataType type)
         case DataType::Vec2: return 4 * 2;
         case DataType::Vec3: return 4 * 3;
         case DataType::Vec4: return 4 * 4;
-        case DataType::Mat2: return 4 * 2 * 2;
-        case DataType::Mat3: return 4 * 3 * 3;
-        case DataType::Mat4: return 4 * 4 * 4;
     }
     
     CORE_ASSERT(false, "Unknown vertex data type!");
@@ -94,7 +87,7 @@ struct BufferElement
     /// @param type Data type of the element.
     /// @param normalized Normalize the data.
     BufferElement(const std::string& name, DataType type, bool normalized = false)
-        : Name(name), Type(type), Size(utils::data::GetSizeOfType(type)), Offset(0),
+        : Name(name), Type(type), Size(utils::data::GetDataSize(type)), Offset(0),
         Normalized(normalized)
     {}
     /// @brief Delete the buffer element.

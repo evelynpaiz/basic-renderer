@@ -19,7 +19,7 @@ Simple::Simple(int width, int height)
 void Simple::OnAttach()
 {
     auto& materialLibrary = Renderer::GetMaterialLibrary();
-    auto material = materialLibrary.Create<Material>("Simple", "resources/shaders/base/Simple.Metal");
+    auto material = materialLibrary.Create<Material>("Simple", "resources/shaders/base/Simple.glsl");
     
     auto cube = utils::Geometry::ModelCube<GeoVertexData<glm::vec4, glm::vec2, glm::vec3>>();
     cube->SetScale(glm::vec3(2.0f));

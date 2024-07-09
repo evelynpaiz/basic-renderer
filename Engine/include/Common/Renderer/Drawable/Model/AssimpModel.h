@@ -35,7 +35,7 @@ public:
     /// @param filePath The path to the model file.
     /// @param primitive The primitive type of the model.
     AssimpModel(const std::filesystem::path& filePath,
-                const PrimitiveType &primitive = PrimitiveType::Triangles)
+                const PrimitiveType &primitive = PrimitiveType::Triangle)
     : LoadedModel<AssimpVertexData>(filePath, primitive)
     {
         LoadModel(filePath);

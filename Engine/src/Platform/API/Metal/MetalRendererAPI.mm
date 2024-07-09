@@ -2,6 +2,8 @@
 #include "Platform/Metal/MetalRendererAPI.h"
 
 #include "Platform/Metal/MetalContext.h"
+#include "Platform/Metal/MetalRendererUtils.h"
+
 #include "Platform/Metal/Drawable/MetalDrawable.h"
 #include "Platform/Metal/Buffer/MetalIndexBuffer.h"
 
@@ -59,7 +61,7 @@ void MetalRendererAPI::Draw(const std::shared_ptr<Drawable>& drawable,
     
     id<MTLBuffer> indexBuffer = reinterpret_cast<id<MTLBuffer>>(metalIndexBuffer->GetBuffer());
     [encoder 
-        drawIndexedPrimitives:MTLPrimitiveTypeTriangle
+        drawIndexedPrimitives:utils::graphics::mtl::ToMetalPrimitive(primitive)
         indexCount:metalIndexBuffer->GetCount()
         indexType:MTLIndexTypeUInt32
         indexBuffer:indexBuffer

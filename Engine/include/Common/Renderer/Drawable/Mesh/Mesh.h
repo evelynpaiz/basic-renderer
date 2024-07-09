@@ -63,7 +63,7 @@ public:
     // Render
     // ----------------------------------------
     void DrawMesh(const glm::mat4& transform = glm::mat4(1.0f),
-                  const PrimitiveType &primitive = PrimitiveType::Triangles);
+                  const PrimitiveType &primitive = PrimitiveType::Triangle);
     
     // Mesh variables
     // ----------------------------------------

@@ -50,7 +50,7 @@ public:
     // Draw
     // ----------------------------------------
     virtual void Draw(const std::shared_ptr<Drawable>& drawable,
-                      const PrimitiveType &primitive = PrimitiveType::Triangles) = 0;
+                      const PrimitiveType &primitive = PrimitiveType::Triangle) = 0;
     
     // Setter(s)
     // ----------------------------------------

@@ -38,11 +38,11 @@ public:
     // Render
     // ----------------------------------------
     static void Draw(const std::shared_ptr<Drawable>& drawable,
-                     const PrimitiveType &primitive = PrimitiveType::Triangles);
+                     const PrimitiveType &primitive = PrimitiveType::Triangle);
     static void Draw(const std::shared_ptr<Drawable>& drawable,
                      const std::shared_ptr<Material>& material,
                      const glm::mat4 &transform = glm::mat4(1.0f),
-                     const PrimitiveType &primitive = PrimitiveType::Triangles);
+                     const PrimitiveType &primitive = PrimitiveType::Triangle);
     
     // Getters(s)
     // ----------------------------------------

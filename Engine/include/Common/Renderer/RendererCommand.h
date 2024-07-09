@@ -26,7 +26,7 @@ public:
     // Render
     // ----------------------------------------
     static void Draw(const std::shared_ptr<Drawable>& drawable,
-                     const PrimitiveType &primitive = PrimitiveType::Triangles);
+                     const PrimitiveType &primitive = PrimitiveType::Triangle);
     
     // Setter(s)
     // ----------------------------------------

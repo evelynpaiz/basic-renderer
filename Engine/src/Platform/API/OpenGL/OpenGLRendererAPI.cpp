@@ -1,7 +1,7 @@
 #include "enginepch.h"
 #include "Platform/OpenGL/OpenGLRendererAPI.h"
 
-#include "Platform/OpenGL/Buffer/OpenGLBufferUtils.h"
+#include "Platform/OpenGL/OpenGLRendererUtils.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -17,13 +17,13 @@ void OpenGLRendererAPI::Init()
 /**
  * Clear the buffers to preset values.
  *
- * @param buffersActive State of the buffers.
+ * @param bufferState State of the buffers.
  */
-void OpenGLRendererAPI::Clear(const BufferState& buffersActive)
+void OpenGLRendererAPI::Clear(const BufferState& bufferState)
 {
     // Clear buffers
-    glClear(utils::data::OpenGL::BufferStateToOpenGLMask(buffersActive));
-    SetDepthTesting(buffersActive.depthBufferActive);
+    glClear(utils::graphics::gl::ToClearMask(bufferState));
+    SetDepthTesting(bufferState.depthBufferActive);
 }
 
 /**
@@ -49,7 +49,7 @@ void OpenGLRendererAPI::Draw(const std::shared_ptr<Drawable>& drawable,
 {
     drawable->Bind();
     drawable->GetIndexBuffer()->Bind();
-    glDrawElements(utils::OpenGL::PrimitiveTypeToOpenGLType(primitive),
+    glDrawElements(utils::graphics::gl::ToOpenGLPrimitive(primitive),
                    drawable->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 }
 
