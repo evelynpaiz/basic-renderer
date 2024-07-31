@@ -33,9 +33,9 @@ public:
     
     // Setter(s)
     // ----------------------------------------
-    void SetBool(const std::string &name, bool value) override;
-    void SetInt(const std::string &name, int value) override;
-    void SetFloat(const std::string &name, float value) override;
+    void SetBool(const std::string& name, bool value) override;
+    void SetInt(const std::string& name, int value) override;
+    void SetFloat(const std::string& name, float value) override;
     
     void SetVec2(const std::string& name, const glm::vec2& value) override;
     void SetVec3(const std::string& name, const glm::vec3& value) override;
@@ -49,6 +49,14 @@ private:
     // Compilation
     // ----------------------------------------
     void CompileShader(const std::filesystem::path& filePath);
+    
+    // Argument(s) and Uniform(s)
+    // ----------------------------------------
+    void ProcessShaderArgument(void* arg, ShaderType type);
+    void ExtractShaderResources(void* descriptor);
+    
+    void UpdateUniformBuffers();
+    friend class MetalDrawable;
     
     // Shader variables
     // ----------------------------------------

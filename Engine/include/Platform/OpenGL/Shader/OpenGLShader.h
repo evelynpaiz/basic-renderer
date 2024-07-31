@@ -25,10 +25,6 @@ public:
     void Bind() const override;
     void Unbind() const override;
     
-    // Getter(s)
-    // ----------------------------------------
-    int GetUniformLocation(const std::string& name);
-    
     // Setter(s)
     // ----------------------------------------
     void SetBool(const std::string &name, bool value) override;
@@ -78,6 +74,10 @@ private:
     unsigned int CreateShader(const std::string& vertexShader,
                               const std::string& fragmentShader,
                               const std::string& gemetryShader = "");
+    
+    // Attributes(s) & Uniform(s)
+    // ----------------------------------------
+    void ExtractShaderResources();
     // Parsing
     // ----------------------------------------
     OpenGLShaderSource ParseShader(const std::filesystem::path& filepath);
@@ -87,8 +87,6 @@ private:
 private:
     ///< ID of the shader program.
     unsigned int m_ID = 0;
-    ///< Cache of uniform locations.
-    std::unordered_map<std::string, int> m_UniformBuffer;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

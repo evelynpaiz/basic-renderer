@@ -160,7 +160,7 @@ public:
     {
         auto material = std::make_shared<Type>(std::forward<Args>(args)...);
         
-        std::string message = GetName() + " " + name + " is not of the specified type!";
+        std::string message = GetTypeName() + " '" + name + "' is not of the specified type!";
         CORE_ASSERT(std::dynamic_pointer_cast<Material>(material), message);
         
         Add(name, material);

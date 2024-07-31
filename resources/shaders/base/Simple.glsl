@@ -3,9 +3,17 @@
 
 layout (location = 0) in vec4 a_Position;
 
+struct Transform {
+    mat4 Model;
+    mat4 View;
+    mat4 Projection;
+};
+
+uniform Transform u_Transform;
+
 void main()
 {
-    gl_Position = a_Position;
+    gl_Position = u_Transform.Projection * u_Transform.View * u_Transform.Model * a_Position;
 }
 
 #shader fragment
@@ -13,7 +21,9 @@ void main()
 
 layout (location = 0) out vec4 color;
 
+uniform vec3 u_Color;
+
 void main()
 {
-    color = vec4(0.8f, 0.0f, 0.3f, 1.0f);
+    color = vec4(u_Color, 1.0f);
 }

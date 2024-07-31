@@ -1,6 +1,8 @@
 #include "enginepch.h"
 #include "Platform/OpenGL/Shader/OpenGLShader.h"
 
+#include "Platform/OpenGL/OpenGLRendererUtils.h"
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -13,9 +15,13 @@
 OpenGLShader::OpenGLShader(const std::string& name, const std::filesystem::path& filePath)
     : Shader(name, filePath)
 {
+    // Parse the shader and divide it in the different program sources
     OpenGLShaderSource source = ParseShader(filePath);
+    // Create the shader program
     m_ID = CreateShader(source.VertexSource, source.FragmentSource,
                         source.GeometrySource);
+    // Define the shader attributes and uniforms
+    ExtractShaderResources();
 }
 
 /**
@@ -52,28 +58,6 @@ void OpenGLShader::Unbind() const
 }
 
 /**
- * Get the location number of a uniform.
- *
- * @param name Name of the uniform.
- *
- * @return Uniform location.
- */
-int OpenGLShader::GetUniformLocation(const std::string& name)
-{
-    // Verify that the location of the uniform is not cached
-    if (m_UniformBuffer.find(name) != m_UniformBuffer.end())
-        return m_UniformBuffer[name];
-    
-    // Retrieve the location of the uniform and cache it too
-    int location = glGetUniformLocation(m_ID, name.c_str());
-    if (location == -1)
-        CORE_WARN("Uniform " + name + " doesn't exist!");
-    
-    m_UniformBuffer[name] = location;
-    return location;
-}
-
-/**
  * Set the uniform with a bool value.
  *
  * @param name Uniform name.
@@ -81,7 +65,9 @@ int OpenGLShader::GetUniformLocation(const std::string& name)
  */
 void OpenGLShader::SetBool(const std::string& name, bool value)
 {
-    glUniform1i(GetUniformLocation(name), (int)value);
+    auto& uniform = SetUniformData(name, value);
+    if (uniform.Update)
+        glUniform1i(uniform.Location, (int)value);
 }
 
 /**
@@ -92,7 +78,9 @@ void OpenGLShader::SetBool(const std::string& name, bool value)
  */
 void OpenGLShader::SetInt(const std::string& name, int value)
 {
-    glUniform1i(GetUniformLocation(name), value);
+    auto& uniform = SetUniformData(name, value);
+    if (uniform.Update)
+        glUniform1i(uniform.Location, value);
 }
 
 /**
@@ -103,7 +91,9 @@ void OpenGLShader::SetInt(const std::string& name, int value)
  */
 void OpenGLShader::SetFloat(const std::string& name, float value)
 {
-    glUniform1f(GetUniformLocation(name), value);
+    auto& uniform = SetUniformData(name, value);
+    if (uniform.Update)
+        glUniform1f(uniform.Location, value);
 }
 
 /**
@@ -114,7 +104,9 @@ void OpenGLShader::SetFloat(const std::string& name, float value)
  */
 void OpenGLShader::SetVec2(const std::string& name, const glm::vec2& value)
 {
-    glUniform2fv(glGetUniformLocation(m_ID, name.c_str()), 1, &value[0]);
+    auto& uniform = SetUniformData(name, value);
+    if (uniform.Update)
+        glUniform2fv(uniform.Location, 1, &value[0]);
 }
 
 /**
@@ -125,7 +117,9 @@ void OpenGLShader::SetVec2(const std::string& name, const glm::vec2& value)
  */
 void OpenGLShader::SetVec3(const std::string& name, const glm::vec3& value)
 {
-    glUniform3fv(glGetUniformLocation(m_ID, name.c_str()), 1, &value[0]);
+    auto& uniform = SetUniformData(name, value);
+    if (uniform.Update)
+        glUniform3fv(uniform.Location, 1, &value[0]);
 }
 
 /**
@@ -136,7 +130,9 @@ void OpenGLShader::SetVec3(const std::string& name, const glm::vec3& value)
  */
 void OpenGLShader::SetVec4(const std::string& name, const glm::vec4& value)
 {
-    glUniform4fv(glGetUniformLocation(m_ID, name.c_str()), 1, &value[0]);
+    auto& uniform = SetUniformData(name, value);
+    if (uniform.Update)
+        glUniform4fv(uniform.Location, 1, &value[0]);
 }
 
 /**
@@ -147,7 +143,9 @@ void OpenGLShader::SetVec4(const std::string& name, const glm::vec4& value)
  */
 void OpenGLShader::SetMat2(const std::string& name, const glm::mat2& value)
 {
-    glUniformMatrix2fv(glGetUniformLocation(m_ID, name.c_str()), 1, GL_FALSE, &value[0][0]);
+    auto& uniform = SetUniformData(name, value);
+    if (uniform.Update)
+        glUniformMatrix2fv(uniform.Location, 1, GL_FALSE, &value[0][0]);
 }
 
 /**
@@ -158,7 +156,9 @@ void OpenGLShader::SetMat2(const std::string& name, const glm::mat2& value)
  */
 void OpenGLShader::SetMat3(const std::string& name, const glm::mat3& value)
 {
-    glUniformMatrix3fv(glGetUniformLocation(m_ID, name.c_str()), 1, GL_FALSE, &value[0][0]);
+    auto& uniform = SetUniformData(name, value);
+    if (uniform.Update)
+        glUniformMatrix3fv(uniform.Location, 1, GL_FALSE, &value[0][0]);
 }
 
 /**
@@ -169,7 +169,9 @@ void OpenGLShader::SetMat3(const std::string& name, const glm::mat3& value)
  */
 void OpenGLShader::SetMat4(const std::string& name, const glm::mat4& value)
 {
-    glUniformMatrix4fv(glGetUniformLocation(m_ID, name.c_str()), 1, GL_FALSE, &value[0][0]);
+    auto& uniform = SetUniformData(name, value);
+    if (uniform.Update)
+        glUniformMatrix4fv(uniform.Location, 1, GL_FALSE, &value[0][0]);
 }
 
 /**
@@ -265,6 +267,46 @@ unsigned int OpenGLShader::CreateShader(const std::string& vertexShader,
 }
 
 /**
+ * Extracts and stores information about active attributes and uniforms from the shader program.
+ *
+ * @pre  The shader program should be successfully linked (`m_ID` should be valid).
+ * @post  `m_Attributes` will contain information about the active attributes.
+ * @post  `m_Uniforms` will contain information about the active uniforms.
+ */
+void OpenGLShader::ExtractShaderResources()
+{
+    // Counter of attributes/uniformss
+    GLint count;
+    // Buffer to store attribute/uniform values temporaly
+    GLchar name[256];
+    GLenum type;
+
+    // Retrieve attributes
+    glGetProgramiv(m_ID, GL_ACTIVE_ATTRIBUTES, &count);
+    for (GLint i = 0; i < count; ++i)
+    {
+        glGetActiveAttrib(m_ID, i, sizeof(name), nullptr, nullptr, &type, name);
+        
+        DataElement element(utils::graphics::gl::ToDataType(type));
+        m_Attributes.Add(name, element);
+    }
+
+    // Retrieve uniforms
+    glGetProgramiv(m_ID, GL_ACTIVE_UNIFORMS, &count);
+    for (GLint i = 0; i < count; ++i)
+    {
+        glGetActiveUniform(m_ID, i, sizeof(name), nullptr, nullptr, &type, name);
+
+        auto [group, member] = utils::SplitString(name);
+        GLint location = glGetUniformLocation(m_ID, name);
+
+        UniformElement element(utils::graphics::gl::ToDataType(type));
+        element.Location = static_cast<int32_t>(location);
+        m_Uniforms.Add(group, member, element);
+    }
+}
+
+/**
  * Parse shader input file.
  *
  * @param filepath Path to the shader file.
@@ -275,12 +317,6 @@ OpenGLShader::OpenGLShaderSource OpenGLShader::ParseShader(const std::filesystem
 {
     // Open the file
     std::ifstream stream(filepath);
-    
-    // Define the different shader classes available
-    enum class ShaderType
-    {
-        NONE = -1, VERTEX = 0, FRAGMENT = 1, GEOMETRY = 2
-    };
     
     // Parse the file
     std::string line;

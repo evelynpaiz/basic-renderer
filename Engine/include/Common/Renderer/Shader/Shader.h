@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Common/Core/Library.h"
+#include "Common/Renderer/Buffer/Buffer.h"
+#include "Common/Renderer/Shader/Uniform.h"
 
 #include <glm/glm.hpp>
 
@@ -65,6 +66,54 @@ protected:
         : m_Name(name), m_FilePath(filePath)
     {}
     
+    // Getter(s)
+    // ----------------------------------------
+    bool IsUniform(const std::string& name) const;
+    static std::filesystem::path GetFullFilePath(const std::filesystem::path& filePath);
+    
+    // Setter(s)
+    // ----------------------------------------
+    /// @brief Sets the data for a uniform variable in the uniform buffer.
+    /// @return The location of the uniform variable in the shader.
+    template <typename T>
+    UniformElement& SetUniformData(const std::string& name, const T& value)
+    {
+        // Check if the uniform is defined in the shader
+        CORE_ASSERT(IsUniform(name), "Uniform '" + name + "' not found!");
+        
+        // Get the uniform from the buffer of uniforms
+        auto [group, member] = utils::SplitString(name);
+        auto& uniform = m_Uniforms.Get(group, member);
+        // Do not update the uniform and check if it will be necessary to do
+        uniform.Update = false;
+        
+        // Verify that the type of data is the same
+        if (uniform.Type != utils::data::GetDataType<T>())
+        {
+            CORE_WARN("Uniform '{0}' type mismatch!", name);
+            return uniform;
+        }
+        
+        // Check if the value has actually changed
+        if (uniform.Data && memcmp(&value, uniform.Data, uniform.Size) == 0)
+        {
+            return uniform;
+        }
+        
+        // Save the data of the uniform
+        if (!uniform.Data)
+        {
+             uniform.Data = ::operator new(uniform.Size);
+             new (uniform.Data) T(value);
+        }
+        else
+        {
+             *reinterpret_cast<T*>(uniform.Data) = value;
+        }
+        uniform.Update = true;
+        return uniform;
+    }
+    
     // Shader variables
     // ----------------------------------------
 protected:
@@ -72,6 +121,11 @@ protected:
     std::string m_Name;
     ///< File path of shader source program.
     std::filesystem::path m_FilePath;
+    
+    ///< Vertex attributes supported by the shader.
+    BufferLayout m_Attributes;
+    ///< Uniforms supported by the shader.
+    UniformLibrary m_Uniforms;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

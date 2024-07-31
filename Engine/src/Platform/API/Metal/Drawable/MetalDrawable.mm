@@ -77,6 +77,11 @@ void MetalDrawable::Bind() const
             offset:0
             atIndex:static_cast<NSUInteger>(i)];
     }
+    
+    // Define the uniforms in the command encoder
+    auto* metalShader = dynamic_cast<MetalShader*>(m_Shader.get());
+    CORE_ASSERT(metalShader, "Invalid shader cast - not a Metal shader!");
+    metalShader->UpdateUniformBuffers();
 }
 
 /**
@@ -112,6 +117,9 @@ void MetalDrawable::SetPipelineState() const
     NSError* error = nil;
     m_State->PipelineState = [device newRenderPipelineStateWithDescriptor:m_State->PipelineDescriptor error:&error];
     CORE_ASSERT(!error, "Failed to define the pipeline state!");
+    
+    // If shader information has not been defined, define it
+    metalShader->ExtractShaderResources(reinterpret_cast<void*>(m_State->PipelineDescriptor));
 }
 
 /**
@@ -122,18 +130,18 @@ void MetalDrawable::SetPipelineState() const
 void MetalDrawable::SetVertexAttributes(const std::shared_ptr<VertexBuffer> &vbo)
 {
     // Check if the vertex buffer has a layout defined
-    CORE_ASSERT(vbo->GetLayout().GetElements().size(),
-                "Vertex buffer has no layout!");
+    CORE_ASSERT(!vbo->GetLayout().IsEmpty(), "Vertex buffer has no layout!");
     
     // Get the index of the vertex buffer
     int indexVertexBuffer = GetVertexBufferIndex(vbo);
-    CORE_ASSERT(indexVertexBuffer >= 0, "Vertex buffer not yet defined in the drawable!");
+    CORE_ASSERT(indexVertexBuffer >= 0, "Vertex buffer not defined inside the drawable!");
     
     // Describe the vertex
     const auto& layout = vbo->GetLayout();
-    for (const auto& element : layout)
+    for (const auto& name : layout.GetBufferOrder())
     {
-        // Access the attribute information
+        // Define the vertex attribute
+        auto& element = layout.Get(name);
         auto *attribute = m_State->VertexDescriptor.attributes[m_Index];
         attribute.format = utils::graphics::mtl::ToMetalFormat(element.Type);
         attribute.offset = element.Offset;

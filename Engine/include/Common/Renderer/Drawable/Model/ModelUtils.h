@@ -9,7 +9,6 @@
 
 namespace utils { namespace Geometry
 {
-
 /**
  * Generate a buffer layout for a vector of 3D vertices with position information.
  *
@@ -20,7 +19,7 @@ namespace utils { namespace Geometry
 inline BufferLayout BufferLayoutGeometry(std::vector<GeoVertexData<glm::vec4>>&)
 {
     return {
-        { "a_Position", DataType::Vec4 }
+        { "a_Position", { DataType::Vec4 } }
     };
 }
 
@@ -34,8 +33,8 @@ inline BufferLayout BufferLayoutGeometry(std::vector<GeoVertexData<glm::vec4>>&)
 inline BufferLayout BufferLayoutGeometry(std::vector<GeoVertexData<glm::vec4, glm::vec2>>&)
 {
     return {
-        { "a_Position", DataType::Vec4 },
-        { "a_TextureCoord", DataType::Vec2 }
+        { "a_Position", { DataType::Vec4 } },
+        { "a_TextureCoord", { DataType::Vec2 } }
     };
 }
 
@@ -49,8 +48,8 @@ inline BufferLayout BufferLayoutGeometry(std::vector<GeoVertexData<glm::vec4, gl
 inline BufferLayout BufferLayoutGeometry(std::vector<GeoVertexData<glm::vec4, glm::vec3>>&)
 {
     return {
-        { "a_Position", DataType::Vec4 },
-        { "a_Normal", DataType::Vec3 }
+        { "a_Position", { DataType::Vec4 } },
+        { "a_Normal", { DataType::Vec3 } }
     };
 }
 
@@ -64,9 +63,9 @@ inline BufferLayout BufferLayoutGeometry(std::vector<GeoVertexData<glm::vec4, gl
 inline BufferLayout BufferLayoutGeometry(std::vector<GeoVertexData<glm::vec4, glm::vec2, glm::vec3>>&)
 {
     return {
-        { "a_Position", DataType::Vec4 },
-        { "a_TextureCoord", DataType::Vec2 },
-        { "a_Normal", DataType::Vec3 }
+        { "a_Position", { DataType::Vec4 } },
+        { "a_TextureCoord", {  DataType::Vec2 } },
+        { "a_Normal", { DataType::Vec3 } }
     };
 }
 

@@ -71,9 +71,9 @@ Mesh<AssimpVertexData> AssimpModel::ProcessMesh(aiMesh *mesh)
     std::vector<AssimpVertexData> vertices;
     std::vector<unsigned int> indices;
     BufferLayout layout = {
-        { "a_Position", DataType::Vec4 },
-        { "a_TextureCoord", DataType::Vec2 },
-        { "a_Normal", DataType::Vec3 }
+        { "a_Position", { DataType::Vec4 } },
+        { "a_TextureCoord", { DataType::Vec2 } },
+        { "a_Normal", { DataType::Vec3 } }
     };
     
     // Process the vertex data

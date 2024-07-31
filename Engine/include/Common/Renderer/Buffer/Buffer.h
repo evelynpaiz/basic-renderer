@@ -1,177 +1,35 @@
 #pragma once
 
-/**
- * Enumeration of vertex attribute data types.
- *
- * The `DataType` enumeration represents different data types that can be used for vertex attributes.
- * It includes boolean, integer, floating-point, vectors (2D, 3D, 4D), and matrices (2x2, 3x3, 4x4) types.
- */
-enum class DataType
-{
-    Bool, Int, Float,
-    Vec2, Vec3, Vec4
-};
-
-namespace utils { namespace data {
-/**
- * Get the component count of a data type.
- *
- * @param dataType The data type.
- *
- * @return The number of components that the data has.
- */
-inline unsigned int GetComponentCount(DataType dataType)
-{
-    switch (dataType)
-    {
-        case DataType::Bool: return 1;
-        case DataType::Int: return 1;
-        case DataType::Float: return 1;
-        case DataType::Vec2: return 2;
-        case DataType::Vec3: return 3;
-        case DataType::Vec4: return 4;
-    }
-    
-    CORE_ASSERT(false, "Unknown vertex data type!");
-    return 0;
-}
+#include "Common/Renderer/Buffer/Data.h"
 
 /**
- * Get the size (in bytes) of the data depending on its type.
+ * Specialized data layout for vertex buffer attributes.
  *
- * @param dataType The data type.
+ * This class derives from `DataLayout<DataElement>` and is specifically
+ * designed for defining the arrangement and format of vertex attributes within a
+ * vertex buffer.
  *
- * @return The size of the data (in bytes).
+ * It inherits the functionality of `DataLayout` for managing the elements and
+ * calculating offsets and stride.
+ *
+ * @note `BufferLayout` objects are typically used in conjunction with a
+ *       `VertexBuffer` (or a similar mechanism) to define how vertex data
+ *       is structured in GPU memory.
  */
-inline unsigned int GetDataSize(DataType dataType)
-{
-    switch (dataType)
-    {
-        case DataType::Bool: return 1;
-        case DataType::Int: return 4;
-        case DataType::Float: return 4;
-        case DataType::Vec2: return 4 * 2;
-        case DataType::Vec3: return 4 * 3;
-        case DataType::Vec4: return 4 * 4;
-    }
-    
-    CORE_ASSERT(false, "Unknown vertex data type!");
-    return 0;
-}
-
-} // namespace data
-} // namespace utils
-
-/**
- * Represents a vertex attribute (element).
- */
-struct BufferElement
-{
-    // Buffer element variables
-    // ----------------------------------------
-    ///< Name of the element.
-    std::string Name;
-    ///< Data type.
-    DataType Type;
-    ///< Size (in bytes) of the element.
-    unsigned int Size;
-    ///< Offset value for the element.
-    unsigned int Offset;
-    ///< Specifies if the data should be normalized.
-    bool Normalized;
-    
-    // Constructor(s)/Destructor
-    // ----------------------------------------
-    /// @brief Generate an attribute (element) for a buffer.
-    /// @param name Name of the element.
-    /// @param type Data type of the element.
-    /// @param normalized Normalize the data.
-    BufferElement(const std::string& name, DataType type, bool normalized = false)
-        : Name(name), Type(type), Size(utils::data::GetDataSize(type)), Offset(0),
-        Normalized(normalized)
-    {}
-    /// @brief Delete the buffer element.
-    ~BufferElement() = default;
-};
-
-/**
- * Describes the layout of vertex attributes within a single vertex buffer.
- *
- * The `BufferLayout` class represents a collection of `BufferElements` that define the
- * arrangement and format of vertex attributes in a vertex buffer. It provides methods to retrieve
- * information about the elements in the layout.
- *
- * `BufferLayout` objects are typically used in conjunction with a `VertexBuffer` to define
- * the structure of vertex data stored in GPU memory.
- */
-class BufferLayout
+class BufferLayout : public DataLayout<DataElement>
 {
 public:
-    // Constructor(s)/ Destructor
+    // Constructor/ Destructor
     // ----------------------------------------
-    /// @brief Generate a layout for the buffer(s).
-    BufferLayout() = default;
-    /// @brief Generate a layout for the buffer(s).
-    /// @param elements List of buffer elements to be set.
-    BufferLayout(const std::initializer_list<BufferElement>& elements)
-        : m_Elements(elements)
-    {
-        CalculateOffsetAndStride();
-    }
+    /// @brief Creates an empty buffer layout.
+    BufferLayout() : DataLayout("Buffer element") {}
+    /// @brief Creates a buffer layout from an initializer list of buffer elements.
+    /// @param elements A list containing the elements to be added to the layout.
+    BufferLayout(const std::initializer_list<std::pair<std::string, DataElement>>& elements)
+            : DataLayout(elements, "Buffer element")
+    {}
     /// @brief Delete the defined layout.
-    ~BufferLayout() = default;
-    
-    // Getter(s)
-    // ----------------------------------------
-    /// @brief Get the space between consecutive vertex attributes.
-    /// @return The stride value.
-    unsigned int GetStride() const { return m_Stride; }
-    /// @brief Get all the elements inside the vertex buffer layout.
-    /// @return Buffer elements.
-    const std::vector<BufferElement> GetElements() const
-    {
-        return m_Elements;
-    }
-    
-    // Iteration support
-    // ----------------------------------------
-    /// @brief Get the first element  of the buffer.
-    /// @return Iterator pointing to the first buffer element.
-    std::vector<BufferElement>::iterator begin() { return m_Elements.begin(); }
-    /// @brief Get the last element of the buffer.
-    /// @return Iterator pointing to the last buffer element.
-    std::vector<BufferElement>::iterator end() { return m_Elements.end(); }
-    /// @brief Get the first element of the buffer (constant value).
-    /// @return Iterator pointing to the first buffer element.
-    std::vector<BufferElement>::const_iterator begin() const { return m_Elements.begin(); }
-    /// @brief Get the last element of the buffer (constant value).
-    /// @return Iterator pointing to the last buffer element.
-    std::vector<BufferElement>::const_iterator end() const { return m_Elements.end(); }
-    
-private:
-    // Calculators
-    // ----------------------------------------
-    /// @brief  Calculate the offset (starting position of each vertex attribute) and the stride
-    /// (space between consecutives vertex attributes) for the defined vertex attributes.
-    void CalculateOffsetAndStride()
-    {
-        unsigned int offset = 0;
-        m_Stride = 0;
-        for (auto& element : m_Elements)
-        {
-            element.Offset = offset;
-            offset += element.Size;
-            m_Stride += element.Size;
-        }
-    }
-
-    // Buffer layout variables
-    // ----------------------------------------
-private:
-    ///< Vertex buffer elements.
-    std::vector<BufferElement> m_Elements;
-    ///< Space between consecutive vertex attributes.
-    unsigned int m_Stride = 0;
+    ~BufferLayout() override = default;
 };
 
 /**

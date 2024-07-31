@@ -19,16 +19,55 @@ inline GLenum ToOpenGLType(DataType dataType)
 {
     switch (dataType)
     {
+        case DataType::None:  return 0;
         case DataType::Bool:  return GL_BOOL;
         case DataType::Int:   return GL_INT;
         case DataType::Float: return GL_FLOAT;
         case DataType::Vec2:  return GL_FLOAT;
         case DataType::Vec3:  return GL_FLOAT;
         case DataType::Vec4:  return GL_FLOAT;
+        case DataType::Mat2:  return GL_FLOAT;
+        case DataType::Mat3:  return GL_FLOAT;
+        case DataType::Mat4:  return GL_FLOAT;
+        
     }
     
-    CORE_ASSERT(false, "Unknown vertex data type!");
+    CORE_ASSERT(false, "Unknown data type!");
     return 0;
+}
+
+/**
+ * Convert an OpenGL type to its corresponding data type.
+ *
+ * @param glType The OpenGL data type.
+ *
+ * @return The corresponding DataType.
+ *
+ * @note If the input glType value is not recognized, the function will assert with an error.
+ */
+inline DataType ToDataType(GLenum glType)
+{
+    switch (glType)
+    {
+        case GL_BOOL:       return DataType::Bool;
+        case GL_INT:        return DataType::Int;
+        case GL_FLOAT:      return DataType::Float;
+        case GL_FLOAT_VEC2: return DataType::Vec2;
+        case GL_FLOAT_VEC3: return DataType::Vec3;
+        case GL_FLOAT_VEC4: return DataType::Vec4;
+        case GL_FLOAT_MAT2: return DataType::Mat2;
+        case GL_FLOAT_MAT3: return DataType::Mat3;
+        case GL_FLOAT_MAT4: return DataType::Mat4;
+            
+        case GL_SAMPLER_2D:
+        case GL_SAMPLER_3D:
+        case GL_SAMPLER_CUBE:
+        case GL_SAMPLER_2D_SHADOW:
+                            return DataType::Int;
+    }
+    
+    CORE_ASSERT(false, "Unknown OpenGL data type!");
+    return DataType::None;
 }
 
 /**

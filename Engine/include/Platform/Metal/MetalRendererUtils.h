@@ -19,16 +19,50 @@ inline MTLVertexFormat ToMetalFormat(DataType dataType)
 {
     switch (dataType)
     {
+        case DataType::None:  return MTLVertexFormatInvalid;
+            
         case DataType::Bool:  return MTLVertexFormatInt;
         case DataType::Int:   return MTLVertexFormatInt;
         case DataType::Float: return MTLVertexFormatFloat;
         case DataType::Vec2:  return MTLVertexFormatFloat2;
         case DataType::Vec3:  return MTLVertexFormatFloat3;
         case DataType::Vec4:  return MTLVertexFormatFloat4;
+            
+        // Not supported by Metal
+        case DataType::Mat2:  return MTLVertexFormatInvalid;
+        case DataType::Mat3:  return MTLVertexFormatInvalid;
+        case DataType::Mat4:  return MTLVertexFormatInvalid;
     }
     
-    CORE_ASSERT(false, "Unknown vertex data type!");
+    CORE_ASSERT(false, "Unknown data type!");
     return MTLVertexFormatInvalid;
+}
+
+/**
+ * Convert an OpenGL type to its corresponding data type.
+ *
+ * @param glType The OpenGL data type.
+ *
+ * @return The corresponding DataType.
+ *
+ * @note If the input glType value is not recognized, the function will assert with an error.
+ */
+inline DataType ToDataType(MTLDataType mtlType)
+{
+    switch (mtlType)
+    {
+        case MTLDataTypeInt:        return DataType::Int;
+        case MTLDataTypeFloat:      return DataType::Float;
+        case MTLDataTypeFloat2:     return DataType::Vec2;
+        case MTLDataTypeFloat3:     return DataType::Vec3;
+        case MTLDataTypeFloat4:     return DataType::Vec4;
+        case MTLDataTypeFloat2x2:   return DataType::Mat2;
+        case MTLDataTypeFloat3x3:   return DataType::Mat3;
+        case MTLDataTypeFloat4x4:   return DataType::Mat4;
+    }
+    
+    CORE_ASSERT(false, "Unknown Metal data type!");
+    return DataType::None;
 }
 
 /**

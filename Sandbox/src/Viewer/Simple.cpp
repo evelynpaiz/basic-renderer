@@ -11,15 +11,20 @@
  */
 Simple::Simple(int width, int height)
     : Layer("Test Layer")
-{}
+{
+    // Define the rendering camera
+    m_Camera = std::make_shared<PerspectiveCamera>(width, height);
+    m_Camera->SetPosition(glm::vec3(0.0f, 0.0f, 10.0f));
+}
 
 /**
  * Attach (add) the viewer layer to the rendering engine.
  */
 void Simple::OnAttach()
 {
+    // Define the models
     auto& materialLibrary = Renderer::GetMaterialLibrary();
-    auto material = materialLibrary.Create<Material>("Simple", "resources/shaders/base/Simple.glsl");
+    auto material = materialLibrary.Create<Material>("Simple", "resources/shaders/base/Simple");
     
     auto cube = utils::Geometry::ModelCube<GeoVertexData<glm::vec4, glm::vec2, glm::vec3>>();
     cube->SetScale(glm::vec3(2.0f));
@@ -34,18 +39,19 @@ void Simple::OnAttach()
  */
 void Simple::OnUpdate(Timestep ts)
 {
+    static float t = 0;
+    t += ts;
+    
     // Reset rendering statistics
     Renderer::ResetStats();
     
     RendererCommand::Clear(glm::vec4(0.33f, 0.33f, 0.33f, 1.0f));
     
-    Renderer::BeginScene();
+    auto shader  = Renderer::GetMaterialLibrary().Get("Simple")->GetShader();
+    shader->Bind();
+    shader->SetVec3("u_Color", glm::vec3(std::cos(t), 0.0f, std::sin(t)));
     
-    //shader->SetMat4("u_Transform.Model", glm::mat4(1.0f));
-    //shader->SetMat4("u_Transform.View", glm::mat4(1.0f));
-    //shader->SetMat4("u_Transform.Projection", glm::mat4(1.0f));
-    
-    //shader->SetVec4("u_Material.Color", glm::vec4(0.8f, 0.0f, 0.2f, 1.0f));
+    Renderer::BeginScene(m_Camera);
     
     m_Models.Get("Cube")->DrawModel();
     

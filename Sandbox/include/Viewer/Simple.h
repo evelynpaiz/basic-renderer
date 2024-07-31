@@ -23,6 +23,8 @@ private:
     bool OnWindowResize(WindowResizeEvent &e);
     
 private:
+    ///< Rendering camera.
+    std::shared_ptr<PerspectiveCamera> m_Camera;
     ///< Set of objects in the scene.
     ModelLibrary m_Models;
     

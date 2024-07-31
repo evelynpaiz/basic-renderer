@@ -19,7 +19,8 @@
  * @return A shared pointer to the created shader, or nullptr if the API
  *         is not supported or an error occurs.
  */
-std::shared_ptr<Shader> Shader::Create(const std::string &name, const std::filesystem::path &filePath)
+std::shared_ptr<Shader> Shader::Create(const std::string &name,
+                                       const std::filesystem::path &filePath)
 {
     switch (Renderer::GetAPI())
     {
@@ -27,13 +28,12 @@ std::shared_ptr<Shader> Shader::Create(const std::string &name, const std::files
             CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
             return nullptr;
             
-            
         case RendererAPI::API::OpenGL:
-            return std::make_shared<OpenGLShader>(name, filePath);
+            return std::make_shared<OpenGLShader>(name, GetFullFilePath(filePath));
              
 #ifdef __APPLE__
         case RendererAPI::API::Metal:
-             return std::make_shared<MetalShader>(name, filePath);
+             return std::make_shared<MetalShader>(name, GetFullFilePath(filePath));
 #endif
     }
     
@@ -57,13 +57,12 @@ std::shared_ptr<Shader> Shader::Create(const std::filesystem::path &filePath)
             CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
             return nullptr;
             
-            
         case RendererAPI::API::OpenGL:
-            return std::make_shared<OpenGLShader>(filePath);
+            return std::make_shared<OpenGLShader>(GetFullFilePath(filePath));
              
 #ifdef __APPLE__
         case RendererAPI::API::Metal:
-             return std::make_shared<MetalShader>(filePath);
+             return std::make_shared<MetalShader>(GetFullFilePath(filePath));
 #endif
     }
     
@@ -86,6 +85,67 @@ std::string Shader::ReadFile(const std::filesystem::path& filePath)
     std::stringstream buffer;
     buffer << fileStream.rdbuf();
     return buffer.str();
+}
+
+/**
+ * Verify if the uniform is defined in the shader program.
+ *
+ * @param name Name of the uniform.
+ *
+ * @return 'True' if the uniform is defined in the shader.
+ */
+bool Shader::IsUniform(const std::string& name) const
+{
+    auto [group, member] = utils::SplitString(name);
+    if (m_Uniforms.Exists(group, member))
+        return true;
+        
+    CORE_WARN("Uniform " + name + " doesn't exist!");
+    return false;
+}
+
+/**
+ * Constructs the full file path for a shader, including the correct extension.
+ *
+ * This function takes a base file path for a shader (e.g., "shaders/MyShader")
+ * and automatically appends the appropriate file extension based on the currently
+ * active rendering API (".glsl" for OpenGL, ".Metal" for Metal).
+ *
+ * @param filePath The base file path for the shader.
+ *
+ * @return The complete file path with the appropriate shader file extension.
+ */
+std::filesystem::path Shader::GetFullFilePath(const std::filesystem::path& filePath)
+{
+    // Define a copy of the filepath to be modify
+    std::filesystem::path fullFilePath = filePath;
+    
+    // Get the extension of the shader based on the graphics API that is currently in use
+    std::string extension;
+    switch (Renderer::GetAPI()) {
+        case RendererAPI::API::OpenGL:
+            extension = ".glsl";
+            break;
+            
+#ifdef __APPLE__
+        case RendererAPI::API::Metal:
+            extension = ".Metal";
+            break;
+#endif
+            
+        default:
+            CORE_ASSERT(false, "Unknown Renderer API!");
+            return filePath;
+    }
+
+    // Update the extension of the file path if necessary
+    if (filePath.extension() != extension)
+    {
+        CORE_ASSERT(filePath.extension().empty(), "Shader extension not supported for the current graphics API");
+        fullFilePath += extension;
+    }
+
+    return fullFilePath;
 }
 
 // ----------------------------------------
