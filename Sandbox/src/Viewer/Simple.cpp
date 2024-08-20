@@ -24,12 +24,19 @@ void Simple::OnAttach()
 {
     // Define the models
     auto& materialLibrary = Renderer::GetMaterialLibrary();
-    auto material = materialLibrary.Create<Material>("Simple", "resources/shaders/base/Simple");
+    auto material = materialLibrary.Create<SimpleColorMaterial>("SimpleColor");
     
-    auto cube = utils::Geometry::ModelCube<GeoVertexData<glm::vec4, glm::vec2, glm::vec3>>();
+    auto cube = utils::Geometry::ModelCube<GeoVertexData<glm::vec4>>();
     cube->SetScale(glm::vec3(2.0f));
     cube->SetMaterial(material);
     m_Models.Add("Cube", cube);
+    
+    auto plane = utils::Geometry::ModelPlane<GeoVertexData<glm::vec4>>();
+    plane->SetPosition(glm::vec3(0.0f, -1.5f, 0.0f));
+    plane->SetScale(glm::vec3(10.0f));
+    plane->SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
+    plane->SetMaterial(material);
+    m_Models.Add("Plane", plane);
 }
 
 /**
@@ -39,23 +46,26 @@ void Simple::OnAttach()
  */
 void Simple::OnUpdate(Timestep ts)
 {
-    static float t = 0;
-    t += ts;
+    auto& material = Renderer::GetMaterialLibrary().Get("SimpleColor");
+    std::shared_ptr<SimpleColorMaterial> simpleMaterial =
+        std::dynamic_pointer_cast<SimpleColorMaterial>(material);
     
     // Reset rendering statistics
     Renderer::ResetStats();
     
+    // Clear buffer
     RendererCommand::Clear(glm::vec4(0.33f, 0.33f, 0.33f, 1.0f));
     
-    auto shader  = Renderer::GetMaterialLibrary().Get("Simple")->GetShader();
-    shader->Bind();
-    shader->SetVec3("u_Color", glm::vec3(std::cos(t), 0.0f, std::sin(t)));
-    
+    // Render
     Renderer::BeginScene(m_Camera);
-    
+    simpleMaterial->SetColor(glm::vec4(0.8f, 0.0f, 0.3f, 1.0f));
     m_Models.Get("Cube")->DrawModel();
-    
+    simpleMaterial->SetColor(glm::vec4(0.3f, 0.0f, 0.8f, 1.0f));
+    m_Models.Get("Plane")->DrawModel();
     Renderer::EndScene();
+    
+    // Update camera
+    m_Camera->OnUpdate(ts);
 }
 
 /**
@@ -70,6 +80,9 @@ void Simple::OnEvent(Event &e)
     // Dispatch the event to the application event callbacks
     dispatcher.Dispatch<WindowResizeEvent>(
         BIND_EVENT_FN(Simple::OnWindowResize));
+    
+    // Handle the events on the camera
+    m_Camera->OnEvent(e);
 }
 
 /**

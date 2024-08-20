@@ -311,7 +311,7 @@ void OpenGLShader::ExtractShaderResources()
  *
  * @param filepath Path to the shader file.
  *
- * @return The vertex and fragment program source.
+ * @return The program source.
  */
 OpenGLShader::OpenGLShaderSource OpenGLShader::ParseShader(const std::filesystem::path& filepath)
 {
@@ -344,7 +344,7 @@ OpenGLShader::OpenGLShaderSource OpenGLShader::ParseShader(const std::filesystem
                 std::string includePath = line.substr(line.find_first_of('"') + 1,
                                                       line.find_last_of('"') - line.find_first_of('"') - 1);
                 std::string includedSource = ReadFile(includePath);
-                ss[(int)type] << includedSource << '\n';
+                ss[(int)type] << includedSource;
             }
             else
                 ss[(int)type] << line << '\n';

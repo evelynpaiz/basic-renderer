@@ -197,7 +197,7 @@ void MetalShader::CompileShader(const std::filesystem::path& filePath)
     id<MTLDevice> device = reinterpret_cast<id<MTLDevice>>(context->GetDevice());
     
     // Load the shader source program
-    std::string sourceFromFile = ReadFile(filePath);
+    std::string sourceFromFile = ParseShader(filePath);
     NSString* sourceCode = [NSString stringWithUTF8String:sourceFromFile.c_str()];
     
     // Compile the shader source code into a Metal library
@@ -208,6 +208,44 @@ void MetalShader::CompileShader(const std::filesystem::path& filePath)
     // Define the shader functions
     m_ShaderSource->VertexFunction = [m_ShaderSource->Library newFunctionWithName:@"vertex_main"];
     m_ShaderSource->FragmentFunction = [m_ShaderSource->Library newFunctionWithName:@"fragment_main"];
+    
+    // Note: Metal Shaders need to have a function called "vertex_main" 
+    // for the vertex shader and "fragment_main" for the fragment shader
+    CORE_ASSERT(m_ShaderSource->VertexFunction, "Failed to create vertex shader function 'vertex_main'!");
+    CORE_ASSERT(m_ShaderSource->FragmentFunction, "Failed to create fragment shader function 'fragment_main'!");
+}
+
+/**
+ * Parse shader input file.
+ *
+ * @param filepath Path to the shader file.
+ *
+ * @return The program source.
+ */
+std::string MetalShader::ParseShader(const std::filesystem::path& filepath)
+{
+    // Open the file
+    std::ifstream stream(filepath);
+    
+    // Parse the file
+    std::string line;
+    std::stringstream ss;
+    while (getline(stream, line))
+    {
+        // Include statement handling
+        if (line.find("#import") != std::string::npos)
+        {
+            std::string includePath = line.substr(line.find_first_of('"') + 1,
+                                                  line.find_last_of('"') - line.find_first_of('"') - 1);
+            std::string includedSource = ReadFile(includePath);
+            ss << includedSource;
+        }
+        else
+            ss << line << '\n';
+    }
+    
+    // Return the shader sources
+    return ss.str();
 }
 
 /**

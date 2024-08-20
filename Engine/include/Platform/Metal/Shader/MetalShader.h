@@ -49,6 +49,7 @@ private:
     // Compilation
     // ----------------------------------------
     void CompileShader(const std::filesystem::path& filePath);
+    std::string ParseShader(const std::filesystem::path& filepath);
     
     // Argument(s) and Uniform(s)
     // ----------------------------------------

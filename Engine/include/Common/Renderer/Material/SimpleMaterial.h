@@ -131,7 +131,7 @@ public:
     /// @brief Generate a material for hair with the specified shader file path.
     /// @param filePath The file path to the shader used by the material.
     SimpleColorMaterial(const std::filesystem::path& filePath =
-                        std::filesystem::path("Resources/shaders/base/SimpleColor.glsl"))
+                        std::filesystem::path("Resources/shaders/base/SimpleColor"))
         : Material(filePath), FlatColor()
     {}
     /// @brief Destructor for the hair shading material.
