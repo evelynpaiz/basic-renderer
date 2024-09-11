@@ -1,77 +1,63 @@
 #pragma once
 
-#include "Common/Renderer/Texture/TextureUtils.h"
 #include "Common/Renderer/Texture/Texture.h"
 
-#include <filesystem>
 
-/**
- * Represents a cube texture that can be bound to geometry during rendering.
- *
- * The `TextureCube` class provides functionality to create, bind, unbind, and configure cube textures.
- * Cube textures consist of six faces, each with its own texture data. These textures can
- * be bound to specific texture slots for use in a `Shader`.
- *
- * Copying or moving `TextureCube` objects is disabled to ensure single ownership and prevent
- * unintended texture duplication.
- */
 class TextureCube : public Texture
 {
 public:
     // Constructor(s)/Destructor
     // ----------------------------------------
-    TextureCube();
-    TextureCube(const void *data);
-    TextureCube(const std::vector<const void *>& data);
-    TextureCube(const TextureSpecification& spec);
-    TextureCube(const void *data, const TextureSpecification& spec);
-    TextureCube(const std::vector<const void *>& data, const TextureSpecification& spec);
+    static std::shared_ptr<TextureCube> Create();
+    static std::shared_ptr<TextureCube> Create(const TextureSpecification& spec);
+    
+    static std::shared_ptr<TextureCube> CreateFromData(const void *data);
+    static std::shared_ptr<TextureCube> CreateFromData(const std::vector<const void *>& data);
+    static std::shared_ptr<TextureCube> CreateFromData(const void *data, const TextureSpecification& spec);
+    static std::shared_ptr<TextureCube> CreateFromData(const std::vector<const void *>& data,
+                                                       const TextureSpecification& spec);
+    
+    static std::shared_ptr<TextureCube> CreateFromFile(const std::filesystem::path& directory,
+                                                       const std::vector<std::string>& files, bool flip);
+    static std::shared_ptr<TextureCube> CreateFromFile(const std::filesystem::path& directory,
+                                                       const std::vector<std::string>& files,
+                                                       const TextureSpecification& spec,
+                                                       bool flip);
     
 protected:
-    // Target type
+    // Constructor(s)
     // ----------------------------------------
-    GLenum TextureTarget() const override;
+    /// @brief Create a cube texture with no data.
+    TextureCube() = default;
+    /// @brief Create a cube texture with specific properties and no data.
+    /// @param spec The texture specifications.
+    TextureCube(const TextureSpecification& spec)
+        : Texture(spec)
+    {}
+    
+    /// @brief Create a general texture from a specific path.
+    /// @param directory Textures file path.
+    /// @param files List of texture files.
+    /// @param flip Fip the texture vertically.
+    TextureCube(const std::filesystem::path& directory,
+                const std::vector<std::string>& files, bool flip) :
+        Texture(directory), m_Files(files), m_Flip(flip)
+    {}
+    /// @brief Create a general texture with specific properties and defined file path.
+    /// @param directory Textures file path.
+    /// @param files List of texture files.
+    /// @param spec The texture specifications.
+    /// @param flip Fip the texture vertically.
+    TextureCube(const std::filesystem::path& directory,
+                const std::vector<std::string>& files,
+                const TextureSpecification& spec, bool flip) :
+        Texture(directory, spec), m_Files(files), m_Flip(flip)
+    {}
     
     // Texture creation
     // ----------------------------------------
-    void CreateTexture(const void *data) override;
-    void CreateTexture(const std::vector<const void *>& data);
+    virtual void CreateTexture(const std::vector<const void *>& data) = 0;
     
-    // Texture variables
-    // ----------------------------------------
-protected:
-    ///< Textures properties.
-    std::vector<TextureSpecification> m_CubeSpecs;
-    
-    // Disable the copying or moving of this resource
-    // ----------------------------------------
-public:
-    TextureCube(const TextureCube&) = delete;
-    TextureCube(TextureCube&&) = delete;
-
-    TextureCube& operator=(const TextureCube&) = delete;
-    TextureCube& operator=(TextureCube&&) = delete;
-};
-
-/**
- * Represents a cube texture loaded from individual files.
- *
- * The `Texture3DResource` class is a specialization of `Texture3D` that provides functionality
- * to load 3D textures from individual image files, one for each face of the cube. It is particularly
- * useful for creating environment maps and reflections.
- *
- * Copying or moving `Texture3DResource` objects is disabled to ensure single ownership and prevent
- * unintended resource duplication.
- */
-class TextureCubeResource : public TextureCube
-{
-public:
-    // Constructor(s)/Destructor
-    // ----------------------------------------
-    TextureCubeResource(const std::filesystem::path& directory,
-                        const std::vector<std::string>& files, bool flip = true);
-    
-private:
     // Loading
     // ----------------------------------------
     void LoadFromFile(const std::filesystem::path& directory,
@@ -79,21 +65,42 @@ private:
     
     // Texture variables
     // ----------------------------------------
-private:
-    ///< Path to the files.
-    std::filesystem::path m_Directory;
+protected:
     ///< File names.
     std::vector<std::string> m_Files;
     
     ///< Texture flipping.
-    bool m_Flip;
+    bool m_Flip = true;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    TextureCubeResource(const TextureCubeResource&) = delete;
-    TextureCubeResource(TextureCubeResource&&) = delete;
-
-    TextureCubeResource& operator=(const TextureCubeResource&) = delete;
-    TextureCubeResource& operator=(TextureCubeResource&&) = delete;
+    DISABLE_COPY_AND_MOVE(TextureCube);
 };
+
+/**
+ * Utility functions related to texture operations.
+ */
+namespace utils { namespace textures {
+
+template <>
+struct TextureHelper<TextureCube>
+{
+    /// @brief Sets the width and height of a `TextureSpecification` for the faces of a `TextureCube`.
+    /// @param spec The `TextureSpecification` object whose size needs to be set.
+    /// @param size The width and height to set for the faces of the cube texture.
+    static void SetSize(TextureSpecification& spec, unsigned int size)
+    {
+        spec.SetTextureSize(size, size);
+    }
+};
+
+/**
+ * Get a shared pointer to a cube white texture.
+ *
+ * @return A cube white texture.
+ */
+DEFINE_WHITE_TEXTURE(TextureCube)
+
+} // namespace Texturing
+} // namespace utils

@@ -177,9 +177,5 @@ protected:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    Camera(const Camera&) = delete;
-    Camera(Camera&&) = delete;
-
-    Camera& operator=(const Camera&) = delete;
-    Camera& operator=(Camera&&) = delete;
+    DISABLE_COPY_AND_MOVE(Camera);
 };

@@ -69,9 +69,5 @@ private:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    MetalShader(const MetalShader&) = delete;
-    MetalShader(MetalShader&&) = delete;
-
-    MetalShader& operator=(const MetalShader&) = delete;
-    MetalShader& operator=(MetalShader&&) = delete;
+    DISABLE_COPY_AND_MOVE(MetalShader);
 };

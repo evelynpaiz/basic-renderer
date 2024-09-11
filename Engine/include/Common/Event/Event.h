@@ -148,11 +148,7 @@ private:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    EventDispatcher(const EventDispatcher&) = delete;
-    EventDispatcher(EventDispatcher&&) = delete;
-
-    EventDispatcher& operator=(const EventDispatcher&) = delete;
-    EventDispatcher& operator=(EventDispatcher&&) = delete;
+    DISABLE_COPY_AND_MOVE(EventDispatcher);
 };
 
 /**

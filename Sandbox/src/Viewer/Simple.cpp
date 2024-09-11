@@ -24,14 +24,14 @@ void Simple::OnAttach()
 {
     // Define the models
     auto& materialLibrary = Renderer::GetMaterialLibrary();
-    auto material = materialLibrary.Create<SimpleColorMaterial>("SimpleColor");
+    auto material = materialLibrary.Create<SimpleTextureMaterial>("SimpleColor");
     
-    auto cube = utils::Geometry::ModelCube<GeoVertexData<glm::vec4>>();
+    auto cube = utils::Geometry::ModelCube<GeoVertexData<glm::vec4, glm::vec2>>();
     cube->SetScale(glm::vec3(2.0f));
     cube->SetMaterial(material);
     m_Models.Add("Cube", cube);
     
-    auto plane = utils::Geometry::ModelPlane<GeoVertexData<glm::vec4>>();
+    auto plane = utils::Geometry::ModelPlane<GeoVertexData<glm::vec4, glm::vec2>>();
     plane->SetPosition(glm::vec3(0.0f, -1.5f, 0.0f));
     plane->SetScale(glm::vec3(10.0f));
     plane->SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
@@ -47,8 +47,12 @@ void Simple::OnAttach()
 void Simple::OnUpdate(Timestep ts)
 {
     auto& material = Renderer::GetMaterialLibrary().Get("SimpleColor");
-    std::shared_ptr<SimpleColorMaterial> simpleMaterial =
-        std::dynamic_pointer_cast<SimpleColorMaterial>(material);
+    std::shared_ptr<SimpleTextureMaterial> simpleMaterial =
+        std::dynamic_pointer_cast<SimpleTextureMaterial>(material);
+    
+    auto texture1 = Texture2D::CreateFromFile("Resources/textures/diffuse.jpeg");
+    auto texture2 = Texture2D::CreateFromFile("Resources/textures/specular.jpeg");
+    auto texture3 = utils::textures::WhiteTexture2D();
     
     // Reset rendering statistics
     Renderer::ResetStats();
@@ -58,10 +62,10 @@ void Simple::OnUpdate(Timestep ts)
     
     // Render
     Renderer::BeginScene(m_Camera);
-    simpleMaterial->SetColor(glm::vec4(0.8f, 0.0f, 0.3f, 1.0f));
-    m_Models.Get("Cube")->DrawModel();
-    simpleMaterial->SetColor(glm::vec4(0.3f, 0.0f, 0.8f, 1.0f));
+    simpleMaterial->SetTextureMap(texture1);
     m_Models.Get("Plane")->DrawModel();
+    //simpleMaterial->SetTextureMap(texture2);
+    //m_Models.Get("Cube")->DrawModel();
     Renderer::EndScene();
     
     // Update camera

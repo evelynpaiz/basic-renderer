@@ -91,9 +91,5 @@ private:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    OpenGLShader(const OpenGLShader&) = delete;
-    OpenGLShader(OpenGLShader&&) = delete;
-
-    OpenGLShader& operator=(const OpenGLShader&) = delete;
-    OpenGLShader& operator=(OpenGLShader&&) = delete;
+    DISABLE_COPY_AND_MOVE(OpenGLShader);
 };

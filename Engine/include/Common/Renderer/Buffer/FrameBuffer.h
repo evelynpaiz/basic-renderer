@@ -7,6 +7,9 @@
 #include "Common/Renderer/Texture/TextureUtils.h"
 #include "Common/Renderer/Texture/Texture.h"
 
+// TODO: Remove
+#include "Platform/OpenGL/Texture/OpenGLTextureUtils.h"
+
 /**
  * Defines the specification for framebuffer attachments.
  *
@@ -147,7 +150,7 @@ public:
     std::vector<T> GetAttachmentData(const unsigned int index)
     {
         auto& format = m_ColorAttachmentsSpec[index].Format;
-        int channels = utils::OpenGL::TextureFormatToChannelNumber(format);
+        int channels = utils::textures::GetChannelCount(format);
         
         // Ensure numChannels is within a valid range
         if (channels < 1 || channels > 4)
@@ -169,8 +172,8 @@ public:
         //              buffer.data());
         
         glReadPixels(0, 0, m_Spec.Width, (m_Spec.Height > 0 ? m_Spec.Height : 1.0f),
-                     utils::OpenGL::TextureFormatToOpenGLBaseType(format),
-                     utils::OpenGL::TextureFormatToOpenGLDataType(format),
+                     utils::textures::gl::ToOpenGLBaseFormat(format),
+                     utils::textures::gl::ToOpenGLDataFormat(format),
                      buffer.data());
         
         return buffer;
@@ -211,7 +214,7 @@ private:
     ///< Color attachments specifications.
     std::vector<TextureSpecification> m_ColorAttachmentsSpec;
     ///< Depth attachment specification.
-    TextureSpecification m_DepthAttachmentSpec = TextureFormat::None;
+    TextureSpecification m_DepthAttachmentSpec;
     
     ///< The states active in the framebuffer.
     BufferState m_ActiveBuffers = { false, false, false };
@@ -219,11 +222,7 @@ private:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    FrameBuffer(const FrameBuffer&) = delete;
-    FrameBuffer(FrameBuffer&&) = delete;
-
-    FrameBuffer& operator=(const FrameBuffer&) = delete;
-    FrameBuffer& operator=(FrameBuffer&&) = delete;
+    DISABLE_COPY_AND_MOVE(FrameBuffer);
 };
 
 /**

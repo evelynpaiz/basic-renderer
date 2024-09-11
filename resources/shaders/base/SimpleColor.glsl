@@ -14,7 +14,7 @@
 #include "Resources/shaders/shared/structure/material/ColorMaterial.glsl"
 
 // Include fragment inputs
-#include "Resources/shaders/shared/chunk/fragment/Pos.fs.glsl"
+#include "Resources/shaders/shared/chunk/fragment/Base.fs.glsl"
 
 // Entry point of the fragment shader
 void main()

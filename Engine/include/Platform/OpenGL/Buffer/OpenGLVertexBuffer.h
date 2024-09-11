@@ -34,9 +34,5 @@ private:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    OpenGLVertexBuffer(const OpenGLVertexBuffer&) = delete;
-    OpenGLVertexBuffer(OpenGLVertexBuffer&&) = delete;
-
-    OpenGLVertexBuffer& operator=(const OpenGLVertexBuffer&) = delete;
-    OpenGLVertexBuffer& operator=(OpenGLVertexBuffer&&) = delete;
+    DISABLE_COPY_AND_MOVE(OpenGLVertexBuffer);
 };

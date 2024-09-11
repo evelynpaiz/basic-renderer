@@ -19,27 +19,15 @@
  * @return A shared pointer to the created shader, or nullptr if the API
  *         is not supported or an error occurs.
  */
+//CREATE_RENDERER_OBJECT(Shader, const const std::string &name,
+//                       const std::filesystem::path &filePath)
+
 std::shared_ptr<Shader> Shader::Create(const std::string &name,
                                        const std::filesystem::path &filePath)
 {
-    switch (Renderer::GetAPI())
-    {
-        case RendererAPI::API::None:
-            CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-            return nullptr;
-            
-        case RendererAPI::API::OpenGL:
-            return std::make_shared<OpenGLShader>(name, GetFullFilePath(filePath));
-             
-#ifdef __APPLE__
-        case RendererAPI::API::Metal:
-             return std::make_shared<MetalShader>(name, GetFullFilePath(filePath));
-#endif
-    }
-    
-    CORE_ASSERT(false, "Unknown Renderer API!");
-    return nullptr;
+    CREATE_RENDERER_OBJECT(Shader, name, filePath)
 }
+
 
 /**
  * Create a shader based on the active rendering API.
@@ -51,23 +39,7 @@ std::shared_ptr<Shader> Shader::Create(const std::string &name,
  */
 std::shared_ptr<Shader> Shader::Create(const std::filesystem::path &filePath)
 {
-    switch (Renderer::GetAPI())
-    {
-        case RendererAPI::API::None:
-            CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-            return nullptr;
-            
-        case RendererAPI::API::OpenGL:
-            return std::make_shared<OpenGLShader>(GetFullFilePath(filePath));
-             
-#ifdef __APPLE__
-        case RendererAPI::API::Metal:
-             return std::make_shared<MetalShader>(GetFullFilePath(filePath));
-#endif
-    }
-    
-    CORE_ASSERT(false, "Unknown Renderer API!");
-    return nullptr;
+    CREATE_RENDERER_OBJECT(Shader, filePath)
 }
 
 /**

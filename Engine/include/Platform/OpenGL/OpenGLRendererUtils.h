@@ -4,6 +4,9 @@
 
 #include <GL/glew.h>
 
+/**
+ * Utility functions related to OpenGL rendering operations.
+ */
 namespace utils { namespace graphics { namespace gl
 {
 /**
@@ -77,7 +80,7 @@ inline DataType ToDataType(GLenum glType)
  *
  * @return Bitwise OR of masks that indicate the buffers to be cleared.
  */
-inline GLbitfield ToClearMask(const BufferState& bufferState) {
+inline GLbitfield ToOpenGLClearMask(const BufferState& bufferState) {
     GLbitfield mask = 0;
     if (bufferState.colorBufferActive) {
         mask |= GL_COLOR_BUFFER_BIT;

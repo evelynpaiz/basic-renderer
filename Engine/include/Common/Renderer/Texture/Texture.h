@@ -1,24 +1,6 @@
 #pragma once
 
 #include "Common/Renderer/Texture/TextureUtils.h"
-#include <filesystem>
-
-/**
- * Enumeration representing the types of textures.
- *
- * The `TextureType` enum class defines the various types of textures that can be used
- * within a graphics application. It provides identifiers for different texture categories,
- * such as regular 2D textures and cube maps, which are used for different rendering purposes.
- * This enum is typically used in functions and structures to specify the type of a texture.
- */
-enum class TextureType
-{
-    None = 0,
-    TEXTURE1D,
-    TEXTURE2D,
-    TEXTURE3D,
-    TEXTURECUBE,
-};
 
 /**
  * Specifications (properties) of a texture.
@@ -34,23 +16,13 @@ struct TextureSpecification
     // ----------------------------------------
     /// @brief Define a texture with a default format.
     TextureSpecification() = default;
+    
     /// @brief Define a texture with a specific format.
-    /// @param format The texture format.
-    TextureSpecification(const TextureFormat& format) :
-        Format(format)
-    { }
-    /// @brief Define a texture with a specific format.
-    /// @param format The texture format.
     /// @param type The type of the texture.
-    TextureSpecification(const TextureFormat& format, const TextureType& type) :
-        Type(type), Format(format)
-    { }
-    /// @brief Define a texture with a specific format.
     /// @param format The texture format.
-    /// @param wrap The texture wrap.
-    TextureSpecification(const TextureFormat& format, const TextureWrap& wrap) :
-        Format(format), Wrap(wrap)
-    { }
+    TextureSpecification(const TextureType& type, const TextureFormat& format) :
+        Type(type), Format(format)
+    {}
     
     /// @brief Define the size of the texture (in pixels).
     /// @param width The texture size (width).
@@ -69,10 +41,10 @@ struct TextureSpecification
     int Width = 0, Height = 0, Depth = 0;
     
     ///< The type (dimension) of the texture.
-    TextureType Type = TextureType::TEXTURE2D;
-    
+    TextureType Type = TextureType::None;
     ///< The internal format of the texture data.
     TextureFormat Format = TextureFormat::None;
+    
     ///< The texture wrap mode, specifying how texture coordinates outside the [0, 1] range
     ///< are handled.
     TextureWrap Wrap = TextureWrap::None;
@@ -81,7 +53,7 @@ struct TextureSpecification
     
     ///< A flag indicating whether mipmaps should be created for the texture. Mipmaps are
     ///< precalculated versions of the texture at different levels of detail, providing smoother
-    ///< rendering at varying distances
+    ///< rendering at varying distances.
     bool MipMaps = false;
 };
 
@@ -89,27 +61,54 @@ struct TextureSpecification
 class FrameBuffer;
 
 /**
- * Represents a texture that can be bound to geometry during rendering.
+ * Abstract base class representing a texture resource.
  *
- * The `Texture` class provides functionality to create, bind, unbind, and configure the texture.
+ * The `Texture` class provides a common interface for creating, binding, and configuring texture data.
+ * It serves as an abstract base class, defining the essential operations that concrete texture types (e.g.,
+ * `Texture2D`, `TextureCube`) must implement.
  * Textures can be bound to specific texture slots for use in a `Shader`. The class supports
  * loading texture data with specified specifications using the `TextureSpecification` struct.
  *
- * Copying or moving `Texture` objects is disabled to ensure single ownership and prevent
- * unintended texture duplication.
+ * @note Copying and moving `Texture` objects is disabled to ensure single ownership and prevent
+ * unintended resource duplication.
  */
 class Texture
 {
 public:
     // Destructor
     // ----------------------------------------
-    virtual ~Texture();
+    /// @brief Delete the texture.
+    virtual ~Texture() = default;
     
     // Usage
     // ----------------------------------------
-    void Bind() const;
-    void BindToTextureUnit(const unsigned int slot) const;
-    void Unbind() const;
+    /// @brief Bind the texture.
+    virtual void Bind() const = 0;
+    /// @brief Bind the texture to a specific texture unit.
+    /// @param slot The texture unit slot to which the texture will be bound.
+    virtual void BindToTextureUnit(uint32_t slot) const = 0;
+    /// @brief Unbind the texture.
+    virtual void Unbind() const = 0;
+    
+    // Getter(s)
+    // ----------------------------------------
+    /// @brief Get the configurations of the texture.
+    /// @return The texture specification.
+    const TextureSpecification& GetSpecification() const { return m_Spec; }
+    
+    /// @brief Get the file path of the texture.
+    /// @return The path to the file.
+    std::filesystem::path GetPath() const { return m_Path; }
+    /// @brief Get the name of the loaded texture (file name).
+    /// @return The texture name.
+    std::string GetName() { return m_Path.filename().string(); }
+    /// @brief Get the directory where the texture file is located.
+    /// @return The directory of the texture.
+    std::string GetDirectory() { return m_Path.parent_path().string(); }
+    
+    /// @brief Checks if the texture data has been successfully loaded.
+    /// @return True if the texture data is loaded, false otherwise.
+    bool IsLoaded() const { return m_IsLoaded; }
     
     // Friend class definition(s)
     // ----------------------------------------
@@ -118,12 +117,23 @@ public:
 protected:
     // Constructor(s)
     // ----------------------------------------
-    Texture();
-    Texture(const TextureSpecification& spec);
+    /// @brief Create a general texture.
+    Texture() = default;
     
-    // Target type
-    // ----------------------------------------
-    virtual GLenum TextureTarget() const = 0;
+    /// @brief Create a general texture with specific properties.
+    /// @param spec The texture specifications.
+    Texture(const TextureSpecification& spec) : m_Spec(spec) {}
+    
+    /// @brief Create a general texture from a specific path.
+    /// @param path Texture file path.
+    Texture(const std::filesystem::path& path) : m_Path(path) {}
+    /// @brief Create a general texture with specific properties and defined file path.
+    /// @param path Texture file path.
+    /// @param spec The texture specifications.
+    Texture(const std::filesystem::path& path,
+            const TextureSpecification& spec) :
+        m_Spec(spec), m_Path(path)
+    {}
     
     // Texture creation
     // ----------------------------------------
@@ -131,66 +141,71 @@ protected:
     
     // Destructor
     // ----------------------------------------
-    void ReleaseTexture();
+    virtual void ReleaseTexture() = 0;
     
     // Texture variables
     // ----------------------------------------
 protected:
     ///< ID of the texture.
-    unsigned int m_ID = 0;
-    ///< Texture properties.
+    uint32_t m_ID = 0;
+    ///< Texture specifications.
     TextureSpecification m_Spec;
+    
+    ///< Path to the texture file(s) on disk.
+    std::filesystem::path m_Path;
+    
+    ///< Flag indicating if the texture data has been successfully loaded.
+    bool m_IsLoaded = false;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    Texture(const Texture&) = delete;
-    Texture(Texture&&) = delete;
-
-    Texture& operator=(const Texture&) = delete;
-    Texture& operator=(Texture&&) = delete;
+    DISABLE_COPY_AND_MOVE(Texture);
 };
 
 /**
  * Utility functions related to texture operations.
  */
-namespace utils {
-/// @brief Namespace containing utility functions for texturing operations.
-namespace Texturing {
+namespace utils { namespace textures {
 
 /**
- * Get a shared pointer to a 1x1 white texture.
+ * Helper struct for `TextureSpecification`.
  *
- * This function returns a shared pointer to a 1x1 texture with a single white pixel.
- * If the texture has already been created, it will be reused to avoid redundant texture creation.
- *
- * @tparam T The type of texture to create (e.g., 1D, 2D, or 3D).
- * @return A shared pointer to the 1x1 white texture.
+ * @tparam T The texture type (e.g., `Texture2D`, `Texture3D`) that this
+ *            specialization of `TextureHelper` will handle.
  */
 template <typename T>
-inline std::shared_ptr<T>& WhiteTexture()
+struct TextureHelper
 {
-    // Static variable to hold the shared pointer to the texture
-    static std::shared_ptr<T> texture;
-    
-    // Check if the texture has already been created
-    if (texture)
-        return texture;
-    
-    // Define the texture specifications
-    TextureSpecification spec = TextureSpecification(TextureFormat::RGB8);
-    spec.SetTextureSize(1, 1);
-    spec.Wrap = TextureWrap::Repeat; // Set texture wrap mode to repeat
-    
-    // Define the color data for a single white pixel (R, G, B values)
-    const unsigned char whitePixel[] = { 255, 255, 255 };
-    
-    // Create the 1x1 white texture using the specified data and specifications
-    texture = std::make_shared<T>(whitePixel, spec);
-    
-    // Return the created texture
-    return texture;
-}
+    /// @brief Sets the size of the `spec` according to the texture type `T`.
+    /// @param spec  The `TextureSpecification` object whose size needs to be set.
+    /// @param size The size value. 
+    static void SetSize(TextureSpecification& spec, unsigned int size);
+};
+
+/**
+ * Generates a function to get a shared pointer to a cached white texture.
+ *
+ * @param TextureType The texture type (e.g., `Texture2D`, `Texture3D`).
+ *
+ * @code{.cpp}
+ *   CREATE_WHITE_TEXTURE(Texture2D) // Defines `WhiteTexture2D()`
+ * @endcode
+ */
+#define DEFINE_WHITE_TEXTURE(TextureType)\
+    inline std::shared_ptr<TextureType>& White##TextureType()\
+    {\
+        static std::shared_ptr<TextureType> texture;\
+        if (texture)\
+            return texture;\
+        TextureSpecification spec;\
+        TextureHelper<TextureType>::SetSize(spec, 1);\
+        spec.Format = TextureFormat::RGB8;\
+        spec.Wrap = TextureWrap::Repeat;\
+        const unsigned char whitePixel[] = {255, 255, 255};\
+        texture = TextureType::CreateFromData(whitePixel, spec);\
+        return texture;\
+    }
 
 /**
  * Update the specifications of a texture resource based on width, height, channels, and extension.
@@ -237,5 +252,5 @@ inline void UpdateSpecsTextureResource(TextureSpecification& spec, const unsigne
     spec.MipMaps = true;
 }
 
-} // namespace Texturing
+} // namespace textures
 } // namespace utils

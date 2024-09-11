@@ -80,9 +80,5 @@ protected:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    LightedMaterial(const LightedMaterial&) = delete;
-    LightedMaterial(LightedMaterial&&) = delete;
-
-    LightedMaterial& operator=(const LightedMaterial&) = delete;
-    LightedMaterial& operator=(LightedMaterial&&) = delete;
+    DISABLE_COPY_AND_MOVE(LightedMaterial);
 };

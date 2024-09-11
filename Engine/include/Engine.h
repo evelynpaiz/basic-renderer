@@ -3,6 +3,7 @@
 // --------------------------------------------
 // Logger
 // --------------------------------------------
+#include "Common/Core/Base.h"
 #include "Common/Core/Log.h"
 #include "Common/Core/Assert.h"
 

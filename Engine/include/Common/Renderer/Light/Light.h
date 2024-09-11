@@ -82,11 +82,7 @@ protected:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    BaseLight(const BaseLight&) = delete;
-    BaseLight(BaseLight&&) = delete;
-
-    BaseLight& operator=(const BaseLight&) = delete;
-    BaseLight& operator=(BaseLight&&) = delete;
+    DISABLE_COPY_AND_MOVE(BaseLight);
 };
 
 /**
@@ -218,7 +214,9 @@ protected:
     {
         FrameBufferSpecification spec;
         spec.SetFrameBufferSize(width, height);
-        spec.AttachmentsSpec = { TextureFormat::DEPTH24 };
+        spec.AttachmentsSpec = {
+            { TextureType::TEXTURE2D, TextureFormat::DEPTH24 }
+        };
         m_Framebuffer = std::make_shared<FrameBuffer>(spec);
     }
     
@@ -249,11 +247,7 @@ protected:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    Light(const Light&) = delete;
-    Light(Light&&) = delete;
-
-    Light& operator=(const Light&) = delete;
-    Light& operator=(Light&&) = delete;
+    DISABLE_COPY_AND_MOVE(Light);
 };
 
 /**

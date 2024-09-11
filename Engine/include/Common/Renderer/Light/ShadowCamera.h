@@ -37,11 +37,7 @@ public:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    OrthographicShadow(const OrthographicShadow&) = delete;
-    OrthographicShadow(Camera&&) = delete;
-
-    OrthographicShadow& operator=(const OrthographicShadow&) = delete;
-    OrthographicShadow& operator=(OrthographicShadow&&) = delete;
+    DISABLE_COPY_AND_MOVE(OrthographicShadow);
 };
 
 /**
@@ -78,9 +74,5 @@ public:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    PerspectiveShadow(const PerspectiveShadow&) = delete;
-    PerspectiveShadow(Camera&&) = delete;
-
-    PerspectiveShadow& operator=(const PerspectiveShadow&) = delete;
-    PerspectiveShadow& operator=(PerspectiveShadow&&) = delete;
+    DISABLE_COPY_AND_MOVE(PerspectiveShadow);
 };

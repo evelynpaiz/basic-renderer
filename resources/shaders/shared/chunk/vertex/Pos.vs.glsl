@@ -1,5 +1,5 @@
-// Input vertex attribute: Position of the vertex in object space
-layout (location = 0) in vec4 a_Position;
+// Input vertex attributes
+layout (location = 0) in vec4 a_Position;       // Vertex position in object space
 
 // Uniform buffer block containing transformation matrices
 uniform Transform u_Transform;

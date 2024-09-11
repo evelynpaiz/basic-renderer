@@ -18,21 +18,5 @@
 std::shared_ptr<IndexBuffer> IndexBuffer::Create(const uint32_t *indices,
                                                  const uint32_t count)
 {
-    switch (Renderer::GetAPI())
-    {
-        case RendererAPI::API::None:
-            CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-            return nullptr;
-            
-        case RendererAPI::API::OpenGL:
-            return std::make_shared<OpenGLIndexBuffer>(indices, count);
-             
-    #ifdef __APPLE__
-        case RendererAPI::API::Metal:
-             return std::make_shared<MetalIndexBuffer>(indices, count);
-    #endif
-    }
-    
-    CORE_ASSERT(false, "Unknown Renderer API!");
-    return nullptr;
+    CREATE_RENDERER_OBJECT(IndexBuffer, indices, count)
 }

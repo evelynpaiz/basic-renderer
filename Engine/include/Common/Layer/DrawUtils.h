@@ -148,7 +148,7 @@ inline void Vec3Control(const std::string &label,
  *
  * @return `true` if the texture has been updated (new image loaded), `false` otherwise.
  */
-inline bool TextureLoader(std::shared_ptr<Texture2DResource> &texture,
+inline bool TextureLoader(std::shared_ptr<Texture2D> &texture,
                           std::filesystem::path &filePath, const char *label,
                           const char *filter, const bool &flip = true)
 {
@@ -156,7 +156,7 @@ inline bool TextureLoader(std::shared_ptr<Texture2DResource> &texture,
     bool updated = false;
     
     // Select the correct texture to be displayed
-    const auto &displayTexture = texture ? texture : utils::Texturing::EmptyTexture();
+    const auto &displayTexture = texture ? texture : utils::textures::EmptyTexture2D();
 
     ImTextureID textureID = (ImTextureID)((uintptr_t)(displayTexture->m_ID));
     float aspect = (float)displayTexture->m_Spec.Height / displayTexture->m_Spec.Width;
@@ -174,7 +174,7 @@ inline bool TextureLoader(std::shared_ptr<Texture2DResource> &texture,
         filePath = FileDialogs::OpenFile(filter);
         if (!filePath.empty())
         {
-            texture = std::make_shared<Texture2DResource>(filePath);
+            texture = Texture2D::CreateFromFile(filePath);
             updated = true;
         }
     }

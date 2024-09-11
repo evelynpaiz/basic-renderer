@@ -82,3 +82,31 @@ private:
     ///< The currently active rendering API.
     static API s_API;
 };
+
+#ifdef __APPLE__
+    #define CREATE_RENDERER_OBJECT(ObjectType, ...)\
+        switch (Renderer::GetAPI())\
+        {\
+            case RendererAPI::API::None:\
+                CORE_ASSERT(false, "RendererAPI::None is not supported!");\
+                return nullptr;\
+            case RendererAPI::API::OpenGL:\
+                return std::make_shared<OpenGL##ObjectType>(__VA_ARGS__);\
+            case RendererAPI::API::Metal:\
+                return std::make_shared<Metal##ObjectType>(__VA_ARGS__);\
+        }\
+        CORE_ASSERT(false, "Unknown Renderer API!");\
+        return nullptr;
+#else
+    #define CREATE_RENDERER_OBJECT(ObjectType, ...)\
+        switch (Renderer::GetAPI())\
+        {\
+            case RendererAPI::API::None:\
+                CORE_ASSERT(false, "RendererAPI::None is not supported!");\
+                return nullptr;\
+            case RendererAPI::API::OpenGL:\
+                return std::make_shared<OpenGL##ObjectType>(__VA_ARGS__);\
+        }\
+        CORE_ASSERT(false, "Unknown Renderer API!");\
+        return nullptr;
+#endif

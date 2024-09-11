@@ -1,160 +1,259 @@
 #include "enginepch.h"
 #include "Common/Renderer/Texture/TextureCube.h"
 
-#include <GL/glew.h>
+#include "Common/Renderer/Renderer.h"
+
+#include "Platform/OpenGL/Texture/OpenGLTextureCube.h"
+
 #include <stb_image.h>
 
-// --------------------------------------------
-// Texture (3D)
-// --------------------------------------------
-
 /**
- * Create a base cube texture.
- */
-TextureCube::TextureCube()
-    : Texture()
-{
-    m_Spec.Type = TextureType::TEXTURECUBE;
-}
-
-/**
- * Create a cube texture from input data.
+ * Create a cube texture based on the active rendering API.
  *
- * @param data The data for the cube texture.
+ * @return A shared pointer to the created texture, or nullptr if the API is not supported or an error occurs.
  */
-TextureCube::TextureCube(const void *data)
-    : TextureCube()
+std::shared_ptr<TextureCube> TextureCube::Create()
 {
-    CreateTexture(data);
-}
-
-/**
- * Create a cube texture from input data.
- *
- * @param data The data for the cube texture.
- */
-TextureCube::TextureCube(const std::vector<const void *>& data)
-    : TextureCube()
-{
-    CreateTexture(data);
-}
-
-/**
- * Create a base cube texture with specific properties.
- *
- * @param spec The texture specifications.
- */
-TextureCube::TextureCube(const TextureSpecification& spec)
-    : Texture(spec), m_CubeSpecs(std::vector<TextureSpecification>(6, spec))
-{
-    m_Spec.Type = TextureType::TEXTURECUBE;
-}
-
-/**
- * Create a cube texture from input data and with specific properties.
- *
- * @param data The data for the cube texture.
- * @param spec The texture specifications.
- */
-TextureCube::TextureCube(const void *data, const TextureSpecification& spec)
-    : TextureCube(spec)
-{
-    CreateTexture(data);
-}
-
-/**
- * Create a cube texture from input data and with specific properties.
- *
- * @param data The data for the cube texture.
- * @param spec The texture specifications.
- */
-TextureCube::TextureCube(const std::vector<const void *>& data, const TextureSpecification& spec)
-    : TextureCube(spec)
-{
-    CreateTexture(data);
-}
-
-/**
- * Get the texture target based on the texture specification.
- *
- * @return The OpenGL texture target.
- */
-GLenum TextureCube::TextureTarget() const
-{
-    return (GLenum)GL_TEXTURE_CUBE_MAP;
-}
-
-/**
- * Create and configure the texture based on the texture specification and provided data.
- *
- * @param data The texture data. This can be nullptr if the texture is to be written.
- */
-void TextureCube::CreateTexture(const void *data)
-{
-    // The data is duplicated for all faces of the cube map
-    std::vector<const void *> cube(6, data);
-    CreateTexture(cube);
-}
-
-/**
- * Create and configure the texture based on the texture specification and provided data.
- *
- * @param data The texture data. This can be nullptr if the texture is to be written.
- */
-void TextureCube::CreateTexture(const std::vector<const void *>& data)
-{
-    // Check that the data contains exactly 6 faces
-    CORE_ASSERT(data.size() == 6, "Invalid data for the texture cube map!");
-    
-    // Bind the texture
-    Bind();
-    
-    // Set texture wrapping and filtering parameters
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S,
-                    utils::OpenGL::TextureWrapToOpenGLType(m_Spec.Wrap));
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T,
-                    utils::OpenGL::TextureWrapToOpenGLType(m_Spec.Wrap));
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R,
-                    utils::OpenGL::TextureWrapToOpenGLType(m_Spec.Wrap));
-    
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER,
-                    utils::OpenGL::TextureFilterToOpenGLType(m_Spec.Filter, m_Spec.MipMaps));
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER,
-                    utils::OpenGL::TextureFilterToOpenGLType(m_Spec.Filter, false));
-    
-    for (unsigned int i = 0; i < data.size(); ++i)
+    switch (Renderer::GetAPI())
     {
-        // Verify size of the 2D texture
-        CORE_ASSERT(m_CubeSpecs[i].Width > 0 && m_CubeSpecs[i].Height > 0, "2D texture size not properly defined!");
-        // Create the texture with the data
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, utils::OpenGL::TextureFormatToOpenGLInternalType(m_CubeSpecs[i].Format),
-                     m_CubeSpecs[i].Width, m_CubeSpecs[i].Height, 0, utils::OpenGL::TextureFormatToOpenGLBaseType(m_CubeSpecs[i].Format),
-                     utils::OpenGL::TextureFormatToOpenGLDataType(m_CubeSpecs[i].Format), data[i]);
+        case RendererAPI::API::None:
+            CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+            return nullptr;
+            
+        case RendererAPI::API::OpenGL:
+            return std::make_shared<OpenGLTextureCube>();
+        
+/*
+#ifdef __APPLE__
+        case RendererAPI::API::Metal:
+             return std::make_shared<MetalTexture1D>();
+#endif
+*/
     }
     
-    // Generate mipmaps if specified
-    if (m_Spec.MipMaps)
-        glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-    
-    // Unbind the texture
-    Unbind();
+    CORE_ASSERT(false, "Unknown Renderer API!");
+    return nullptr;
 }
 
-// --------------------------------------------
-// Texture Cube Resource
-// --------------------------------------------
+/**
+ * Create a cube texture based on the active rendering API.
+ *
+ * @param spec The texture specifications.
+ *
+ * @return A shared pointer to the created texture, or nullptr if the API is not supported or an error occurs.
+ */
+std::shared_ptr<TextureCube> TextureCube::Create(const TextureSpecification& spec)
+{
+    switch (Renderer::GetAPI())
+    {
+        case RendererAPI::API::None:
+            CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+            return nullptr;
+            
+        case RendererAPI::API::OpenGL:
+            return std::make_shared<OpenGLTextureCube>(spec);
+        
+/*
+#ifdef __APPLE__
+        case RendererAPI::API::Metal:
+             return std::make_shared<MetalTexture1D>(spec);
+#endif
+*/
+    }
+    
+    CORE_ASSERT(false, "Unknown Renderer API!");
+    return nullptr;
+}
 
 /**
- * Generate a texture from the input source file.
+ * Create a cube texture based on the active rendering API.
  *
- * @param filePath Texture file path.
- * @param flip Fip the texture vertically.
+ * @param data The data to be placed on all the faces of the cube.
+ *
+ * @return A shared pointer to the created texture, or nullptr if the API is not supported or an error occurs.
  */
-TextureCubeResource::TextureCubeResource(const std::filesystem::path& directory,
-                                         const std::vector<std::string>& files, bool flip)
-    : TextureCube(), m_Directory(directory), m_Files(files), m_Flip(flip)
+std::shared_ptr<TextureCube> TextureCube::CreateFromData(const void *data)
 {
-    LoadFromFile(directory, files);
+    switch (Renderer::GetAPI())
+    {
+        case RendererAPI::API::None:
+            CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+            return nullptr;
+            
+        case RendererAPI::API::OpenGL:
+            return std::make_shared<OpenGLTextureCube>(data);
+        
+/*
+#ifdef __APPLE__
+        case RendererAPI::API::Metal:
+             return std::make_shared<MetalTexture1D>(data);
+#endif
+*/
+    }
+    
+    CORE_ASSERT(false, "Unknown Renderer API!");
+    return nullptr;
+}
+
+/**
+ * Create a cube texture based on the active rendering API.
+ *
+ * @param data The data for the cube texture (defined for each face).
+ *
+ * @return A shared pointer to the created texture, or nullptr if the API is not supported or an error occurs.
+ */
+std::shared_ptr<TextureCube> TextureCube::CreateFromData(const std::vector<const void *>& data)
+{
+    switch (Renderer::GetAPI())
+    {
+        case RendererAPI::API::None:
+            CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+            return nullptr;
+            
+        case RendererAPI::API::OpenGL:
+            return std::make_shared<OpenGLTextureCube>(data);
+        
+/*
+#ifdef __APPLE__
+        case RendererAPI::API::Metal:
+             return std::make_shared<MetalTexture1D>(data);
+#endif
+*/
+    }
+    
+    CORE_ASSERT(false, "Unknown Renderer API!");
+    return nullptr;
+}
+
+/**
+ * Create a 2D texture based on the active rendering API.
+ *
+ * @param data The data to be placed on all the faces of the cube.
+ * @param spec The texture specifications.
+ *
+ * @return A shared pointer to the created texture, or nullptr if the API is not supported or an error occurs.
+ */
+std::shared_ptr<TextureCube> TextureCube::CreateFromData(const void *data,
+                                                         const TextureSpecification& spec)
+{
+    switch (Renderer::GetAPI())
+    {
+        case RendererAPI::API::None:
+            CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+            return nullptr;
+            
+        case RendererAPI::API::OpenGL:
+            return std::make_shared<OpenGLTextureCube>(data, spec);
+        
+/*
+#ifdef __APPLE__
+        case RendererAPI::API::Metal:
+             return std::make_shared<MetalTexture1D>(dataspec);
+#endif
+*/
+    }
+    
+    CORE_ASSERT(false, "Unknown Renderer API!");
+    return nullptr;
+}
+
+/**
+ * Create a 2D texture based on the active rendering API.
+ *
+ * @param data The data for the cube texture (defined for each face).
+ * @param spec The texture specifications.
+ *
+ * @return A shared pointer to the created texture, or nullptr if the API is not supported or an error occurs.
+ */
+std::shared_ptr<TextureCube> TextureCube::CreateFromData(const std::vector<const void *>& data,
+                                                         const TextureSpecification& spec)
+{
+    switch (Renderer::GetAPI())
+    {
+        case RendererAPI::API::None:
+            CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+            return nullptr;
+            
+        case RendererAPI::API::OpenGL:
+            return std::make_shared<OpenGLTextureCube>(data, spec);
+        
+/*
+#ifdef __APPLE__
+        case RendererAPI::API::Metal:
+             return std::make_shared<MetalTexture1D>(dataspec);
+#endif
+*/
+    }
+    
+    CORE_ASSERT(false, "Unknown Renderer API!");
+    return nullptr;
+}
+
+/**
+ * Create a cube texture based on the active rendering API.
+ *
+ * @param directory Textures file path.
+ * @param files List of texture files.
+ * @param flip Fip the texture vertically.
+ *
+ * @return A shared pointer to the created texture, or nullptr if the API is not supported or an error occurs.
+ */
+std::shared_ptr<TextureCube> TextureCube::CreateFromFile(const std::filesystem::path& directory,
+                                                         const std::vector<std::string>& files, bool flip)
+{
+    switch (Renderer::GetAPI())
+    {
+        case RendererAPI::API::None:
+            CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+            return nullptr;
+            
+        case RendererAPI::API::OpenGL:
+            return std::make_shared<OpenGLTextureCube>(directory, files, flip);
+        
+/*
+#ifdef __APPLE__
+        case RendererAPI::API::Metal:
+             return std::make_shared<MetalTexture1D>(dataspec);
+#endif
+*/
+    }
+    
+    CORE_ASSERT(false, "Unknown Renderer API!");
+    return nullptr;
+}
+
+/**
+ * Create a cube texture based on the active rendering API.
+ *
+ * @param directory Textures file path.
+ * @param files List of texture files.
+ * @param flip Fip the texture vertically.
+ *
+ * @return A shared pointer to the created texture, or nullptr if the API is not supported or an error occurs.
+ */
+std::shared_ptr<TextureCube> TextureCube::CreateFromFile(const std::filesystem::path& directory,
+                                                         const std::vector<std::string>& files,
+                                                         const TextureSpecification& spec, bool flip)
+{
+    switch (Renderer::GetAPI())
+    {
+        case RendererAPI::API::None:
+            CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+            return nullptr;
+            
+        case RendererAPI::API::OpenGL:
+            return std::make_shared<OpenGLTextureCube>(directory, files, spec, flip);
+        
+/*
+#ifdef __APPLE__
+        case RendererAPI::API::Metal:
+             return std::make_shared<MetalTexture1D>(dataspec);
+#endif
+*/
+    }
+    
+    CORE_ASSERT(false, "Unknown Renderer API!");
+    return nullptr;
 }
 
 /**
@@ -163,8 +262,8 @@ TextureCubeResource::TextureCubeResource(const std::filesystem::path& directory,
  * @param directory Textures file path.
  * @param files List of texture files.
  */
-void TextureCubeResource::LoadFromFile(const std::filesystem::path& directory,
-                                       const std::vector<std::string>& files)
+void TextureCube::LoadFromFile(const std::filesystem::path& directory,
+                               const std::vector<std::string>& files)
 {
     // Check that the data contains exactly 6 faces
     CORE_ASSERT(files.size() == 6, "Invalid data for the texture cube map!");
@@ -172,7 +271,6 @@ void TextureCubeResource::LoadFromFile(const std::filesystem::path& directory,
     // Load the image into our local buffer
     int width, height, channels;
     std::vector<const void*> data(files.size(), nullptr);
-    m_CubeSpecs = std::vector<TextureSpecification>(files.size(), TextureSpecification());
     
     for(unsigned int i = 0; i < data.size(); i++)
     {
@@ -196,11 +294,9 @@ void TextureCubeResource::LoadFromFile(const std::filesystem::path& directory,
         }
         
         // Save the corresponding image information
-        utils::Texturing::UpdateSpecsTextureResource(m_CubeSpecs[i], width, height, channels);
-        CORE_ASSERT((unsigned int)m_CubeSpecs[i].Format, "Data format of " + filePath.filename().string() + " not supported!");
+        utils::textures::UpdateSpecsTextureResource(m_Spec, width, height, channels);
+        CORE_ASSERT((unsigned int)m_Spec.Format, "Data format of " + filePath.filename().string() + " not supported!");
     }
-    // Get the general image information
-    utils::Texturing::UpdateSpecsTextureResource(m_Spec, 0, 0, 0);
     
     // Generate the cube texture
     CreateTexture(data);

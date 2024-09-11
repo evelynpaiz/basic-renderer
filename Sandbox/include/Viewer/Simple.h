@@ -31,9 +31,5 @@ private:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    Simple(const Simple&) = delete;
-    Simple(Simple&&) = delete;
-    
-    Simple& operator=(const Simple&) = delete;
-    Simple& operator=(Simple&&) = delete;
+    DISABLE_COPY_AND_MOVE(Simple);
 };

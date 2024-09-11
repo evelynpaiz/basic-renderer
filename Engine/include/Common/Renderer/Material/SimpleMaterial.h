@@ -149,11 +149,7 @@ protected:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    SimpleColorMaterial(const SimpleColorMaterial&) = delete;
-    SimpleColorMaterial(SimpleColorMaterial&&) = delete;
-
-    SimpleColorMaterial& operator=(const SimpleColorMaterial&) = delete;
-    SimpleColorMaterial& operator=(SimpleColorMaterial&&) = delete;
+    DISABLE_COPY_AND_MOVE(SimpleColorMaterial);
 };
 
 /**
@@ -195,11 +191,7 @@ protected:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    SimpleTextureMaterial(const SimpleTextureMaterial&) = delete;
-    SimpleTextureMaterial(SimpleTextureMaterial&&) = delete;
-
-    SimpleTextureMaterial& operator=(const SimpleTextureMaterial&) = delete;
-    SimpleTextureMaterial& operator=(SimpleTextureMaterial&&) = delete;
+    DISABLE_COPY_AND_MOVE(SimpleTextureMaterial);
 };
 
 /**
@@ -243,9 +235,5 @@ protected:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    SimpleMaterial(const SimpleMaterial&) = delete;
-    SimpleMaterial(SimpleMaterial&&) = delete;
-
-    SimpleMaterial& operator=(const SimpleMaterial&) = delete;
-    SimpleMaterial& operator=(SimpleMaterial&&) = delete;
+    DISABLE_COPY_AND_MOVE(SimpleMaterial);
 };

@@ -39,9 +39,5 @@ private:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    OpenGLVertexArray(const OpenGLVertexArray&) = delete;
-    OpenGLVertexArray(OpenGLVertexArray&&) = delete;
-
-    OpenGLVertexArray& operator=(const OpenGLVertexArray&) = delete;
-    OpenGLVertexArray& operator=(OpenGLVertexArray&&) = delete;
+    DISABLE_COPY_AND_MOVE(OpenGLVertexArray);
 };

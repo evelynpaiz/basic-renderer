@@ -33,9 +33,5 @@ private:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    OpenGLIndexBuffer(const OpenGLIndexBuffer&) = delete;
-    OpenGLIndexBuffer(OpenGLIndexBuffer&&) = delete;
-
-    OpenGLIndexBuffer& operator=(const OpenGLIndexBuffer&) = delete;
-    OpenGLIndexBuffer& operator=(OpenGLIndexBuffer&&) = delete;
+    DISABLE_COPY_AND_MOVE(OpenGLIndexBuffer);
 };

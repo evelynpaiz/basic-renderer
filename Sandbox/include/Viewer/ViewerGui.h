@@ -52,9 +52,5 @@ private:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    ViewerGui(const ViewerGui&) = delete;
-    ViewerGui(ViewerGui&&) = delete;
-    
-    ViewerGui& operator=(const ViewerGui&) = delete;
-    ViewerGui& operator=(ViewerGui&&) = delete;
+    DISABLE_COPY_AND_MOVE(ViewerGui);
 };

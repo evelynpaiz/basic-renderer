@@ -121,10 +121,10 @@ void OcclusionMaterial::GenerateNoiseTexture(std::uniform_real_distribution<floa
         ssaoNoise.push_back(noise);
     }
     
-    TextureSpecification spec(TextureFormat::RGBA16F);
+    TextureSpecification spec = { TextureType::TEXTURE2D, TextureFormat::RGBA16F };
     spec.SetTextureSize(4, 4);
     spec.Filter = TextureFilter::Nearest;
     spec.Wrap = TextureWrap::Repeat;
     
-    m_NoiseTexture = std::make_shared<Texture2D>(ssaoNoise.data(), spec);
+    m_NoiseTexture = Texture2D::CreateFromData(ssaoNoise.data(), spec);
 }

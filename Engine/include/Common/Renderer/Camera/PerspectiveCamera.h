@@ -128,10 +128,5 @@ protected:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    // Constructors
-    PerspectiveCamera(const PerspectiveCamera&) = delete;
-    PerspectiveCamera(PerspectiveCamera&&) = delete;
-    // Operators
-    PerspectiveCamera& operator=(const PerspectiveCamera&) = delete;
-    PerspectiveCamera& operator=(PerspectiveCamera&&) = delete;
+    DISABLE_COPY_AND_MOVE(PerspectiveCamera);
 };

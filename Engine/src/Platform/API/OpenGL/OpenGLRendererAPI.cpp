@@ -22,7 +22,7 @@ void OpenGLRendererAPI::Init()
 void OpenGLRendererAPI::Clear(const BufferState& bufferState)
 {
     // Clear buffers
-    glClear(utils::graphics::gl::ToClearMask(bufferState));
+    glClear(utils::graphics::gl::ToOpenGLClearMask(bufferState));
     SetDepthTesting(bufferState.depthBufferActive);
 }
 

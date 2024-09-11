@@ -105,9 +105,5 @@ private:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    Window(const Window&) = delete;
-    Window(Window&&) = delete;
-
-    Window& operator=(const Window&) = delete;
-    Window& operator=(Window&&) = delete;
+    DISABLE_COPY_AND_MOVE(Window);
 };

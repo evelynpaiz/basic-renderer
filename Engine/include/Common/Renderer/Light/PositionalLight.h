@@ -76,9 +76,5 @@ public:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    PositionalLight(const PositionalLight&) = delete;
-    PositionalLight(PositionalLight&&) = delete;
-
-    PositionalLight& operator=(const PositionalLight&) = delete;
-    PositionalLight& operator=(PositionalLight&&) = delete;
+    DISABLE_COPY_AND_MOVE(PositionalLight);
 };

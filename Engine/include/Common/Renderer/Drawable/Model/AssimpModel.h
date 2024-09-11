@@ -57,9 +57,5 @@ private:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    AssimpModel(const AssimpModel&) = delete;
-    AssimpModel(AssimpModel&&) = delete;
-
-    AssimpModel& operator=(const AssimpModel&) = delete;
-    AssimpModel& operator=(AssimpModel&&) = delete;
+    DISABLE_COPY_AND_MOVE(AssimpModel);
 };

@@ -73,9 +73,5 @@ private:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    Application(const Application&) = delete;
-    Application(Application&&) = delete;
-
-    Application& operator=(const Application&) = delete;
-    Application& operator=(Application&&) = delete;
+    DISABLE_COPY_AND_MOVE(Application);
 };

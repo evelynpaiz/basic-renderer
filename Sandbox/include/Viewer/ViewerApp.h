@@ -35,9 +35,5 @@ private:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    ViewerApp(const ViewerApp&) = delete;
-    ViewerApp(ViewerApp&&) = delete;
-
-    ViewerApp& operator=(const ViewerApp&) = delete;
-    ViewerApp& operator=(ViewerApp&&) = delete;
+    DISABLE_COPY_AND_MOVE(ViewerApp);
 };

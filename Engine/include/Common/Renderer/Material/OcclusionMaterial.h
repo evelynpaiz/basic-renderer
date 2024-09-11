@@ -82,9 +82,5 @@ public:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    OcclusionMaterial(const OcclusionMaterial&) = delete;
-    OcclusionMaterial(OcclusionMaterial&&) = delete;
-
-    OcclusionMaterial& operator=(const OcclusionMaterial&) = delete;
-    OcclusionMaterial& operator=(OcclusionMaterial&&) = delete;
+    DISABLE_COPY_AND_MOVE(OcclusionMaterial);
 };

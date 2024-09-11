@@ -69,9 +69,5 @@ protected:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    VertexBuffer(const VertexBuffer&) = delete;
-    VertexBuffer(VertexBuffer&&) = delete;
-
-    VertexBuffer& operator=(const VertexBuffer&) = delete;
-    VertexBuffer& operator=(VertexBuffer&&) = delete;
+    DISABLE_COPY_AND_MOVE(VertexBuffer);
 };

@@ -8,6 +8,7 @@
 
 // TODO: remove opengl definitions
 #include "Platform/OpenGL/OpenGLRendererUtils.h"
+#include "Platform/OpenGL/Texture/OpenGLTextureUtils.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
@@ -31,11 +32,11 @@ FrameBuffer::FrameBuffer(const FrameBufferSpecification& spec)
         spec.MipMaps = m_Spec.MipMaps;
         
         spec.Wrap = spec.Wrap != TextureWrap::None ? spec.Wrap :
-                    utils::OpenGL::IsDepthFormat(spec.Format) ?
+                    utils::textures::IsDepthFormat(spec.Format) ?
                     TextureWrap::ClampToBorder : TextureWrap::ClampToEdge;
         
         // Depth attachment
-        if (utils::OpenGL::IsDepthFormat(spec.Format))
+        if (utils::textures::IsDepthFormat(spec.Format))
         {
             spec.Filter = TextureFilter::Nearest;
             
@@ -130,7 +131,7 @@ void FrameBuffer::Unbind(const bool& genMipMaps) const
         for (auto& attachment : m_ColorAttachments)
         {
             attachment->Bind();
-            glGenerateMipmap(attachment->TextureTarget());
+            glGenerateMipmap(utils::textures::gl::ToOpenGLTextureTarget(attachment->m_Spec.Type));
         }
     }
     
@@ -149,7 +150,7 @@ void FrameBuffer::ClearAttachment(const unsigned int index, const int value)
     // TODO: support other types of data. For the moment this is only for RED images.
     auto& spec = m_ColorAttachmentsSpec[index];
     glClearTexImage(m_ColorAttachments[index]->m_ID, 0,
-                    utils::OpenGL::TextureFormatToOpenGLInternalType(spec.Format),
+                    utils::textures::gl::ToOpenGLInternalFormat(spec.Format),
                     GL_INT, &value);
 }
 
@@ -172,7 +173,7 @@ void FrameBuffer::Blit(const std::shared_ptr<FrameBuffer>& src,
     CORE_ASSERT(src && dst, "Trying to blit undefined framebuffer(s)");
     
     // Determine the mask based on selected buffer components
-    GLbitfield mask = utils::graphics::gl::ToClearMask(buffersActive);
+    GLbitfield mask = utils::graphics::gl::ToOpenGLClearMask(buffersActive);
     
     // Bind the source framebuffer for reading and the destination framebuffer for drawing
     glBindFramebuffer(GL_READ_FRAMEBUFFER, src->m_ID);
@@ -180,7 +181,7 @@ void FrameBuffer::Blit(const std::shared_ptr<FrameBuffer>& src,
     // Perform the blit operation
     glBlitFramebuffer(0, 0, src->m_Spec.Width, src->m_Spec.Height,
                       0, 0, dst->m_Spec.Width, dst->m_Spec.Height,
-                      mask, utils::OpenGL::TextureFilterToOpenGLType(filter, false));
+                      mask, utils::textures::gl::ToOpenGLFilter(filter, false));
     
     // Unbind the framebuffers
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -211,7 +212,7 @@ void FrameBuffer::BlitColorAttachments(const std::shared_ptr<FrameBuffer>& src,
     // Copy the block of pixels from the source to the destination color attachment
     glBlitFramebuffer(0, 0, src->m_Spec.Width, src->m_Spec.Height,
                       0, 0, dst->m_Spec.Width, dst->m_Spec.Height,
-                      GL_COLOR_BUFFER_BIT, utils::OpenGL::TextureFilterToOpenGLType(filter, false));
+                      GL_COLOR_BUFFER_BIT, utils::textures::gl::ToOpenGLFilter(filter, false));
     
     // Unbind the framebuffers and restore the default draw buffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -291,13 +292,13 @@ void FrameBuffer::Invalidate()
                 switch (type)
                 {
                     case TextureType::TEXTURE1D: 
-                        return std::make_shared<Texture1D>(m_ColorAttachmentsSpec[i]);
+                        return Texture1D::Create(m_ColorAttachmentsSpec[i]);
                     case TextureType::TEXTURE2D: 
-                        return std::make_shared<Texture2D>(m_ColorAttachmentsSpec[i], m_Spec.Samples);
+                        return Texture2D::Create(m_ColorAttachmentsSpec[i], m_Spec.Samples);
                     case TextureType::TEXTURE3D: 
-                        return std::make_shared<Texture3D>(m_ColorAttachmentsSpec[i]);
+                        return Texture3D::Create(m_ColorAttachmentsSpec[i]);
                     case TextureType::TEXTURECUBE: 
-                        return std::make_shared<TextureCube>(m_ColorAttachmentsSpec[i]);
+                        return TextureCube::Create(m_ColorAttachmentsSpec[i]);
                     case TextureType::None:
                     default: return nullptr;
                 }
@@ -305,7 +306,7 @@ void FrameBuffer::Invalidate()
             m_ColorAttachments[i] = createTexture();
             
             // Check if the attachment has been properly defined
-            if (!m_ColorAttachments[i] || format == TextureFormat::None || utils::OpenGL::IsDepthFormat(format))
+            if (!m_ColorAttachments[i] || format == TextureFormat::None || utils::textures::IsDepthFormat(format))
             {
                 CORE_WARN("Data in color attachment not properly defined");
                 continue;
@@ -314,23 +315,20 @@ void FrameBuffer::Invalidate()
             // Create the texture for the color attachment
             m_ColorAttachments[i]->CreateTexture(nullptr);
             
+            GLenum target = utils::textures::gl::ToOpenGLTextureTarget(m_ColorAttachments[i]->m_Spec.Type);
             switch (type)
             {
                 case TextureType::TEXTURE1D:
-                    glFramebufferTexture1D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, 
-                                           m_ColorAttachments[i]->TextureTarget(), m_ColorAttachments[i]->m_ID, 0);
+                    glFramebufferTexture1D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, target, m_ColorAttachments[i]->m_ID, 0);
                     break;
                 case TextureType::TEXTURE2D:
-                    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, 
-                                           m_ColorAttachments[i]->TextureTarget(), m_ColorAttachments[i]->m_ID, 0);
+                    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, target, m_ColorAttachments[i]->m_ID, 0);
                     break;
                 case TextureType::TEXTURE3D:
-                    glFramebufferTexture3D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, 
-                                           m_ColorAttachments[i]->TextureTarget(), m_ColorAttachments[i]->m_ID, 0, 0);
+                    glFramebufferTexture3D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, target , m_ColorAttachments[i]->m_ID, 0, 0);
                     break;
                 case TextureType::TEXTURECUBE:
-                    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, 
-                                           m_ColorAttachments[i]->TextureTarget(), m_ColorAttachments[i]->m_ID, 0);
+                    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, target , m_ColorAttachments[i]->m_ID, 0);
                     break;
                 case TextureType::None:
                 default:
@@ -341,12 +339,12 @@ void FrameBuffer::Invalidate()
     
     // Depth attachment
     if(m_DepthAttachmentSpec.Format != TextureFormat::None &&
-       utils::OpenGL::IsDepthFormat(m_DepthAttachmentSpec.Format))
+       utils::textures::IsDepthFormat(m_DepthAttachmentSpec.Format))
     {
-        m_DepthAttachment = std::make_shared<Texture2D>(m_DepthAttachmentSpec, m_Spec.Samples);
+        m_DepthAttachment = Texture2D::Create(m_DepthAttachmentSpec, m_Spec.Samples);
         m_DepthAttachment->CreateTexture(nullptr);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, utils::OpenGL::TextureFormatToOpenGLDepthType(m_DepthAttachment->m_Spec.Format),
-                               m_DepthAttachment->TextureTarget(), m_DepthAttachment->m_ID, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, utils::textures::gl::ToOpenGLDepthAttachment(m_DepthAttachment->m_Spec.Format),
+                               utils::textures::gl::ToOpenGLTextureTarget(m_DepthAttachment->m_Spec.Type), m_DepthAttachment->m_ID, 0);
     }
     
     // Draw the color attachments
@@ -389,7 +387,7 @@ void FrameBuffer::ReleaseFramebuffer()
 void FrameBuffer::SaveAttachment(const unsigned int index, const std::filesystem::path &path)
 {
     auto& format = m_ColorAttachmentsSpec[index].Format;
-    int channels = utils::OpenGL::TextureFormatToChannelNumber(format);
+    int channels = utils::textures::GetChannelCount(format);
     
     std::string extension = path.extension().string();
     std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
@@ -402,14 +400,14 @@ void FrameBuffer::SaveAttachment(const unsigned int index, const std::filesystem
     int stride = channels * m_Spec.Width;
     channels += (stride % 4) ? (4 - stride % 4) : 0;
     int bufferSize = stride * m_Spec.Height;
-    void* buffer = utils::AllocateBufferForFormat(format, bufferSize);
+    void* buffer = utils::textures::AllocateTextureBuffer(format, bufferSize);
     
     // Read the pixel data
     BindForReadAttachment(index);
     glPixelStorei(GL_PACK_ALIGNMENT, channels);
     glReadPixels(0, 0, m_Spec.Width, m_Spec.Height,
-                 utils::OpenGL::TextureFormatToOpenGLBaseType(format),
-                 utils::OpenGL::TextureFormatToOpenGLDataType(format),
+                 utils::textures::gl::ToOpenGLBaseFormat(format),
+                 utils::textures::gl::ToOpenGLDataFormat(format),
                  buffer);
 
     // TODO: support more file formats
@@ -425,5 +423,5 @@ void FrameBuffer::SaveAttachment(const unsigned int index, const std::filesystem
     else
         CORE_WARN("Unsupported file format!");
     
-    utils::DeallocateBufferForFormat(format, buffer);
+    utils::textures::FreeTextureBuffer(format, buffer);
 }

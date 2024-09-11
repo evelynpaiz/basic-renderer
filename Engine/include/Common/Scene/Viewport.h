@@ -28,7 +28,10 @@ public:
         // Define the framebuffer to be render into and update its information
         FrameBufferSpecification viewportSpec;
         viewportSpec.SetFrameBufferSize(width, height);
-        viewportSpec.AttachmentsSpec = { TextureFormat::RGBA8, TextureFormat::DEPTH16 };
+        viewportSpec.AttachmentsSpec = {
+            { TextureType::TEXTURE2D, TextureFormat::RGBA8 },
+            { TextureType::TEXTURE2D, TextureFormat::DEPTH16 }
+        };
         m_Framebuffer = std::make_shared<FrameBuffer>(viewportSpec);
         
         // Define the material to be displayed in the viewport

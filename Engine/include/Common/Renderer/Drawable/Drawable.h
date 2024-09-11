@@ -117,9 +117,5 @@ protected:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    Drawable(const Drawable&) = delete;
-    Drawable(Drawable&&) = delete;
-
-    Drawable& operator=(const Drawable&) = delete;
-    Drawable& operator=(Drawable&&) = delete;
+    DISABLE_COPY_AND_MOVE(Drawable);
 };

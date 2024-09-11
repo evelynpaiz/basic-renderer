@@ -1,135 +1,129 @@
 #pragma once
 
-#include "Common/Renderer/Texture/TextureUtils.h"
 #include "Common/Renderer/Texture/Texture.h"
 
-#include <filesystem>
-
-/**
- * Represents a 2D texture that can be bound to geometry during rendering.
- *
- * The `Texture2D` class provides functionality to create, bind, unbind, and configure 2D textures.
- * 2D textures consist of a single surface with texture data. These textures can
- * be bound to specific texture slots for use in a `Shader`.
- *
- * Copying or moving `Texture2D` objects is disabled to ensure single ownership and prevent
- * unintended texture duplication.
- */
-class Texture2D : public Texture
-{
-public:
-    // Constructor(s)/Destructor
-    // ----------------------------------------
-    Texture2D(const int& samples = 1);
-    Texture2D(const void *data, const int& samples = 1);
-    Texture2D(const TextureSpecification& spec, const int& samples = 1);
-    Texture2D(const void *data, const TextureSpecification& spec, const int& samples = 1);
-    
-protected:
-    // Target type
-    // ----------------------------------------
-    GLenum TextureTarget() const override;
-    
-    // Texture creation
-    // ----------------------------------------
-    void CreateTexture(const void *data) override;
-    
-    // Texture variables
-    // ----------------------------------------
-protected:
-    ///< The number of samples in the texture.
-    int m_Samples = 1;
-    
-    // Disable the copying or moving of this resource
-    // ----------------------------------------
-public:
-    Texture2D(const Texture2D&) = delete;
-    Texture2D(Texture2D&&) = delete;
-
-    Texture2D& operator=(const Texture2D&) = delete;
-    Texture2D& operator=(Texture2D&&) = delete;
-};
-
 // Forward declarations
-class Texture2DResource;
+class Texture2D;
 
 /**
  * Utility functions related to texture operations.
  */
 namespace utils { namespace Draw {
 
-inline bool TextureLoader(std::shared_ptr<Texture2DResource> &texture,
+inline bool TextureLoader(std::shared_ptr<Texture2D> &texture,
                           std::filesystem::path &name, const char *label,
                           const char *filter, const bool &flip);
 } // namespace Draw
 } // namespace utils
 
 /**
- * Represents a (loaded) 2D texture used to add details to rendered geometry.
+ * Represents a two-dimensional texture.
  *
- * The `Texture2DResource` class is a specialized subclass of  `Texture` that provides
- * functionality to load and bind 2D textures that can be applied to geometry during rendering.
- * The class supports loading textures from file paths, binding them to specific texture slots for
- * use in a `Shader`, and unbinding them after they have been used.
+ * The `Texture2D` class specializes the `Texture` base class to provide functionality
+ * for creating and managing standard 2D textures. This class supports multisampling to improve
+ * visual quality.
  *
- * Copying or moving `Texture2DResource` objects is disabled to ensure single ownership
- * and prevent unintended texture duplication.
+ * Like other texture types, `Texture2D` objects can be bound to specific texture units for
+ * use within shaders.
+ *
+ * @note Copying and moving `Texture2D` objects is disabled to ensure single ownership
+ * and prevent unintended resource duplication.
  */
-class Texture2DResource : public Texture2D
+class Texture2D : public Texture
 {
 public:
     // Constructor(s)/Destructor
     // ----------------------------------------
-    Texture2DResource(const std::filesystem::path& filePath, bool flip = true);
+    static std::shared_ptr<Texture2D> Create(uint8_t samples = 1);
+    static std::shared_ptr<Texture2D> Create(const TextureSpecification& spec,
+                                             uint8_t samples = 1);
     
-    // Getter(s)
-    // ----------------------------------------
-    /// @brief Get the file path of the texture.
-    /// @return The path to the file.
-    std::filesystem::path GetPath() const { return m_FilePath; }
-    /// @brief Get the name of the loaded texture (file name).
-    /// @return The texture name.
-    std::string GetName() { return m_FilePath.filename().string(); }
-    /// @brief Get the directory where the texture file is located.
-    /// @return The directory of the texture.
-    std::string GetDirectory() { return m_FilePath.parent_path().string(); }
+    static std::shared_ptr<Texture2D> CreateFromData(const void *data, uint8_t samples = 1);
+    static std::shared_ptr<Texture2D> CreateFromData(const void *data, const TextureSpecification& spec,
+                                                     uint8_t samples = 1);
+    
+    static std::shared_ptr<Texture2D> CreateFromFile(const std::filesystem::path& filePath,
+                                                     bool flip = true);
+    static std::shared_ptr<Texture2D> CreateFromFile(const std::filesystem::path& filePath,
+                                                     const TextureSpecification& spec,
+                                                     bool flip = true);
     
     // Friend class definition(s)
     // ----------------------------------------
-    friend bool utils::Draw::TextureLoader(std::shared_ptr<Texture2DResource> &texture,
+    friend bool utils::Draw::TextureLoader(std::shared_ptr<Texture2D> &texture,
                                            std::filesystem::path &name, const char *label,
                                            const char *filter, const bool &flip);
-        
-private:
+    
+protected:
+    // Constructor(s)
+    // ----------------------------------------
+    /// @brief Create a 2D texture with no data.
+    /// @param samples The number of samples to use for multisampling.
+    Texture2D(uint8_t samples) : Texture(), m_Samples(samples) {}
+    /// @brief Create a 2D texture with specific properties and no data.
+    /// @param spec The texture specifications.
+    /// @param samples The number of samples to use for multisampling.
+    Texture2D(const TextureSpecification& spec, uint8_t samples)
+        : Texture(spec), m_Samples(samples)
+    {}
+    
+    /// @brief Create a general texture from a specific path.
+    /// @param filePath Texture file path.
+    /// @param flip Fip the texture vertically.
+    Texture2D(const std::filesystem::path& filePath, bool flip) :
+        Texture(filePath), m_Flip(flip)
+    {}
+    /// @brief Create a general texture with specific properties and defined file path.
+    /// @param filePath Texture file path.
+    /// @param spec The texture specifications.
+    /// @param flip Fip the texture vertically.
+    Texture2D(const std::filesystem::path& filePath,
+              const TextureSpecification& spec, bool flip) :
+        Texture(filePath, spec), m_Flip(flip)
+    {}
+    
+protected:
     // Loading
     // ----------------------------------------
     void LoadFromFile(const std::filesystem::path& filePath);
     
     // Texture variables
     // ----------------------------------------
-private:
-    ///< Path to the file.
-    std::filesystem::path m_FilePath;
-    
+protected:
+    ///< The number of samples in the texture.
+    uint8_t m_Samples = 1;
     ///< Texture flipping.
-    bool m_Flip;
+    bool m_Flip = true;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    Texture2DResource(const Texture2DResource&) = delete;
-    Texture2DResource(Texture2DResource&&) = delete;
-
-    Texture2DResource& operator=(const Texture2DResource&) = delete;
-    Texture2DResource& operator=(Texture2DResource&&) = delete;
+    DISABLE_COPY_AND_MOVE(Texture2D);
 };
 
 /**
  * Utility functions related to texture operations.
  */
-namespace utils {
-/// @brief Namespace containing utility functions for texturing operations.
-namespace Texturing {
+namespace utils { namespace textures {
+
+template <>
+struct TextureHelper<Texture2D>
+{
+    /// @brief Sets the width and height of a `TextureSpecification` for a `Texture2D`.
+    /// @param spec The `TextureSpecification` object whose size needs to be set.
+    /// @param size The width and height to set for the texture.
+    static void SetSize(TextureSpecification& spec, unsigned int size)
+    {
+        spec.SetTextureSize(size, size);
+    }
+};
+
+/**
+ * Get a shared pointer to a 1x1 white texture.
+ *
+ * @return A 1x1 white texture.
+ */
+DEFINE_WHITE_TEXTURE(Texture2D)
 
 /**
  * Get a shared pointer to an empty texture with a checkerboard pattern.
@@ -139,17 +133,17 @@ namespace Texturing {
  *
  * @return A shared pointer to the empty texture with a checkerboard pattern.
  */
-inline std::shared_ptr<Texture2DResource> EmptyTexture()
+inline std::shared_ptr<Texture2D> EmptyTexture2D()
 {
     // Static variable to hold the shared pointer to the texture
-    static std::shared_ptr<Texture2DResource> texture;
+    static std::shared_ptr<Texture2D> texture;
     
     // Check if the texture has already been created
     if (texture)
         return texture;
     
     // Create the empty texture using a ccheckerboard pattern
-    texture = std::make_shared<Texture2DResource>("resources/common/checkerboard.png");
+    texture = Texture2D::CreateFromFile("resources/common/checkerboard.png");
     
     // Return the created texture
     return texture;

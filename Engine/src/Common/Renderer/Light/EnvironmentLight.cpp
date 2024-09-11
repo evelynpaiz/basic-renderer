@@ -40,8 +40,8 @@ void EnvironmentLight::InitEnvironmentFramebuffers(const unsigned int cubeSize)
     FrameBufferSpecification spec;
     spec.SetFrameBufferSize(cubeSize, cubeSize);
     spec.AttachmentsSpec = {
-        TextureFormat::DEPTH24,
-        { TextureFormat::RGB16F, TextureType::TEXTURECUBE }
+        { TextureType::TEXTURE2D, TextureFormat::DEPTH24 },
+        { TextureType::TEXTURECUBE, TextureFormat::RGB16F }
     };
     
     spec.MipMaps = true;
@@ -147,7 +147,7 @@ void EnvironmentLight::DefineLightProperties(const std::shared_ptr<Shader> &shad
     {
         // Set the irradiance map uniform to a white texture cube
         utils::Texturing::SetTextureMap(shader, "u_Environment.IrradianceMap",
-                                        utils::Texturing::WhiteTexture<TextureCube>(), slot++);
+                                        utils::textures::WhiteTextureCube(), slot++);
     }
 }
 

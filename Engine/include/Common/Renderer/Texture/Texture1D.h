@@ -1,45 +1,66 @@
 #pragma once
 
-#include "Common/Renderer/Texture/TextureUtils.h"
 #include "Common/Renderer/Texture/Texture.h"
 
-#include <filesystem>
-
 /**
- * Represents a 1D texture that can be bound to geometry during rendering.
+ * Represents a one-dimensional texture.
  *
- * The `Texture1D` class provides functionality to create, bind, unbind, and configure 1D textures.
- * 1D textures consist of a single line of texture data. These textures can be bound to specific texture
- * slots for use in a `Shader`.
+ * The `Texture1D` class specializes the `Texture` base class to provide functionality for creating
+ * and managing 1D textures. These textures consist of a single line of texel data.
  *
- * Copying or moving `Texture1D` objects is disabled to ensure single ownership and prevent
- * unintended texture duplication.
+ * Like other texture types, `Texture1D` objects can be bound to specific texture units for use within
+ * shaders.
+ *
+ * @note Copying or moving `Texture1D` objects is disabled to ensure single ownership and prevent
+ * unintended resource duplication.
  */
 class Texture1D : public Texture
 {
 public:
-    // Constructor(s)/Destructor
+    // Constructor(s)
     // ----------------------------------------
-    Texture1D();
-    Texture1D(const void *data);
-    Texture1D(const TextureSpecification& spec);
-    Texture1D(const void *data, const TextureSpecification& spec);
+    static std::shared_ptr<Texture1D> Create();
+    static std::shared_ptr<Texture1D> Create(const TextureSpecification& spec);
+    
+    static std::shared_ptr<Texture1D> CreateFromData(const void *data);
+    static std::shared_ptr<Texture1D> CreateFromData(const void *data,
+                                                     const TextureSpecification& spec);
     
 protected:
-    // Target type
+    // Constructor(s)
     // ----------------------------------------
-    GLenum TextureTarget() const override;
-    
-    // Texture creation
-    // ----------------------------------------
-    void CreateTexture(const void *data) override;
+    Texture1D() : Texture() {}
+    Texture1D(const TextureSpecification& spec) : Texture(spec) {}
     
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    Texture1D(const Texture1D&) = delete;
-    Texture1D(Texture1D&&) = delete;
-
-    Texture1D& operator=(const Texture1D&) = delete;
-    Texture1D& operator=(Texture1D&&) = delete;
+    DISABLE_COPY_AND_MOVE(Texture1D);
 };
+
+/**
+ * Utility functions related to texture operations.
+ */
+namespace utils { namespace textures {
+
+template <>
+struct TextureHelper<Texture1D>
+{
+    /// @brief Sets the width of a `TextureSpecification` for a `Texture1D`.
+    /// @param spec The `TextureSpecification` object whose size needs to be set.
+    /// @param size The width to set for the texture.
+    static void SetSize(TextureSpecification& spec, unsigned int size)
+    {
+        spec.SetTextureSize(size);
+    }
+};
+
+/**
+ * Get a shared pointer to a 1x white texture.
+ *
+ * @return A 1x white texture.
+ */
+DEFINE_WHITE_TEXTURE(Texture1D)
+
+} // namespace Texturing
+} // namespace utils

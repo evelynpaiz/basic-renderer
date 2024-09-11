@@ -88,9 +88,5 @@ private:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    DirectionalLight(const DirectionalLight&) = delete;
-    DirectionalLight(DirectionalLight&&) = delete;
-
-    DirectionalLight& operator=(const DirectionalLight&) = delete;
-    DirectionalLight& operator=(DirectionalLight&&) = delete;
+    DISABLE_COPY_AND_MOVE(DirectionalLight);
 };

@@ -110,9 +110,5 @@ private:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    EnvironmentLight(const EnvironmentLight&) = delete;
-    EnvironmentLight(EnvironmentLight&&) = delete;
-
-    EnvironmentLight& operator=(const EnvironmentLight&) = delete;
-    EnvironmentLight& operator=(EnvironmentLight&&) = delete;
+    DISABLE_COPY_AND_MOVE(EnvironmentLight);
 };

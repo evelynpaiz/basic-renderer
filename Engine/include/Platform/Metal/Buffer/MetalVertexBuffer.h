@@ -43,9 +43,5 @@ private:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    MetalVertexBuffer(const MetalVertexBuffer&) = delete;
-    MetalVertexBuffer(MetalVertexBuffer&&) = delete;
-
-    MetalVertexBuffer& operator=(const MetalVertexBuffer&) = delete;
-    MetalVertexBuffer& operator=(MetalVertexBuffer&&) = delete;
+    DISABLE_COPY_AND_MOVE(MetalVertexBuffer);
 };

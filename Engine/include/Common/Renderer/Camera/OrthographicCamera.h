@@ -73,10 +73,5 @@ protected:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    // Constructors
-    OrthographicCamera(const OrthographicCamera&) = delete;
-    OrthographicCamera(OrthographicCamera&&) = delete;
-    // Operators
-    OrthographicCamera& operator=(const OrthographicCamera&) = delete;
-    OrthographicCamera& operator=(OrthographicCamera&&) = delete;
+    DISABLE_COPY_AND_MOVE(OrthographicCamera);
 };

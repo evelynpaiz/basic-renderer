@@ -55,9 +55,5 @@ protected:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    Layer(const Layer&) = delete;
-    Layer(Layer&&) = delete;
-
-    Layer& operator=(const Layer&) = delete;
-    Layer& operator=(Layer&&) = delete;
+    DISABLE_COPY_AND_MOVE(Layer);
 };

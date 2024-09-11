@@ -59,9 +59,5 @@ private:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    GuiLayer(const GuiLayer&) = delete;
-    GuiLayer(GuiLayer&&) = delete;
-    
-    GuiLayer& operator=(const GuiLayer&) = delete;
-    GuiLayer& operator=(GuiLayer&&) = delete;
+    DISABLE_COPY_AND_MOVE(GuiLayer);
 };

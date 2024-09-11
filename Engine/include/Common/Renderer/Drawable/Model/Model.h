@@ -131,11 +131,7 @@ protected:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    BaseModel(const BaseModel&) = delete;
-    BaseModel(BaseModel&&) = delete;
-
-    BaseModel& operator=(const BaseModel&) = delete;
-    BaseModel& operator=(BaseModel&&) = delete;
+    DISABLE_COPY_AND_MOVE(BaseModel);
 };
 
 /**
@@ -259,11 +255,7 @@ protected:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    Model(const Model&) = delete;
-    Model(Model&&) = delete;
-
-    Model& operator=(const Model&) = delete;
-    Model& operator=(Model&&) = delete;
+    DISABLE_COPY_AND_MOVE(Model);
 };
 
 /**
@@ -320,11 +312,7 @@ protected:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    LoadedModel(const LoadedModel&) = delete;
-    LoadedModel(LoadedModel&&) = delete;
-
-    LoadedModel& operator=(const LoadedModel&) = delete;
-    LoadedModel& operator=(LoadedModel&&) = delete;
+    DISABLE_COPY_AND_MOVE(LoadedModel);
 };
 
 /**

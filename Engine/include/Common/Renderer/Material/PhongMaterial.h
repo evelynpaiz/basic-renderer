@@ -254,11 +254,7 @@ protected:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    PhongColorMaterial(const PhongColorMaterial&) = delete;
-    PhongColorMaterial(PhongColorMaterial&&) = delete;
-
-    PhongColorMaterial& operator=(const PhongColorMaterial&) = delete;
-    PhongColorMaterial& operator=(PhongColorMaterial&&) = delete;
+    DISABLE_COPY_AND_MOVE(PhongColorMaterial);
 };
 
 /**
@@ -303,9 +299,5 @@ protected:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    PhongTextureMaterial(const PhongTextureMaterial&) = delete;
-    PhongTextureMaterial(PhongTextureMaterial&&) = delete;
-
-    PhongTextureMaterial& operator=(const PhongTextureMaterial&) = delete;
-    PhongTextureMaterial& operator=(PhongTextureMaterial&&) = delete;
+    DISABLE_COPY_AND_MOVE(PhongTextureMaterial);
 };

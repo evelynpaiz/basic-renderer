@@ -56,9 +56,5 @@ protected:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    IndexBuffer(const IndexBuffer&) = delete;
-    IndexBuffer(IndexBuffer&&) = delete;
-
-    IndexBuffer& operator=(const IndexBuffer&) = delete;
-    IndexBuffer& operator=(IndexBuffer&&) = delete;
+    DISABLE_COPY_AND_MOVE(IndexBuffer);
 };

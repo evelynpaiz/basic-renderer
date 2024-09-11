@@ -125,11 +125,7 @@ protected:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    Material(const Material&) = delete;
-    Material(Material&&) = delete;
-
-    Material& operator=(const Material&) = delete;
-    Material& operator=(Material&&) = delete;
+    DISABLE_COPY_AND_MOVE(Material);
 };
 
 /**

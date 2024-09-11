@@ -53,9 +53,5 @@ private:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    OpenGLDrawable(const OpenGLDrawable&) = delete;
-    OpenGLDrawable(OpenGLDrawable&&) = delete;
-
-    OpenGLDrawable& operator=(const OpenGLDrawable&) = delete;
-    OpenGLDrawable& operator=(OpenGLDrawable&&) = delete;
+    DISABLE_COPY_AND_MOVE(OpenGLDrawable);
 };

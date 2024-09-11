@@ -77,9 +77,5 @@ private:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    MetalDrawable(const MetalDrawable&) = delete;
-    MetalDrawable(MetalDrawable&&) = delete;
-
-    MetalDrawable& operator=(const MetalDrawable&) = delete;
-    MetalDrawable& operator=(MetalDrawable&&) = delete;
+    DISABLE_COPY_AND_MOVE(MetalDrawable);
 };

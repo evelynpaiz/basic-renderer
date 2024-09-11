@@ -42,9 +42,5 @@ private:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    MetalIndexBuffer(const MetalIndexBuffer&) = delete;
-    MetalIndexBuffer(MetalIndexBuffer&&) = delete;
-
-    MetalIndexBuffer& operator=(const MetalIndexBuffer&) = delete;
-    MetalIndexBuffer& operator=(MetalIndexBuffer&&) = delete;
+    DISABLE_COPY_AND_MOVE(MetalIndexBuffer);
 };

@@ -130,11 +130,7 @@ protected:
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:
-    Shader(const Shader&) = delete;
-    Shader(Shader&&) = delete;
-
-    Shader& operator=(const Shader&) = delete;
-    Shader& operator=(Shader&&) = delete;
+    DISABLE_COPY_AND_MOVE(Shader);
 };
 
 /**
