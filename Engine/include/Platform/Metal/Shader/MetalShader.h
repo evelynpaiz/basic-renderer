@@ -2,6 +2,8 @@
 
 #include "Common/Renderer/Shader/Shader.h"
 
+#include "Platform/Metal/MetalContext.h"
+
 /**
  * Concrete implementation of the Shader class for the Metal API.
  *
@@ -45,6 +47,10 @@ public:
     void SetMat3(const std::string& name, const glm::mat3& value) override;
     void SetMat4(const std::string& name, const glm::mat4& value) override;
     
+    void SetTexture(const std::string &name,
+                    const std::shared_ptr<Texture>& texture,
+                    int slot) override;
+    
 private:
     // Compilation
     // ----------------------------------------
@@ -54,6 +60,11 @@ private:
     // Argument(s) and Uniform(s)
     // ----------------------------------------
     void ProcessShaderArgument(void* arg, ShaderType type);
+    void ProcessTextureArgument(const char* name, int32_t index,
+                                ShaderType type);
+    void ProcessBufferArgument(void* arg, const char* name,
+                               int32_t index, ShaderType type);
+    
     void ExtractShaderResources(void* descriptor);
     
     void UpdateUniformBuffers();
@@ -65,6 +76,12 @@ private:
     ///< Shader program source.
     struct MetalShaderSource;
     std::shared_ptr<MetalShaderSource> m_ShaderSource;
+    
+    ///< List of texture uniforms supported by the shader.s
+    Library<TextureElement> m_Textures;
+    
+    ///< Metal context.
+    MetalContext* m_Context;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

@@ -1,7 +1,6 @@
 #include "enginepch.h"
 #include "Platform/Metal/Drawable/MetalDrawable.h"
 
-#include "Platform/Metal/MetalContext.h"
 #include "Platform/Metal/MetalRendererUtils.h"
 
 #include "Platform/Metal/Buffer/MetalVertexBuffer.h"
@@ -30,6 +29,11 @@ struct MetalDrawable::DrawableState {
  */
 MetalDrawable::MetalDrawable() : Drawable()
 {
+    // Get the Metal graphics context and save it
+    MetalContext& context = dynamic_cast<MetalContext&>(GraphicsContext::Get());
+    CORE_ASSERT(&context, "Graphics context is not Metal!");
+    m_Context = &context;
+    
     // Initalize the drawing state
     m_State = std::make_shared<DrawableState>();
     
@@ -53,11 +57,8 @@ MetalDrawable::~MetalDrawable()
  */
 void MetalDrawable::Bind() const
 {
-    // Get the Metal graphics context
-    MetalContext* context = dynamic_cast<MetalContext*>(&GraphicsContext::Get());
-    CORE_ASSERT(context, "Graphic context is not Metal!");
     // Get the command encoder to encode rendering commands into the buffer
-    id<MTLRenderCommandEncoder> encoder = reinterpret_cast<id<MTLRenderCommandEncoder>>(context->GetEncoder());
+    id<MTLRenderCommandEncoder> encoder = reinterpret_cast<id<MTLRenderCommandEncoder>>(m_Context->GetEncoder());
     
     // Define the state of the pipeline if not yet defined
     if (!m_State->PipelineState)
@@ -92,11 +93,8 @@ void MetalDrawable::SetPipelineState() const
     // Check that a shader has been defined in the drawable object
     CORE_ASSERT(m_Shader, "Shader needs to be defined in drawable object for Metal API!");
     
-    // Get the Metal graphics context
-    MetalContext* context = dynamic_cast<MetalContext*>(&GraphicsContext::Get());
-    CORE_ASSERT(context, "Graphic context is not Metal!");
     // Get the Metal device from the context
-    id<MTLDevice> device = reinterpret_cast<id<MTLDevice>>(context->GetDevice());
+    id<MTLDevice> device = reinterpret_cast<id<MTLDevice>>(m_Context->GetDevice());
     
     // Dynamic cast the shader to a Metal shader
     auto* metalShader = dynamic_cast<MetalShader*>(m_Shader.get());

@@ -175,6 +175,24 @@ void OpenGLShader::SetMat4(const std::string& name, const glm::mat4& value)
 }
 
 /**
+ * Set a texture map in the shader program.
+ *
+ * @param texture The texture map.
+ * @param name Uniform name.
+ * @param slot The texture slot.
+ */
+void OpenGLShader::SetTexture(const std::string &name,
+                              const std::shared_ptr<Texture>& texture,
+                              int slot)
+{
+    if(!texture)
+        return;
+
+    texture->BindToTextureUnit(slot);
+    SetInt(name, slot);
+}
+
+/**
  * Compile the shader from its input file source.
  *
  * @param type Shader type.

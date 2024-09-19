@@ -1,8 +1,8 @@
 #include "enginepch.h"
 #include "Platform/Metal/Shader/MetalShader.h"
 
-#include "Platform/Metal/MetalContext.h"
 #include "Platform/Metal/MetalRendererUtils.h"
+#include "Platform/Metal/Texture/MetalTexture.h"
 
 #include <Metal/Metal.h>
 
@@ -29,6 +29,11 @@ struct MetalShader::MetalShaderSource
 MetalShader::MetalShader(const std::string& name, const std::filesystem::path& filePath)
     : Shader(name, filePath)
 {
+    // Get the Metal graphics context and save it
+    MetalContext& context = dynamic_cast<MetalContext&>(GraphicsContext::Get());
+    CORE_ASSERT(&context, "Graphics context is not Metal!");
+    m_Context = &context;
+    
     // Initialize
     m_ShaderSource = std::make_shared<MetalShaderSource>();
     // Compile the source file and define the shader functions
@@ -184,17 +189,67 @@ void MetalShader::SetMat4(const std::string& name, const glm::mat4& value)
 }
 
 /**
+ * Set a texture map in the shader program.
+ *
+ * @param texture The texture map.
+ * @param name Uniform name.
+ * @param slot The texture slot.
+ */
+void MetalShader::SetTexture(const std::string &name,
+                             const std::shared_ptr<Texture>& texture,
+                             int slot)
+{
+    // Return early if the texture pointer is null
+    if(!texture)
+        return;
+
+    // Get the current Metal render command encoder
+    id<MTLRenderCommandEncoder> encoder =
+        reinterpret_cast<id<MTLRenderCommandEncoder>>(m_Context->GetEncoder());
+    
+    // Dynamically cast the Texture to a MetalTexture
+    std::shared_ptr<MetalTexture> metalTexture = std::dynamic_pointer_cast<MetalTexture>(texture);
+    if (!metalTexture)
+        return;
+    
+    // Get the Metal texture and sampler
+    id<MTLTexture> rawTexture = reinterpret_cast<id<MTLTexture>>(metalTexture->MTLGetTexture());
+    id<MTLSamplerState> rawSampler = reinterpret_cast<id<MTLSamplerState>>(metalTexture->MTLGetSampler());
+    
+    // Get the texture uniform information
+    auto [group, member] = utils::SplitString(name);
+    std::string uniformName = group + (member.empty() ? member : ("_" + member));
+    auto& uniform = m_Textures.Get(uniformName);
+    
+    // Bind the texture to the appropriate shader stages based on its associated shader types
+    for (const auto& type : uniform.ShaderTypes)
+    {
+        switch (type)
+        {
+            case ShaderType::VERTEX:
+                [encoder setVertexTexture:rawTexture atIndex:slot];
+                [encoder setVertexSamplerState:rawSampler atIndex:slot];
+                break;
+            case ShaderType::FRAGMENT:
+                [encoder setFragmentTexture:rawTexture atIndex:slot];
+                [encoder setFragmentSamplerState:rawSampler atIndex:slot];
+                break;
+            default:
+                CORE_WARN("Unsupported shader type for texture!");
+                break;
+        }
+    }
+}
+
+/**
  * Compiles the shader source code for Metal.
  *
  * @param filePath Path to the source file.
  */
 void MetalShader::CompileShader(const std::filesystem::path& filePath)
 {
-    // Get the Metal graphics context
-    MetalContext* context = dynamic_cast<MetalContext*>(&GraphicsContext::Get());
-    CORE_ASSERT(context, "Graphic context is not Metal!");
     // Get the Metal device from the context
-    id<MTLDevice> device = reinterpret_cast<id<MTLDevice>>(context->GetDevice());
+    id<MTLDevice> device = reinterpret_cast<id<MTLDevice>>(m_Context->GetDevice());
     
     // Load the shader source program
     std::string sourceFromFile = ParseShader(filePath);
@@ -249,6 +304,96 @@ std::string MetalShader::ParseShader(const std::filesystem::path& filepath)
 }
 
 /**
+ * Processes a texture argument from Metal reflection data.
+ *
+ * @param name  The name of the texture uniform.
+ * @param index The binding index of the texture in the shader.
+ * @param type  The shader type (e.g., Vertex, Fragment) associated with the texture.
+ */
+void MetalShader::ProcessTextureArgument(const char* name, int32_t index,
+                                         ShaderType type)
+{
+    // Verify if the texture uniform already exists with the same binding index
+    if (m_Textures.Exists(name))
+    {
+        auto& uniform = m_Textures.Get(name);
+        if (uniform.Index == index)
+        {
+            // Add the shader type to the list
+            uniform.SetShaderType(type);
+            return;
+        }
+        else
+        {
+            CORE_WARN("Texture uniform {0} repeated with different binding indices!", name);
+            return;
+        }
+    }
+    
+    // Define a new texture uniform and add it to the collection
+    TextureElement uniform(index);
+    uniform.SetShaderType(type);
+    m_Textures.Add(name, uniform);
+}
+
+/**
+ * @brief Processes a buffer argument from Metal reflection data.
+ *
+ * @param arg   A `void*` pointer to the `MTLArgument` object.
+ * @param name  The name of the uniform group (buffer).
+ * @param index The binding index of the buffer in the shader.
+ * @param type  The shader type (e.g., Vertex, Fragment) associated with the buffer.
+ */
+void MetalShader::ProcessBufferArgument(void *arg, const char *name,
+                                        int32_t index, ShaderType type)
+{
+    // Verify if the uniform buffer already exists with the same binding index
+    if (m_Uniforms.Library<UniformLayout>::Exists(name))
+    {
+        auto& uniform = m_Uniforms.Library<UniformLayout>::Get(name);
+        if (uniform.GetIndex() == index)
+        {
+            // Add the shader type to the list
+            uniform.SetShaderType(type);
+            return;
+        }
+        else
+        {
+            CORE_WARN("Uniform {0} repeated with different binding indices!", name);
+            return;
+        }
+    }
+    
+    // Get the information of the argument
+    MTLArgument* argument = reinterpret_cast<MTLArgument*>(arg);
+    
+    // Check if the argument represents a struct (group of uniforms)
+    if (argument.bufferDataType == MTLDataTypeStruct)
+    {
+        // Process each member of the struct
+        for(MTLStructMember* uniform in argument.bufferStructType.members)
+        {
+            UniformElement element(utils::graphics::mtl::ToDataType(uniform.dataType));
+            element.Offset = static_cast<uint32_t>(uniform.offset);
+            
+            const char* member = [uniform.name UTF8String];
+            m_Uniforms.Add(name, member, element);
+        }
+    }
+    else
+    {
+        // Argument is a simple uniform, add it directly
+        UniformElement element(utils::graphics::mtl::ToDataType(argument.bufferDataType));
+        m_Uniforms.Add(name, "", element);
+    }
+    
+    // Set the binding index and shader type for the uniform layout
+    auto& uniform = m_Uniforms.Library<UniformLayout>::Get(name);
+    uniform.SetIndex(index);
+    uniform.SetShaderType(type);
+}
+
+/**
  * Processes a single shader argument (uniform) from Metal reflection data.
  *
  * @param arg  A `void*` pointer to the `MTLArgument` object.
@@ -265,49 +410,30 @@ void MetalShader::ProcessShaderArgument(void* arg, ShaderType type)
         return;
     
     // Get the uniform group name (assuming the "u_" prefix convention)
-    const char* group = [argument.name UTF8String];
-    if (strncmp(group, "u_", 2) != 0)
+    const char* name = [argument.name UTF8String];
+    if (strncmp(name, "u_", 2) != 0)
         return;
     
     // Get the binding index for the uniform buffer
     int32_t index = static_cast<int32_t>(argument.index);
     
-    // Verify if the uniform already exists
-    // TODO: improve this verification to make it more robust
-    if (m_Uniforms.Library<UniformLayout>::Exists(group))
+    switch (argument.type)
     {
-        auto& uniform = m_Uniforms.Library<UniformLayout>::Get(group);
-        if (uniform.GetIndex() == index)
+        // Uniform is a texture
+        case MTLArgumentTypeTexture:
         {
-            uniform.SetShaderType(type);
+            ProcessTextureArgument(name, index, type);
             return;
         }
-    }
-    
-    // Extract uniform data from the argument
-    if (argument.bufferDataType == MTLDataTypeStruct)
-    {
-        // Uniform is a struct, process each member
-        for(MTLStructMember* uniform in argument.bufferStructType.members)
+        // Uniform is a buffer
+        case MTLArgumentTypeBuffer: 
         {
-            UniformElement element(utils::graphics::mtl::ToDataType(uniform.dataType));
-            element.Offset = static_cast<uint32_t>(uniform.offset);
-            
-            const char* member = [uniform.name UTF8String];
-            m_Uniforms.Add(group, member, element);
+            ProcessBufferArgument(arg, name, index, type);
+            break;
         }
+        default:
+            CORE_ASSERT(true, "Argument type not supported!");
     }
-    else
-    {
-        // Uniform is a simple type, add it directly
-        UniformElement element(utils::graphics::mtl::ToDataType(argument.bufferDataType));
-        m_Uniforms.Add(group, "", element);
-    }
-    
-    // Set the index and shader type for the uniform layout
-    auto& uniform = m_Uniforms.Library<UniformLayout>::Get(group);
-    uniform.SetIndex(index);
-    uniform.SetShaderType(type);
 }
 
 /**
@@ -324,11 +450,8 @@ void MetalShader::ExtractShaderResources(void* descriptor)
     if (!m_Attributes.IsEmpty() || !m_Uniforms.IsEmpty())
         return;
     
-    // Get the Metal graphics context
-    MetalContext* context = dynamic_cast<MetalContext*>(&GraphicsContext::Get());
-    CORE_ASSERT(context, "Graphic context is not Metal!");
     // Get the Metal device from the context
-    id<MTLDevice> device = reinterpret_cast<id<MTLDevice>>(context->GetDevice());
+    id<MTLDevice> device = reinterpret_cast<id<MTLDevice>>(m_Context->GetDevice());
     
     // Get the Metal pipeline descriptor
     MTLRenderPipelineDescriptor* pipelineDescriptor =
@@ -343,8 +466,6 @@ void MetalShader::ExtractShaderResources(void* descriptor)
         reflection:&reflection
         error:&error];
     CORE_ASSERT(!error, "Error creating a reflection of the shader program!");
-    
-    // TODO: extract this information of the vertex attributes
     
     // Process vertex and fragment uniforms
     for (MTLArgument *argument in reflection.vertexArguments)
@@ -362,14 +483,10 @@ void MetalShader::ExtractShaderResources(void* descriptor)
  */
 void MetalShader::UpdateUniformBuffers()
 {
-    // Get the Metal graphics context
-    MetalContext* context = dynamic_cast<MetalContext*>(&GraphicsContext::Get());
-    CORE_ASSERT(context, "Graphic context is not Metal!");
-    
     // Get the Metal device and command encoder
-    id<MTLDevice> device = reinterpret_cast<id<MTLDevice>>(context->GetDevice());
-    id<MTLRenderCommandEncoder> encoder = 
-        reinterpret_cast<id<MTLRenderCommandEncoder>>(context->GetEncoder());
+    id<MTLDevice> device = reinterpret_cast<id<MTLDevice>>(m_Context->GetDevice());
+    id<MTLRenderCommandEncoder> encoder =
+        reinterpret_cast<id<MTLRenderCommandEncoder>>(m_Context->GetEncoder());
     
     // Iterate through each uniform
     for (auto& [uniform, layout]: m_Uniforms)
@@ -405,7 +522,7 @@ void MetalShader::UpdateUniformBuffers()
             memcpy(content + member.Offset, member.Data, member.Size);
         }
         
-        // 3. Bind the Uniform Buffer to the Correct Shader Stage
+        // Bind the Uniform Buffer to the Correct Shader Stage
         for (const auto& type : layout.GetShaderType())
         {
             switch (type)

@@ -15,8 +15,11 @@
 struct MetalContext::MetalState {
     ///< The Metal device (GPU) used for rendering.
     id<MTLDevice> Device;
+    
     ///< The command queue for submitting rendering commands to the GPU.
     id<MTLCommandQueue> Queue;
+    ///< The command queue for resource-related operations (textures, etc.).
+    id<MTLCommandQueue> ResourceQueue;
     
     ///< The command buffer holding the rendering commands.
     id<MTLCommandBuffer> CommandBuffer;
@@ -53,9 +56,10 @@ void MetalContext::Init()
     m_State->Device = MTLCreateSystemDefaultDevice();
     CORE_ASSERT(m_State->Device, "Metal initialization failed: Could not get default Metal device!");
 
-    // Create a command queue for submitting rendering commands to the GPU
+    // Create the command queue(s) for submitting rendering commands to the GPU
     m_State->Queue = [m_State->Device newCommandQueue];
-    CORE_ASSERT(m_State->Queue, "Metal initialization failed: Could not create command queue!");
+    m_State->ResourceQueue = [m_State->Device newCommandQueue];
+    CORE_ASSERT(m_State->Queue && m_State->ResourceQueue, "Metal initialization failed: Could not create command queue(s)!");
 
     // Display the Metal general information
     CORE_INFO("Using Metal:");
@@ -98,6 +102,16 @@ void* MetalContext::GetDevice() const
 void* MetalContext::GetEncoder() const
 {
     return reinterpret_cast<void*>(m_State->Encoder);
+}
+
+/**
+ * @brief Get the command queue for resource-related operations.
+ *
+ * @return A pointer to the command queue, or `nullptr` if no command queue is available.
+ */
+void* MetalContext::GetResourceQueue() const
+{
+    return reinterpret_cast<void*>(m_State->ResourceQueue);
 }
 
 /**
@@ -150,10 +164,10 @@ void MetalContext::Clear(const glm::vec4& color)
     pass.colorAttachments[0].storeAction = MTLStoreActionStore;  // Store the rendered results in the attachment
     pass.colorAttachments[0].texture = m_State->Surface.texture; // Specify the texture to use for this attachment
 
-    // Create a new command buffer for the next frame
+    // Create the new command buffer(s) for the next frame
     m_State->CommandBuffer = [m_State->Queue commandBuffer];
-
-    // Create a render command encoder to encode rendering commands into the buffer
+    
+    // Create the render command encoder(s) to encode rendering commands into the buffer
     m_State->Encoder = [m_State->CommandBuffer renderCommandEncoderWithDescriptor:pass];
 }
 

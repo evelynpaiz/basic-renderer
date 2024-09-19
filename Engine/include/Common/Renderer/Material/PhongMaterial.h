@@ -197,8 +197,8 @@ protected:
     /// @param shader The shader program to set the properties for.
     void SetProperties(const std::shared_ptr<Shader>& shader, unsigned int& slot)
     {
-        utils::Texturing::SetTextureMap(shader, "u_Material.DiffuseMap", m_DiffuseTexture, slot++);
-        utils::Texturing::SetTextureMap(shader, "u_Material.SpecularMap", m_SpecularTexture, slot++);
+        shader->SetTexture("u_Material.DiffuseMap", m_DiffuseTexture, slot++);
+        shader->SetTexture("u_Material.SpecularMap", m_SpecularTexture, slot++);
         
         Phong::SetProperties(shader);
     }

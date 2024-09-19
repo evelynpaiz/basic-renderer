@@ -193,8 +193,8 @@ public:
         if (flags.ShadowProperties)
         {
             DefineTranformProperties(shader);
-            utils::Texturing::SetTextureMap(shader, "u_Light[" + std::to_string(GetID()) + "].ShadowMap",
-                                            GetShadowMap(), slot++);
+            shader->SetTexture("u_Light[" + std::to_string(GetID()) + "].ShadowMap",
+                               GetShadowMap(), slot++);
         }
     }
     

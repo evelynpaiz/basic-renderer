@@ -19,13 +19,10 @@
  * @return A shared pointer to the created shader, or nullptr if the API
  *         is not supported or an error occurs.
  */
-//CREATE_RENDERER_OBJECT(Shader, const const std::string &name,
-//                       const std::filesystem::path &filePath)
-
 std::shared_ptr<Shader> Shader::Create(const std::string &name,
                                        const std::filesystem::path &filePath)
 {
-    CREATE_RENDERER_OBJECT(Shader, name, filePath)
+    CREATE_RENDERER_OBJECT(Shader, name, GetFullFilePath(filePath))
 }
 
 
@@ -39,7 +36,7 @@ std::shared_ptr<Shader> Shader::Create(const std::string &name,
  */
 std::shared_ptr<Shader> Shader::Create(const std::filesystem::path &filePath)
 {
-    CREATE_RENDERER_OBJECT(Shader, filePath)
+    CREATE_RENDERER_OBJECT(Shader, GetFullFilePath(filePath))
 }
 
 /**

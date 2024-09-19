@@ -1,5 +1,5 @@
 // Input vertex attributes
-layout (location = 0) in vec4 a_Position;       // Vertex position in object space
+layout (location = 0) in vec4 a_Position;       // Vertex position in model space
 layout (location = 1) in vec2 a_TextureCoord;   // Texture coordinates
 
 // Uniform buffer block containing transformation matrices

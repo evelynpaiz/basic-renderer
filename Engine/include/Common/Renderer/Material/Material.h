@@ -4,29 +4,6 @@
 #include "Common/Renderer/Shader/Shader.h"
 #include "Common/Renderer/Texture/Texture.h"
 
-namespace utils { namespace Texturing {
-
-/**
- * Set a texture map in the shader program.
- * 
- * @param shader The shader program to set the properties for.
- * @param texture The texture map.
- * @param name The uniform name.
- * @param slot The texture slot.
- */
-inline void SetTextureMap(const std::shared_ptr<Shader>& shader, const std::string& name,
-                          const std::shared_ptr<Texture>& texture, unsigned int slot)
-{
-    if(!texture)
-        return;
-
-    texture->BindToTextureUnit(slot);
-    shader->SetInt(name, slot);
-}
-
-} // namespace Texturing
-} // namespace utils
-
 /**
  * @brief Flags representing properties of a material.
  */

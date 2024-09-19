@@ -14,6 +14,38 @@ enum class ShaderType
 };
 
 /**
+ * Represents a texture element used in a shader.
+ */
+struct TextureElement
+{
+    ///< Binding index for the texture in the shader.
+    int32_t Index = -1;
+    
+    ///< Shader types (vertex, fragment, etc.) that use the texture.
+    std::vector<ShaderType> ShaderTypes;
+    
+    // Constructor(s)/Destructor
+    // ----------------------------------------
+    ///@brief Create a texture element.
+    TextureElement() = default;
+    ///@brief Create a texture element with a defined index.
+    TextureElement(const int32_t index) : Index(index) {}
+    ///@brief Delete the texture element.
+    ~TextureElement() = default;
+    
+    // Setter(s)
+    // ----------------------------------------
+    /// @brief Sets the shader type (vertex, fragment, etc.) that use the texture.
+    /// @param type The shader type.
+    void SetShaderType(ShaderType type)
+    {
+        // Add the shader type only if it's not already present
+        if (std::find(ShaderTypes.begin(), ShaderTypes.end(), type) == ShaderTypes.end())
+            ShaderTypes.push_back(type);
+    }
+};
+
+/**
  * Represents a uniform element within a uniform layout.
  *
  * This struct extends `DataElement` to include information specific to uniform variables,

@@ -4,6 +4,7 @@
 #include "Common/Renderer/Renderer.h"
 
 #include "Platform/OpenGL/Texture/OpenGLTexture1D.h"
+#include "Platform/Metal/Texture/MetalTexture1D.h"
 
 /**
  * Create a 1D texture based on the active rendering API.
@@ -12,25 +13,7 @@
  */
 std::shared_ptr<Texture1D> Texture1D::Create()
 {
-    switch (Renderer::GetAPI())
-    {
-        case RendererAPI::API::None:
-            CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-            return nullptr;
-            
-        case RendererAPI::API::OpenGL:
-            return std::make_shared<OpenGLTexture1D>();
-        
-/*
-#ifdef __APPLE__
-        case RendererAPI::API::Metal:
-             return std::make_shared<MetalTexture1D>();
-#endif
-*/
-    }
-    
-    CORE_ASSERT(false, "Unknown Renderer API!");
-    return nullptr;
+    CREATE_RENDERER_OBJECT(Texture1D)
 }
 
 /**
@@ -42,25 +25,7 @@ std::shared_ptr<Texture1D> Texture1D::Create()
  */
 std::shared_ptr<Texture1D> Texture1D::Create(const TextureSpecification& spec)
 {
-    switch (Renderer::GetAPI())
-    {
-        case RendererAPI::API::None:
-            CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-            return nullptr;
-            
-        case RendererAPI::API::OpenGL:
-            return std::make_shared<OpenGLTexture1D>(spec);
-        
-/*
-#ifdef __APPLE__
-        case RendererAPI::API::Metal:
-             return std::make_shared<MetalTexture1D>(spec);
-#endif
-*/
-    }
-    
-    CORE_ASSERT(false, "Unknown Renderer API!");
-    return nullptr;
+    CREATE_RENDERER_OBJECT(Texture1D, spec)
 }
 
 /**
@@ -72,25 +37,7 @@ std::shared_ptr<Texture1D> Texture1D::Create(const TextureSpecification& spec)
  */
 std::shared_ptr<Texture1D> Texture1D::CreateFromData(const void *data)
 {
-    switch (Renderer::GetAPI())
-    {
-        case RendererAPI::API::None:
-            CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-            return nullptr;
-            
-        case RendererAPI::API::OpenGL:
-            return std::make_shared<OpenGLTexture1D>(data);
-        
-/*
-#ifdef __APPLE__
-        case RendererAPI::API::Metal:
-             return std::make_shared<MetalTexture1D>(data);
-#endif
-*/
-    }
-    
-    CORE_ASSERT(false, "Unknown Renderer API!");
-    return nullptr;
+    CREATE_RENDERER_OBJECT(Texture1D, data)
 }
 
 /**
@@ -104,23 +51,5 @@ std::shared_ptr<Texture1D> Texture1D::CreateFromData(const void *data)
 std::shared_ptr<Texture1D> Texture1D::CreateFromData(const void *data,
                                                      const TextureSpecification& spec)
 {
-    switch (Renderer::GetAPI())
-    {
-        case RendererAPI::API::None:
-            CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-            return nullptr;
-            
-        case RendererAPI::API::OpenGL:
-            return std::make_shared<OpenGLTexture1D>(data, spec);
-        
-/*
-#ifdef __APPLE__
-        case RendererAPI::API::Metal:
-             return std::make_shared<MetalTexture1D>(dataspec);
-#endif
-*/
-    }
-    
-    CORE_ASSERT(false, "Unknown Renderer API!");
-    return nullptr;
+    CREATE_RENDERER_OBJECT(Texture1D, data, spec)
 }

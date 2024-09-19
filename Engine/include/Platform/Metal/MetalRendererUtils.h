@@ -39,13 +39,13 @@ inline MTLVertexFormat ToMetalFormat(DataType dataType)
 }
 
 /**
- * Convert an OpenGL type to its corresponding data type.
+ * Convert a Metal data type to its corresponding data type.
  *
- * @param glType The OpenGL data type.
+ * @param mtlTyme The Metal data type.
  *
  * @return The corresponding DataType.
  *
- * @note If the input glType value is not recognized, the function will assert with an error.
+ * @note If the input mtlType value is not recognized, the function will assert with an error.
  */
 inline DataType ToDataType(MTLDataType mtlType)
 {
@@ -61,7 +61,7 @@ inline DataType ToDataType(MTLDataType mtlType)
         case MTLDataTypeFloat4x4:   return DataType::Mat4;
     }
     
-    CORE_ASSERT(false, "Unknown Metal data type!");
+    CORE_ASSERT(false, "Unknown (or unsupported) Metal data type!");
     return DataType::None;
 }
 

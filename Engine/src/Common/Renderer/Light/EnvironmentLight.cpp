@@ -140,14 +140,13 @@ void EnvironmentLight::DefineLightProperties(const std::shared_ptr<Shader> &shad
     if (GetEnvironmentMap())
     {
         // Set the irradiance map uniform to the environment's irradiance map
-        utils::Texturing::SetTextureMap(shader, "u_Environment.IrradianceMap",
-                                        GetIrradianceMap(), slot++);
+        shader->SetTexture("u_Environment.IrradianceMap", GetIrradianceMap(), slot++);
     }
     else
     {
         // Set the irradiance map uniform to a white texture cube
-        utils::Texturing::SetTextureMap(shader, "u_Environment.IrradianceMap",
-                                        utils::textures::WhiteTextureCube(), slot++);
+        shader->SetTexture("u_Environment.IrradianceMap",
+                           utils::textures::WhiteTextureCube(), slot++);
     }
 }
 

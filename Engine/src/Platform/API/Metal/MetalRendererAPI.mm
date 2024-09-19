@@ -1,7 +1,6 @@
 #include "enginepch.h"
 #include "Platform/Metal/MetalRendererAPI.h"
 
-#include "Platform/Metal/MetalContext.h"
 #include "Platform/Metal/MetalRendererUtils.h"
 
 #include "Platform/Metal/Drawable/MetalDrawable.h"
@@ -16,7 +15,12 @@
  * This method handles the Metal-specific initialization procedures.
  */
 void MetalRendererAPI::Init()
-{}
+{
+    // Get the Metal graphics context and save it
+    MetalContext& context = dynamic_cast<MetalContext&>(GraphicsContext::Get());
+    CORE_ASSERT(&context, "Graphics context is not Metal!");
+    m_Context = &context;
+}
 
 /**
  * Clear the buffers to preset values.
@@ -36,22 +40,15 @@ void MetalRendererAPI::Clear(const BufferState& buffersActive)
  */
 void MetalRendererAPI::Clear(const glm::vec4& color, const BufferState& buffersActive)
 {
-    // Get the Metal graphics context
-    MetalContext* context = dynamic_cast<MetalContext*>(&GraphicsContext::Get());
-    CORE_ASSERT(context, "Graphic context is not Metal!");
-    
     // Clear the buffer with the selected color
-    context->Clear(color);
+    m_Context->Clear(color);
 }
 
 void MetalRendererAPI::Draw(const std::shared_ptr<Drawable>& drawable,
                             const PrimitiveType &primitive)
 {
-    // Get the Metal graphics context
-    MetalContext* context = dynamic_cast<MetalContext*>(&GraphicsContext::Get());
-    CORE_ASSERT(context, "Graphic context is not Metal!");
     // Get the command encoder to encode rendering commands into the buffer
-    id<MTLRenderCommandEncoder> encoder = reinterpret_cast<id<MTLRenderCommandEncoder>>(context->GetEncoder());
+    id<MTLRenderCommandEncoder> encoder = reinterpret_cast<id<MTLRenderCommandEncoder>>(m_Context->GetEncoder());
     
     // Bind the drawable object
     drawable->Bind();

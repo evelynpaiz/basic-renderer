@@ -30,6 +30,8 @@ public:
     void* GetDevice() const;
     void* GetEncoder() const;
     
+    void* GetResourceQueue() const;
+    
     // Setter(s)
     // ----------------------------------------
     static void SetWindowHints();

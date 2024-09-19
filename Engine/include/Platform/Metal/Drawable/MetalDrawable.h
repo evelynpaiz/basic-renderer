@@ -2,6 +2,8 @@
 
 #include "Common/Renderer/Drawable/Drawable.h"
 
+#include "Platform/Metal/MetalContext.h"
+
 /**
  * Represents a drawable object designed for rendering using Apple's Metal framework.
  *
@@ -15,9 +17,6 @@
  */
 class MetalDrawable : public Drawable
 {
-public:
-    struct DrawableState;
-    
 public:
     // Constructor(s)/Destructor
     // ----------------------------------------
@@ -72,7 +71,11 @@ private:
     // ----------------------------------------
 private:
     ///< Holds the core Metal drawable object to render a geometry.
+    struct DrawableState;
     std::shared_ptr<DrawableState> m_State;
+    
+    ///< Metal context.
+    MetalContext* m_Context;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

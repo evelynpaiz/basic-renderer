@@ -37,6 +37,12 @@ void Simple::OnAttach()
     plane->SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
     plane->SetMaterial(material);
     m_Models.Add("Plane", plane);
+    
+    auto texture1 = utils::textures::WhiteTexture2D();
+    auto texture2 = utils::textures::EmptyTexture2D();
+    auto texture3 = Texture2D::CreateFromFile("Resources/textures/diffuse.jpeg");
+    
+    material->SetTextureMap(texture1);
 }
 
 /**
@@ -50,9 +56,9 @@ void Simple::OnUpdate(Timestep ts)
     std::shared_ptr<SimpleTextureMaterial> simpleMaterial =
         std::dynamic_pointer_cast<SimpleTextureMaterial>(material);
     
-    auto texture1 = Texture2D::CreateFromFile("Resources/textures/diffuse.jpeg");
-    auto texture2 = Texture2D::CreateFromFile("Resources/textures/specular.jpeg");
-    auto texture3 = utils::textures::WhiteTexture2D();
+    //auto texture1 = Texture2D::CreateFromFile("Resources/textures/diffuse.jpeg");
+    //auto texture2 = Texture2D::CreateFromFile("Resources/textures/specular.jpeg");
+    //auto texture3 = utils::textures::WhiteTexture2D();
     
     // Reset rendering statistics
     Renderer::ResetStats();
@@ -62,7 +68,8 @@ void Simple::OnUpdate(Timestep ts)
     
     // Render
     Renderer::BeginScene(m_Camera);
-    simpleMaterial->SetTextureMap(texture1);
+    //simpleMaterial->SetColor(glm::vec4(0.3f, 0.8f, 0.2f, 1.0f));
+    //simpleMaterial->SetTextureMap(texture1);
     m_Models.Get("Plane")->DrawModel();
     //simpleMaterial->SetTextureMap(texture2);
     //m_Models.Get("Cube")->DrawModel();

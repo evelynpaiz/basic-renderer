@@ -34,8 +34,8 @@ void OcclusionMaterial::SetMaterialProperties()
     m_Shader->SetMat4("u_ViewProjection", m_View->GetProjectionMatrix());
     m_Shader->SetMat4("u_InvViewProjection", glm::inverse(m_View->GetProjectionMatrix()));
     
-    utils::Texturing::SetTextureMap(m_Shader, "u_Material.DepthMap", m_DepthTexture, m_Slot++);
-    utils::Texturing::SetTextureMap(m_Shader, "u_Material.NoiseMap", m_NoiseTexture, m_Slot++);
+    m_Shader->SetTexture("u_Material.DepthMap", m_DepthTexture, m_Slot++);
+    m_Shader->SetTexture("u_Material.NoiseMap", m_NoiseTexture, m_Slot++);
     
     m_Shader->SetInt("u_Material.SampleCount", m_SampleCount);
     for (unsigned int i = 0; i < m_SampleCount; ++i)

@@ -101,7 +101,7 @@ protected:
     void SetProperties(const std::shared_ptr<Shader>& shader,
                        const std::string& name, unsigned int& slot)
     {
-        utils::Texturing::SetTextureMap(shader, name, m_Texture, slot++);
+        shader->SetTexture(name, m_Texture, slot++);
     }
     
     // Flat texture variables
@@ -172,7 +172,7 @@ public:
     /// @brief Generate a basic material object with the specified shader file path.
     /// @param filePath The file path to the shader used by the material.
     SimpleTextureMaterial(const std::filesystem::path& filePath =
-                  std::filesystem::path("Resources/shaders/base/SimpleTexture.glsl"))
+                  std::filesystem::path("Resources/shaders/base/SimpleTexture"))
         : Material(filePath), FlatTexture()
     {}
     /// @brief Destructor for the basic material.

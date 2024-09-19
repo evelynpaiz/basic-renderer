@@ -4,6 +4,7 @@
 #include "Common/Renderer/Renderer.h"
 
 #include "Platform/OpenGL/Texture/OpenGLTextureCube.h"
+#include "Platform/Metal/Texture/MetalTextureCube.h"
 
 #include <stb_image.h>
 
@@ -14,25 +15,7 @@
  */
 std::shared_ptr<TextureCube> TextureCube::Create()
 {
-    switch (Renderer::GetAPI())
-    {
-        case RendererAPI::API::None:
-            CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-            return nullptr;
-            
-        case RendererAPI::API::OpenGL:
-            return std::make_shared<OpenGLTextureCube>();
-        
-/*
-#ifdef __APPLE__
-        case RendererAPI::API::Metal:
-             return std::make_shared<MetalTexture1D>();
-#endif
-*/
-    }
-    
-    CORE_ASSERT(false, "Unknown Renderer API!");
-    return nullptr;
+    CREATE_RENDERER_OBJECT(TextureCube)
 }
 
 /**
@@ -44,25 +27,7 @@ std::shared_ptr<TextureCube> TextureCube::Create()
  */
 std::shared_ptr<TextureCube> TextureCube::Create(const TextureSpecification& spec)
 {
-    switch (Renderer::GetAPI())
-    {
-        case RendererAPI::API::None:
-            CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-            return nullptr;
-            
-        case RendererAPI::API::OpenGL:
-            return std::make_shared<OpenGLTextureCube>(spec);
-        
-/*
-#ifdef __APPLE__
-        case RendererAPI::API::Metal:
-             return std::make_shared<MetalTexture1D>(spec);
-#endif
-*/
-    }
-    
-    CORE_ASSERT(false, "Unknown Renderer API!");
-    return nullptr;
+    CREATE_RENDERER_OBJECT(TextureCube, spec)
 }
 
 /**
@@ -74,25 +39,7 @@ std::shared_ptr<TextureCube> TextureCube::Create(const TextureSpecification& spe
  */
 std::shared_ptr<TextureCube> TextureCube::CreateFromData(const void *data)
 {
-    switch (Renderer::GetAPI())
-    {
-        case RendererAPI::API::None:
-            CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-            return nullptr;
-            
-        case RendererAPI::API::OpenGL:
-            return std::make_shared<OpenGLTextureCube>(data);
-        
-/*
-#ifdef __APPLE__
-        case RendererAPI::API::Metal:
-             return std::make_shared<MetalTexture1D>(data);
-#endif
-*/
-    }
-    
-    CORE_ASSERT(false, "Unknown Renderer API!");
-    return nullptr;
+    CREATE_RENDERER_OBJECT(TextureCube, data)
 }
 
 /**
@@ -104,25 +51,7 @@ std::shared_ptr<TextureCube> TextureCube::CreateFromData(const void *data)
  */
 std::shared_ptr<TextureCube> TextureCube::CreateFromData(const std::vector<const void *>& data)
 {
-    switch (Renderer::GetAPI())
-    {
-        case RendererAPI::API::None:
-            CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-            return nullptr;
-            
-        case RendererAPI::API::OpenGL:
-            return std::make_shared<OpenGLTextureCube>(data);
-        
-/*
-#ifdef __APPLE__
-        case RendererAPI::API::Metal:
-             return std::make_shared<MetalTexture1D>(data);
-#endif
-*/
-    }
-    
-    CORE_ASSERT(false, "Unknown Renderer API!");
-    return nullptr;
+    CREATE_RENDERER_OBJECT(TextureCube, data)
 }
 
 /**
@@ -136,25 +65,7 @@ std::shared_ptr<TextureCube> TextureCube::CreateFromData(const std::vector<const
 std::shared_ptr<TextureCube> TextureCube::CreateFromData(const void *data,
                                                          const TextureSpecification& spec)
 {
-    switch (Renderer::GetAPI())
-    {
-        case RendererAPI::API::None:
-            CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-            return nullptr;
-            
-        case RendererAPI::API::OpenGL:
-            return std::make_shared<OpenGLTextureCube>(data, spec);
-        
-/*
-#ifdef __APPLE__
-        case RendererAPI::API::Metal:
-             return std::make_shared<MetalTexture1D>(dataspec);
-#endif
-*/
-    }
-    
-    CORE_ASSERT(false, "Unknown Renderer API!");
-    return nullptr;
+    CREATE_RENDERER_OBJECT(TextureCube, data, spec)
 }
 
 /**
@@ -168,25 +79,7 @@ std::shared_ptr<TextureCube> TextureCube::CreateFromData(const void *data,
 std::shared_ptr<TextureCube> TextureCube::CreateFromData(const std::vector<const void *>& data,
                                                          const TextureSpecification& spec)
 {
-    switch (Renderer::GetAPI())
-    {
-        case RendererAPI::API::None:
-            CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-            return nullptr;
-            
-        case RendererAPI::API::OpenGL:
-            return std::make_shared<OpenGLTextureCube>(data, spec);
-        
-/*
-#ifdef __APPLE__
-        case RendererAPI::API::Metal:
-             return std::make_shared<MetalTexture1D>(dataspec);
-#endif
-*/
-    }
-    
-    CORE_ASSERT(false, "Unknown Renderer API!");
-    return nullptr;
+    CREATE_RENDERER_OBJECT(TextureCube, data, spec)
 }
 
 /**
@@ -201,25 +94,7 @@ std::shared_ptr<TextureCube> TextureCube::CreateFromData(const std::vector<const
 std::shared_ptr<TextureCube> TextureCube::CreateFromFile(const std::filesystem::path& directory,
                                                          const std::vector<std::string>& files, bool flip)
 {
-    switch (Renderer::GetAPI())
-    {
-        case RendererAPI::API::None:
-            CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-            return nullptr;
-            
-        case RendererAPI::API::OpenGL:
-            return std::make_shared<OpenGLTextureCube>(directory, files, flip);
-        
-/*
-#ifdef __APPLE__
-        case RendererAPI::API::Metal:
-             return std::make_shared<MetalTexture1D>(dataspec);
-#endif
-*/
-    }
-    
-    CORE_ASSERT(false, "Unknown Renderer API!");
-    return nullptr;
+    CREATE_RENDERER_OBJECT(TextureCube, directory, files, flip)
 }
 
 /**
@@ -235,25 +110,7 @@ std::shared_ptr<TextureCube> TextureCube::CreateFromFile(const std::filesystem::
                                                          const std::vector<std::string>& files,
                                                          const TextureSpecification& spec, bool flip)
 {
-    switch (Renderer::GetAPI())
-    {
-        case RendererAPI::API::None:
-            CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-            return nullptr;
-            
-        case RendererAPI::API::OpenGL:
-            return std::make_shared<OpenGLTextureCube>(directory, files, spec, flip);
-        
-/*
-#ifdef __APPLE__
-        case RendererAPI::API::Metal:
-             return std::make_shared<MetalTexture1D>(dataspec);
-#endif
-*/
-    }
-    
-    CORE_ASSERT(false, "Unknown Renderer API!");
-    return nullptr;
+    CREATE_RENDERER_OBJECT(TextureCube, directory, files, spec, flip)
 }
 
 /**

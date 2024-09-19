@@ -3,6 +3,17 @@
 #include "Common/Renderer/Texture/TextureCube.h"
 #include "Platform/OpenGL/Texture/OpenGLTexture.h"
 
+/**
+ * Concrete implementation of a cubemap texture for OpenGL.
+ *
+ * The `OpenGLTextureCube` class specializes the `TextureCube` class to provide
+ * a concrete implementation using the OpenGL API. It handles the creation, binding,
+ * unbinding, and resource management of cubemap texture data within an
+ * OpenGL context.
+ *
+ * @note Copying and moving `OpenGLTextureCube` objects is disabled to prevent
+ * unintended resource ownership issues.
+ */
 class OpenGLTextureCube : public TextureCube
 {
 public:

@@ -90,6 +90,7 @@ enum class TextureFilter
  * Utility functions related to texture operations.
  */
 namespace utils { namespace textures {
+
 /**
  * Define the number of channels in the texture based on its format.
  *
@@ -99,7 +100,7 @@ namespace utils { namespace textures {
  *
  * @note If the input format is not recognized, the function will assert with an error.
  */
-inline int GetChannelCount(TextureFormat format)
+inline unsigned int GetChannelCount(TextureFormat format)
 {
     switch (format)
     {
@@ -126,6 +127,56 @@ inline int GetChannelCount(TextureFormat format)
         case TextureFormat::DEPTH32:
         case TextureFormat::DEPTH32F:
         case TextureFormat::DEPTH24STENCIL8: return 0;
+    }
+    
+    CORE_ASSERT(false, "Unknown (or unsupported) texture format!");
+    return 0;
+}
+
+/**
+ * Define the number of bytes (per channel) in the texture based on its format.
+ *
+ * @param format The texture format.
+ *
+ * @return Bytes (per pixel) number.
+ *
+ * @note If the input format is not recognized, the function will assert with an error.
+ */
+inline unsigned int GetBytesPerChannel(TextureFormat format)
+{
+    switch (format) 
+    {
+        case TextureFormat::None:
+            return 0;
+            
+        case TextureFormat::R8:
+        case TextureFormat::RG8:
+        case TextureFormat::RGB8:
+        case TextureFormat::RGBA8:
+        
+        case TextureFormat::R8UI:
+        case TextureFormat::RG8UI:
+        case TextureFormat::RGB8UI:
+        case TextureFormat::RGBA8UI:
+            return 1;  // Each channel (R, G, B) is 1 byte
+
+        case TextureFormat::R16F:
+        case TextureFormat::RGB16F:
+        case TextureFormat::RGBA16F:
+            return 2; // Each channel (R, G, B) is 2 bytes
+            
+        case TextureFormat::RGB32F:
+        case TextureFormat::RGBA32F:
+            return 4; // Each channel (R, G, B) is 4 bytes
+            
+        case TextureFormat::DEPTH16:
+            return 2;
+        case TextureFormat::DEPTH24:
+        case TextureFormat::DEPTH24STENCIL8:
+            return 3;
+        case TextureFormat::DEPTH32:
+        case TextureFormat::DEPTH32F:
+            return 4;
     }
     
     CORE_ASSERT(false, "Unknown (or unsupported) texture format!");
@@ -168,6 +219,51 @@ inline bool IsDepthFormat(TextureFormat format)
         case TextureFormat::RG8UI:
         case TextureFormat::RGB8UI:
         case TextureFormat::RGBA8UI: return false;
+    }
+    
+    CORE_ASSERT(false, "Unknown (or unsupported) texture format!");
+    return false;
+}
+
+/**
+ * Verify if a texture format can be represented as RGB format.
+ *
+ * @param format The texture format.
+ *
+ * @return Wheter the format is a RGB format.
+ *
+ * @note If the input format is not recognized, the function will assert with an error.
+ */
+inline bool IsRGBFormat(TextureFormat format)
+{
+    switch (format)
+    {
+        case TextureFormat::RGB8:
+        case TextureFormat::RGB16F:
+        case TextureFormat::RGB32F: 
+        case TextureFormat::RGB8UI:     return true;
+            
+        case TextureFormat::None:
+        case TextureFormat::R8:
+        case TextureFormat::RG8:
+        
+        case TextureFormat::RGBA8:
+            
+        case TextureFormat::R16F:
+        
+        case TextureFormat::RGBA16F:
+            
+        case TextureFormat::RGBA32F:
+            
+        case TextureFormat::R8UI:
+        case TextureFormat::RG8UI:
+        case TextureFormat::RGBA8UI:
+            
+        case TextureFormat::DEPTH24STENCIL8:
+        case TextureFormat::DEPTH32F:
+        case TextureFormat::DEPTH32:
+        case TextureFormat::DEPTH24:
+        case TextureFormat::DEPTH16:    return false;
     }
     
     CORE_ASSERT(false, "Unknown (or unsupported) texture format!");

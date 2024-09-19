@@ -3,6 +3,8 @@
 #include "Common/Renderer/Buffer/Buffer.h"
 #include "Common/Renderer/Shader/Uniform.h"
 
+#include "Common/Renderer/Texture/Texture.h"
+
 #include <glm/glm.hpp>
 
 /**
@@ -51,6 +53,10 @@ public:
     virtual void SetMat2(const std::string& name, const glm::mat2& value) = 0;
     virtual void SetMat3(const std::string& name, const glm::mat3& value) = 0;
     virtual void SetMat4(const std::string& name, const glm::mat4& value) = 0;
+    
+    virtual void SetTexture(const std::string &name, 
+                            const std::shared_ptr<Texture>& texture,
+                            int slot) = 0;
     
     // Parsing
     // ----------------------------------------
