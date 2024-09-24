@@ -27,6 +27,8 @@ private:
     std::shared_ptr<PerspectiveCamera> m_Camera;
     ///< Set of objects in the scene.
     ModelLibrary m_Models;
+    ///< Light sources in the scene.
+    LightLibrary m_Lights;
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

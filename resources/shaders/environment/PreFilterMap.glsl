@@ -2,7 +2,7 @@
 #version 330 core
 
 // Include transformation matrices
-#include "Resources/shaders/common/matrix/SimpleMatrix.glsl"
+#include "Resources/shaders/shared/structure/matrix/SimpleMatrix.glsl"
 
 // Input vertex attributes
 layout (location = 0) in vec4 a_Position;   ///< Vertex position in object space

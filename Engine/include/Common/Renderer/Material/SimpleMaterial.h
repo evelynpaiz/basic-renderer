@@ -214,7 +214,7 @@ public:
     /// @brief Generate a basic material object with the specified shader file path.
     /// @param filePath The file path to the shader used by the material.
     SimpleMaterial(const std::filesystem::path& filePath =
-                  std::filesystem::path("Resources/shaders/base/SimpleColorTexture.glsl"))
+                  std::filesystem::path("Resources/shaders/base/SimpleColorTexture"))
         : Material(filePath), FlatColor(), FlatTexture()
     {}
     /// @brief Destructor for the basic material.

@@ -2,34 +2,16 @@
 #version 330 core
 
 // Include transformation matrices
-#include "Resources/shaders/common/matrix/SimpleMatrix.glsl"
+#include "Resources/shaders/shared/structure/matrix/SimpleMatrix.glsl"
 
-// Input vertex attributes
-layout (location = 0) in vec4 a_Position;   ///< Vertex position in object space
-
-// Uniform buffer block containing transformation matrices
-uniform Transform u_Transform;
-
-// Outputs to fragment shader
-out vec3 v_Position;                        ///< Vertex position in object space
-
-// Entry point of the vertex shader
-void main()
-{
-    // Transform the vertex position and normal from object space to world space
-    vec4 worldPosition = u_Transform.Model * a_Position;
-    v_Position = worldPosition.xyz;
-    
-
-    // Calculate the final position of the vertex in clip space
-    gl_Position = u_Transform.Projection * u_Transform.View * worldPosition;
-}
+// Include vertex shader
+#include "Resources/shaders/shared/chunk/vertex/Pos.vs.glsl"
 
 #shader fragment
 #version 330 core
 
 // Include material properties
-#include "Resources/shaders/common/material/TextureMaterial.glsl"
+#include "Resources/shaders/shared/structure/material/TextureMaterial.glsl"
 
 // Specify the output color of the fragment shader
 layout (location = 0) out vec4 color;

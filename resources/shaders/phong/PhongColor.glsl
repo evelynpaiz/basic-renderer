@@ -2,26 +2,26 @@
 #version 330 core
 
 // Include transformation matrices
-#include "Resources/shaders/common/matrix/NormalMatrix.glsl"
+#include "Resources/shaders/shared/structure/matrix/NormalMatrix.glsl"
 
 // Include vertex shader
-#include "Resources/shaders/common/vertex/PN.vs.glsl"
+#include "Resources/shaders/shared/chunk/vertex/PosNorm.vs.glsl"
 
 #shader fragment
 #version 330 core
 
 // Include material, view and light properties
-#include "Resources/shaders/common/material/PhongColorMaterial.glsl"
-#include "Resources/shaders/common/view/SimpleView.glsl"
-#include "Resources/shaders/common/light/SimpleLight.glsl"
-#include "Resources/shaders/common/light/EnvironmentLight.glsl"
+#include "Resources/shaders/shared/structure/material/PhongColorMaterial.glsl"
+#include "Resources/shaders/shared/structure/view/SimpleView.glsl"
+#include "Resources/shaders/shared/structure/light/SimpleLight.glsl"
+#include "Resources/shaders/shared/structure/light/EnvironmentLight.glsl"
 
 // Include fragment inputs
-#include "Resources/shaders/common/fragment/PN.fs.glsl"
+#include "Resources/shaders/shared/chunk/fragment/PosNorm.fs.glsl"
 
 // Include additional functions
-#include "Resources/shaders/common/utils/Saturate.glsl"
-#include "Resources/shaders/common/utils/Attenuation.glsl"
+#include "Resources/shaders/shared/utils/Saturate.glsl"
+#include "Resources/shaders/shared/utils/Attenuation.glsl"
 
 #include "Resources/shaders/phong/chunks/PhongSpecular.glsl"
 #include "Resources/shaders/phong/chunks/Phong.glsl"

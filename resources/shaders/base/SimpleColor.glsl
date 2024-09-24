@@ -5,7 +5,7 @@
 #include "Resources/shaders/shared/structure/matrix/SimpleMatrix.glsl"
 
 // Include vertex shader
-#include "Resources/shaders/shared/chunk/vertex/Pos.vs.glsl"
+#include "Resources/shaders/shared/chunk/vertex/Base.vs.glsl"
 
 #shader fragment
 #version 330 core

@@ -70,7 +70,7 @@ protected:
         // Define the depth material if it has not been define yet
         auto& library = Renderer::GetMaterialLibrary();
         if (!library.Exists("Depth"))
-            library.Create<Material>("Depth", "Resources/shaders/depth/DepthMap.glsl");
+            library.Create<Material>("Depth", "Resources/shaders/depth/DepthMap");
     }
     
     // Light variables

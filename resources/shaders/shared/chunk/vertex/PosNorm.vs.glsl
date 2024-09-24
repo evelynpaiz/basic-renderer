@@ -16,9 +16,8 @@ void main()
     vec4 worldPosition = u_Transform.Model * a_Position;
     vec3 worldNormal = normalize(u_Transform.Normal * a_Normal);
 
-    // Perspective divide to get vertex position in normalized device coordinates
-    v_Position = worldPosition.xyz / worldPosition.w;
-
+    // Pass the world position to the fragment shader
+    v_Position = worldPosition.xyz;
     // Pass the transformed normal to the fragment shader
     v_Normal = worldNormal;
 

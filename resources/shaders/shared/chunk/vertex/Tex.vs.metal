@@ -13,7 +13,7 @@ struct VertexIn
  */
 struct VertexOut
 {
-    float4 v_Position [[position]];
+    float4 Position [[position]];
     float2 v_TextureCoord;
 };
 
@@ -27,7 +27,7 @@ vertex VertexOut vertex_main(const VertexIn in [[ stage_in ]],
     
     // Pass the input attributes to the fragment shader
     VertexOut out {
-        .v_Position = position,
+        .Position = position,
         .v_TextureCoord = in.a_TextureCoord
     };
     return out;

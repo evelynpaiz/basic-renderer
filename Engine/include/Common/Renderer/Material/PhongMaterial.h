@@ -231,7 +231,7 @@ public:
     /// @param light The light source to be used for shading.
     /// @param filePath The file path to the shader used by the material.
     PhongColorMaterial(const std::filesystem::path& filePath =
-                       std::filesystem::path("Resources/shaders/phong/PhongColor.glsl"))
+                       std::filesystem::path("Resources/shaders/phong/PhongColor"))
         : LightedMaterial(filePath), PhongColor()
     {
         // Update material flags

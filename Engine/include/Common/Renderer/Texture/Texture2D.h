@@ -142,8 +142,13 @@ inline std::shared_ptr<Texture2D> EmptyTexture2D()
     if (texture)
         return texture;
     
+    // Define a basic filtering
+    TextureSpecification spec;
+    spec.Filter = TextureFilter::Nearest;
+    
     // Create the empty texture using a ccheckerboard pattern
-    texture = Texture2D::CreateFromFile("resources/common/checkerboard.png");
+    texture = Texture2D::CreateFromFile("resources/common/checkerboard.png",
+                                        spec);
     
     // Return the created texture
     return texture;

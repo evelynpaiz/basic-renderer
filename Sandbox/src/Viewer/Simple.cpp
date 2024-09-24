@@ -15,6 +15,18 @@ Simple::Simple(int width, int height)
     // Define the rendering camera
     m_Camera = std::make_shared<PerspectiveCamera>(width, height);
     m_Camera->SetPosition(glm::vec3(0.0f, 0.0f, 10.0f));
+    
+    // Define light sources
+    /*
+     m_Lights.Create<EnvironmentLight>("Environment", width, height);
+     
+    auto directional = std::make_shared<DirectionalLight>(width, height,
+                                                          glm::vec3(1.0f),
+                                                          glm::vec3(0.0f, 0.0f, -1.0f));
+    directional->SetDiffuseStrength(0.6f);
+    directional->SetSpecularStrength(0.4f);
+    m_Lights.Add("Directional", directional);
+     */
 }
 
 /**
@@ -24,25 +36,26 @@ void Simple::OnAttach()
 {
     // Define the models
     auto& materialLibrary = Renderer::GetMaterialLibrary();
-    auto material = materialLibrary.Create<SimpleTextureMaterial>("SimpleColor");
+    auto simple = materialLibrary.Create<SimpleMaterial>("Simple");
+    //auto phong = materialLibrary.Create<PhongColorMaterial>("Phong");
     
     auto cube = utils::Geometry::ModelCube<GeoVertexData<glm::vec4, glm::vec2>>();
     cube->SetScale(glm::vec3(2.0f));
-    cube->SetMaterial(material);
+    cube->SetMaterial(simple);
     m_Models.Add("Cube", cube);
     
     auto plane = utils::Geometry::ModelPlane<GeoVertexData<glm::vec4, glm::vec2>>();
     plane->SetPosition(glm::vec3(0.0f, -1.5f, 0.0f));
     plane->SetScale(glm::vec3(10.0f));
     plane->SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
-    plane->SetMaterial(material);
+    plane->SetMaterial(simple);
     m_Models.Add("Plane", plane);
     
-    auto texture1 = utils::textures::WhiteTexture2D();
-    auto texture2 = utils::textures::EmptyTexture2D();
-    auto texture3 = Texture2D::CreateFromFile("Resources/textures/diffuse.jpeg");
+    //auto texture = Texture2D::CreateFromFile("Resources/textures/diffuse.jpeg");
+    auto texture = utils::textures::WhiteTexture2D();
+    simple->SetTextureMap(texture);
     
-    material->SetTextureMap(texture1);
+    //phong->DefineLightProperties(m_Lights);
 }
 
 /**
@@ -52,13 +65,9 @@ void Simple::OnAttach()
  */
 void Simple::OnUpdate(Timestep ts)
 {
-    auto& material = Renderer::GetMaterialLibrary().Get("SimpleColor");
-    std::shared_ptr<SimpleTextureMaterial> simpleMaterial =
-        std::dynamic_pointer_cast<SimpleTextureMaterial>(material);
-    
-    //auto texture1 = Texture2D::CreateFromFile("Resources/textures/diffuse.jpeg");
-    //auto texture2 = Texture2D::CreateFromFile("Resources/textures/specular.jpeg");
-    //auto texture3 = utils::textures::WhiteTexture2D();
+    auto& material = Renderer::GetMaterialLibrary().Get("Simple");
+    std::shared_ptr<SimpleMaterial> simpleMaterial =
+        std::dynamic_pointer_cast<SimpleMaterial>(material);
     
     // Reset rendering statistics
     Renderer::ResetStats();
@@ -68,7 +77,7 @@ void Simple::OnUpdate(Timestep ts)
     
     // Render
     Renderer::BeginScene(m_Camera);
-    //simpleMaterial->SetColor(glm::vec4(0.3f, 0.8f, 0.2f, 1.0f));
+    simpleMaterial->SetColor(glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
     //simpleMaterial->SetTextureMap(texture1);
     m_Models.Get("Plane")->DrawModel();
     //simpleMaterial->SetTextureMap(texture2);
