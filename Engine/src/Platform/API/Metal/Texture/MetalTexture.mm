@@ -104,7 +104,6 @@ void MetalTexture::MTLCreateTexture(const void *data,
              bytesPerRow:stride
              bytesPerImage:imageSize];
     
-
     // Free the allocated memory if conversion took place
     if (uploadData != data)
         free(const_cast<void*>(uploadData));

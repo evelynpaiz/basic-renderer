@@ -9,9 +9,8 @@
  * Create a cube texture with no data defined.
  */
 OpenGLTextureCube::OpenGLTextureCube()
-    : TextureCube()
+    : TextureCube(), OpenGLTexture()
 {
-    OpenGLTexture::GLCreate(m_ID);
     m_Spec.Type = TextureType::TEXTURECUBE;
 }
 
@@ -21,9 +20,8 @@ OpenGLTextureCube::OpenGLTextureCube()
  * @param spec The texture specifications.
  */
 OpenGLTextureCube::OpenGLTextureCube(const TextureSpecification& spec)
-    : TextureCube(spec)
+    : TextureCube(spec), OpenGLTexture()
 {
-    OpenGLTexture::GLCreate(m_ID);
     m_Spec.Type = TextureType::TEXTURECUBE;
 }
 
@@ -84,9 +82,8 @@ OpenGLTextureCube::OpenGLTextureCube(const std::vector<const void *>& data,
  */
 OpenGLTextureCube::OpenGLTextureCube(const std::filesystem::path& directory,
                                      const std::vector<std::string>& files, bool flip)
-    : TextureCube(directory, files, flip)
+    : TextureCube(directory, files, flip), OpenGLTexture()
 {
-    OpenGLTexture::GLCreate(m_ID);
     m_Spec.Type = TextureType::TEXTURECUBE;
     
     LoadFromFile(directory, files);
@@ -104,9 +101,8 @@ OpenGLTextureCube::OpenGLTextureCube(const std::filesystem::path& directory,
                                    const std::vector<std::string>& files,
                                    const TextureSpecification& spec,
                                    bool flip)
-    : TextureCube(directory, files, spec, flip)
+    : TextureCube(directory, files, spec, flip), OpenGLTexture()
 {
-    OpenGLTexture::GLCreate(m_ID);
     m_Spec.Type = TextureType::TEXTURECUBE;
     
     LoadFromFile(directory, files);

@@ -4,11 +4,8 @@
 
 #include "Common/Renderer/Buffer/Buffer.h"
 
-#include "Common/Renderer/Texture/TextureUtils.h"
 #include "Common/Renderer/Texture/Texture.h"
-
-// TODO: Remove
-#include "Platform/OpenGL/Texture/OpenGLTextureUtils.h"
+#include "Common/Renderer/Texture/TextureUtils.h"
 
 /**
  * Defines the specification for framebuffer attachments.
@@ -91,8 +88,8 @@ class FrameBuffer
 public:
     // Constructor(s)/Destructor
     // ----------------------------------------
-    FrameBuffer(const FrameBufferSpecification& spec);
-    ~FrameBuffer();
+    static std::shared_ptr<FrameBuffer> Create(const FrameBufferSpecification& spec);
+    virtual ~FrameBuffer() = default;
     
     // Getters
     // ----------------------------------------
@@ -117,18 +114,20 @@ public:
     /// @return The state of the color, depth and stencil buffers.
     BufferState GetActiveBuffers() const { return m_ActiveBuffers; }
     
+    virtual std::vector<char> GetAttachmentData(const unsigned int index) = 0;
+    
     // Usage
     // ----------------------------------------
-    void Bind() const;
-    void BindForDrawAttachment(const unsigned int index) const;
-    void BindForReadAttachment(const unsigned int index) const;
-    void BindForDrawAttachmentCube(const unsigned int index, const unsigned int face,
-                                   const unsigned int level = 0) const;
-    void Unbind(const bool& genMipMaps = true) const;
+    virtual void Bind() const = 0;
+    virtual void BindForDrawAttachment(const unsigned int index) const = 0;
+    virtual void BindForReadAttachment(const unsigned int index) const = 0;
+    virtual void BindForDrawAttachmentCube(const unsigned int index, const unsigned int face,
+                                           const unsigned int level = 0) const = 0;
+    virtual void Unbind(const bool& genMipMaps = true) const = 0;
     
     // Draw
     // ----------------------------------------
-    void ClearAttachment(const unsigned int index, const int value);
+    virtual void ClearAttachment(const unsigned int index, const int value) = 0;
     
     // Blit
     // ----------------------------------------
@@ -141,44 +140,6 @@ public:
                                      const unsigned int srcIndex, const unsigned int dstIndex,
                                      const TextureFilter& filter = TextureFilter::Nearest);
     
-    // Getter(s)
-    // ----------------------------------------
-    /// @brief Retrieves pixel data from a color attachment of the framebuffer.
-    /// @param index The index of the color attachment to retrieve data from.
-    /// @return A vector containing the pixel data of the color attachment, with each channel.
-    template <typename T>
-    std::vector<T> GetAttachmentData(const unsigned int index)
-    {
-        auto& format = m_ColorAttachmentsSpec[index].Format;
-        int channels = utils::textures::GetChannelCount(format);
-        
-        // Ensure numChannels is within a valid range
-        if (channels < 1 || channels > 4)
-            CORE_ASSERT(false, "Invalid number of channels in the color attachment!");
-        
-        int stride = channels * m_Spec.Width;
-        channels += (stride % 4) ? (4 - stride % 4) : 0;
-        int bufferSize = stride * (m_Spec.Height > 0 ? m_Spec.Height : 1.0f);
-        std::vector<T> buffer(bufferSize);
-
-        BindForReadAttachment(index);
-        glPixelStorei(GL_PACK_ALIGNMENT, channels);
-        
-        // TODO: Add support for all texture types (currently only supports 1D and 2D).
-        // consider using maybe:
-        //glGetTexImage(m_ColorAttachments[index]->TextureTarget(), 0,
-        //              utils::OpenGL::TextureFormatToOpenGLBaseType(format),
-        //              utils::OpenGL::TextureFormatToOpenGLDataType(format),
-        //              buffer.data());
-        
-        glReadPixels(0, 0, m_Spec.Width, (m_Spec.Height > 0 ? m_Spec.Height : 1.0f),
-                     utils::textures::gl::ToOpenGLBaseFormat(format),
-                     utils::textures::gl::ToOpenGLDataFormat(format),
-                     buffer.data());
-        
-        return buffer;
-    }
-    
     // Reset
     // ----------------------------------------
     void Resize(const unsigned int width, const unsigned int height = 0,
@@ -187,23 +148,25 @@ public:
     
     // Save
     // ----------------------------------------
-    void SaveAttachment(const unsigned int index, const std::filesystem::path& path);
+    virtual void SaveAttachment(const unsigned int index,
+                                const std::filesystem::path& path) = 0;
     
-private:
+protected:
+    // Constructor(s)/Destructor
+    // ----------------------------------------
+    FrameBuffer(const FrameBufferSpecification& spec);
+    
     // Destructor
     // ----------------------------------------
-    void ReleaseFramebuffer();
+    virtual void ReleaseFramebuffer() = 0;
     
     // Reset
     // ----------------------------------------
-    void Invalidate();
+    virtual void Invalidate() = 0;
 
     // Framebuffer variables
     // ----------------------------------------
-private:
-    ///< ID of the framebuffer.
-    unsigned int m_ID = 0;
-    
+protected:
     ///< Depth attachment.
     std::shared_ptr<Texture> m_DepthAttachment;
     ///< Color attachments.
@@ -251,7 +214,7 @@ public:
     std::shared_ptr<FrameBuffer> Create(const std::string& name,
                                         FrameBufferSpecification spec)
     {
-        auto framebuffer = std::make_shared<FrameBuffer>(spec);
+        auto framebuffer = FrameBuffer::Create(spec);
         Add(name, framebuffer);
         return framebuffer;
     }

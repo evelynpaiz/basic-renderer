@@ -280,8 +280,7 @@ inline bool IsRGBFormat(TextureFormat format)
  *
  * @note Ensure to delete[] the allocated memory after use to avoid memory leaks.
  */
-inline void* AllocateTextureBuffer(TextureFormat format,
-                                   unsigned int bufferSize)
+inline void* AllocateTextureData(TextureFormat format, unsigned int size)
 {
     switch (format)
     {
@@ -293,12 +292,12 @@ inline void* AllocateTextureBuffer(TextureFormat format,
         case TextureFormat::R8UI:
         case TextureFormat::RG8UI:
         case TextureFormat::RGB8UI:
-        case TextureFormat::RGBA8UI: return static_cast<void*>(new char[bufferSize]);
+        case TextureFormat::RGBA8UI: return static_cast<void*>(new char[size]);
             
         case TextureFormat::DEPTH16:
         case TextureFormat::DEPTH24:
         case TextureFormat::DEPTH32:
-        case TextureFormat::DEPTH24STENCIL8: return static_cast<void*>(new int[bufferSize]);
+        case TextureFormat::DEPTH24STENCIL8: return static_cast<void*>(new int[size]);
             
         case TextureFormat::R16F:
         case TextureFormat::RGB16F:
@@ -306,7 +305,7 @@ inline void* AllocateTextureBuffer(TextureFormat format,
         
         case TextureFormat::RGB32F:
         case TextureFormat::RGBA32F:
-        case TextureFormat::DEPTH32F: return static_cast<void*>(new float[bufferSize]);
+        case TextureFormat::DEPTH32F: return static_cast<void*>(new float[size]);
     }
     
     CORE_ASSERT(false, "Unknown texture format!");
@@ -321,7 +320,7 @@ inline void* AllocateTextureBuffer(TextureFormat format,
  *
  * @note Ensure to use this function to delete the buffer to avoid memory leaks.
  */
-inline void FreeTextureBuffer(TextureFormat format, void* buffer)
+inline void FreeTextureData(TextureFormat format, void* buffer)
 {
     switch (format)
     {

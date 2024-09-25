@@ -217,7 +217,7 @@ protected:
         spec.AttachmentsSpec = {
             { TextureType::TEXTURE2D, TextureFormat::DEPTH24 }
         };
-        m_Framebuffer = std::make_shared<FrameBuffer>(spec);
+        m_Framebuffer = FrameBuffer::Create(spec);
     }
     
 protected:

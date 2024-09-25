@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Common/Renderer/Texture/Texture.h"
 #include "Common/Renderer/Texture/TextureUtils.h"
 
 /**
@@ -17,22 +18,35 @@ class OpenGLTexture
 public:
     // Texture Creator
     // ----------------------------------------
-    static void GLCreate(uint32_t& ID);
+    void GLCreate();
     // Texture Destructor
     // ----------------------------------------
-    static void GLRelease(uint32_t& ID);
+    void GLRelease();
     
     // Texture Usage
     // ----------------------------------------
-    static void GLBind(uint32_t ID, TextureType type);
-    static void GLBindToTextureUnit(uint32_t ID, TextureType type,
-                                    uint32_t slot);
-    static void GLUnbind(TextureType type);
+    void GLBind(TextureType type) const;
+    void GLBindToTextureUnit(TextureType type, uint32_t slot) const;
+    void GLUnbind(TextureType type)const;
+    
+    // Getter(s)
+    // ----------------------------------------
+    static uint32_t GLGetTextureID(const std::shared_ptr<Texture>& texture);
+    
+    // Friend class definition(s)
+    // ----------------------------------------
+    friend class OpenGLFrameBuffer;
     
     // Disable the creation of this resource
     // ----------------------------------------
-public:
-    OpenGLTexture() = delete;
+protected:
+    OpenGLTexture();
+    
+    // Texture variables
+    // ----------------------------------------
+protected:
+    ///< ID of the texture.
+    uint32_t m_ID = 0;
 };
 
 // Destructor
@@ -47,18 +61,18 @@ public:
     /** @brief Binds the texture to the active texture unit. */\
     void Bind() const override\
     {\
-        OpenGLTexture::GLBind(m_ID, m_Spec.Type);\
+        GLBind(m_Spec.Type);\
     }\
     /** @brief Binds the texture to a specific texture unit. */\
     /** @param slot The index of the texture unit to bind to. */\
     void BindToTextureUnit(uint32_t slot) const override\
     {\
-        OpenGLTexture::GLBindToTextureUnit(m_ID, m_Spec.Type, slot);\
+        GLBindToTextureUnit(m_Spec.Type, slot);\
     }\
     /** @brief Unbinds the texture from the active texture unit. */\
     void Unbind() const override\
     {\
-        OpenGLTexture::GLUnbind(m_Spec.Type);\
+        GLUnbind(m_Spec.Type);\
     }
 
 // Creation & Release
@@ -68,7 +82,7 @@ public:
     void ReleaseTexture() override\
     {\
         if (this)\
-            OpenGLTexture::GLRelease(m_ID);\
+            GLRelease();\
     }\
     /** @brief Creates the OpenGL texture. */\
     void CreateTexture(const void* data) override;

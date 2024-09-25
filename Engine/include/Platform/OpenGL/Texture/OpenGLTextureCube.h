@@ -14,7 +14,7 @@
  * @note Copying and moving `OpenGLTextureCube` objects is disabled to prevent
  * unintended resource ownership issues.
  */
-class OpenGLTextureCube : public TextureCube
+class OpenGLTextureCube : public TextureCube, public OpenGLTexture
 {
 public:
     // Constructor(s)/Destructor

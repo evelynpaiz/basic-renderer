@@ -19,13 +19,6 @@ Simple::Simple(int width, int height)
     // Define light sources
     /*
      m_Lights.Create<EnvironmentLight>("Environment", width, height);
-     
-    auto directional = std::make_shared<DirectionalLight>(width, height,
-                                                          glm::vec3(1.0f),
-                                                          glm::vec3(0.0f, 0.0f, -1.0f));
-    directional->SetDiffuseStrength(0.6f);
-    directional->SetSpecularStrength(0.4f);
-    m_Lights.Add("Directional", directional);
      */
 }
 
@@ -51,11 +44,29 @@ void Simple::OnAttach()
     plane->SetMaterial(simple);
     m_Models.Add("Plane", plane);
     
-    //auto texture = Texture2D::CreateFromFile("Resources/textures/diffuse.jpeg");
-    auto texture = utils::textures::WhiteTexture2D();
+    auto texture = Texture2D::CreateFromFile("Resources/textures/diffuse.jpeg");
+    //auto texture = utils::textures::WhiteTexture2D();
     simple->SetTextureMap(texture);
     
     //phong->DefineLightProperties(m_Lights);
+    
+    /*
+    TextureSpecification spec;
+    spec.Type = TextureType::TEXTURE2D;
+    spec.Format = TextureFormat::RGB8;
+    spec.SetTextureSize(800, 400);
+    
+    TextureSpecification depth;
+    depth.Type = TextureType::TEXTURE2D;
+    depth.Format = TextureFormat::DEPTH16;
+    depth.SetTextureSize(800, 400);
+    
+    FrameBufferSpecification fbSpec;
+    fbSpec.SetFrameBufferSize(800, 400);
+    fbSpec.AttachmentsSpec = { spec, depth };
+    
+    std::shared_ptr<FrameBuffer> fb = FrameBuffer::Create(fbSpec);
+     */
 }
 
 /**

@@ -9,9 +9,8 @@
  * Create a base 1D texture.
  */
 OpenGLTexture1D::OpenGLTexture1D()
-    : Texture1D()
+    : Texture1D(), OpenGLTexture()
 {
-    OpenGLTexture::GLCreate(m_ID);
     m_Spec.Type = TextureType::TEXTURE1D;
 }
 
@@ -21,9 +20,8 @@ OpenGLTexture1D::OpenGLTexture1D()
  * @param spec The texture specifications.
  */
 OpenGLTexture1D::OpenGLTexture1D(const TextureSpecification& spec)
-    : Texture1D(spec)
+    : Texture1D(spec), OpenGLTexture()
 {
-    OpenGLTexture::GLCreate(m_ID);
     m_Spec.Type = TextureType::TEXTURE1D;
 }
 

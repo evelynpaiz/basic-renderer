@@ -1,22 +1,39 @@
 #include "enginepch.h"
 #include "Common/Renderer/Buffer/FrameBuffer.h"
 
-#include "Common/Renderer/Texture/Texture1D.h"
-#include "Common/Renderer/Texture/Texture2D.h"
-#include "Common/Renderer/Texture/Texture3D.h"
-#include "Common/Renderer/Texture/TextureCube.h"
+#include "Platform/OpenGL/Buffer/OpenGLFrameBuffer.h"
 
-// TODO: remove opengl definitions
-#include "Platform/OpenGL/OpenGLRendererUtils.h"
-#include "Platform/OpenGL/Texture/OpenGLTextureUtils.h"
+#include "Common/Renderer/Renderer.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
-#include <GL/glew.h>
+/**
+ * Create a framebuffer based on the active rendering API.
+ *
+ * @param spec Framebuffer specifications.
+ *
+ * @return A shared pointer to the created framebuffer, or nullptr if the API
+ *         is not supported or an error occurs.
+ */
+std::shared_ptr<FrameBuffer> FrameBuffer::Create(const FrameBufferSpecification& spec)
+{
+    //CREATE_RENDERER_OBJECT(FrameBuffer, spec)
+    
+    switch (Renderer::GetAPI())
+    {
+        case RendererAPI::API::None:
+            CORE_ASSERT(false, "RendererAPI::None is not supported!");
+            return nullptr;
+        case RendererAPI::API::OpenGL:
+            return std::make_shared<OpenGLFrameBuffer>(spec);
+    }
+    CORE_ASSERT(false, "Unknown Renderer API!");
+    return nullptr;
+}
 
 /**
- * Generate a framebuffer.
+ * Define the framebuffer.
  *
  * @param spec Framebuffer specifications.
  */
@@ -53,170 +70,6 @@ FrameBuffer::FrameBuffer(const FrameBufferSpecification& spec)
             m_ActiveBuffers.colorBufferActive = true;
         }
     }
-    
-    // Define the framebuffer along with all its attachments
-    Invalidate();
-}
-
-/**
- * Delete the framebuffer.
- */
-FrameBuffer::~FrameBuffer()
-{
-    ReleaseFramebuffer();
-}
-
-/**
- * Bind the framebuffer.
- */
-void FrameBuffer::Bind() const
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, m_ID);
-    glViewport(0, 0, m_Spec.Width, m_Spec.Height > 0 ? m_Spec.Height : 1);
-}
-
-/**
- * Bind the framebuffer to draw in a specific color attachment.
- *
- * @param index The color attachment index.
- */
-void FrameBuffer::BindForDrawAttachment(const unsigned int index) const
-{
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_ID);
-    glViewport(0, 0, m_Spec.Width, m_Spec.Height > 0 ? m_Spec.Height : 1);
-    glDrawBuffer(GL_COLOR_ATTACHMENT0 + index);
-}
-
-/**
- * Bind the framebuffer to read a specific color attachment.
- *
- * @param index The color attachment index.
- */
-void FrameBuffer::BindForReadAttachment(const unsigned int index) const
-{
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, m_ID);
-    glReadBuffer(GL_COLOR_ATTACHMENT0 + index);
-}
-
-/**
- * Bind the framebuffer to draw in a specific (cube) color attachment.
- *
- * @param index The color attachment index.
- * @param face The face to be selected from the cube attachment.
- * @param level The mipmap level of the texture image to be attached.
- */
-void FrameBuffer::BindForDrawAttachmentCube(const unsigned int index, const unsigned int face,
-                                            const unsigned int level) const
-{
-    if (m_ColorAttachmentsSpec[index].Type != TextureType::TEXTURECUBE)
-    {
-        CORE_WARN("Trying to bind for drawing an incorrect attachment type!");
-        return;
-    }
-    
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_ID);
-    glViewport(0, 0, m_Spec.Width, m_Spec.Height > 0 ? m_Spec.Height : 1);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
-                           m_ColorAttachments[index]->m_ID, level);
-}
-
-/**
- * Unbind the vertex buffer.
- */
-void FrameBuffer::Unbind(const bool& genMipMaps) const
-{
-    // Generate mipmaps if necesary
-    if (m_Spec.MipMaps && genMipMaps)
-    {
-        for (auto& attachment : m_ColorAttachments)
-        {
-            attachment->Bind();
-            glGenerateMipmap(utils::textures::gl::ToOpenGLTextureTarget(attachment->m_Spec.Type));
-        }
-    }
-    
-    // Bind to the default buffer
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-/**
- * Clear a specific attachment belonging to this framebuffer (set a default value on it).
- *
- * @param index Attachment index to be cleared.
- * @param value Clear (reset) value.
- */
-void FrameBuffer::ClearAttachment(const unsigned int index, const int value)
-{
-    // TODO: support other types of data. For the moment this is only for RED images.
-    auto& spec = m_ColorAttachmentsSpec[index];
-    glClearTexImage(m_ColorAttachments[index]->m_ID, 0,
-                    utils::textures::gl::ToOpenGLInternalFormat(spec.Format),
-                    GL_INT, &value);
-}
-
-/**
- * Blit the contents of a source framebuffer to a destination framebuffer.
- *
- * @param src The source framebuffer from which to copy the contents.
- * @param dst The destination framebuffer to which the contents are copied.
- * @param filter The filtering method used for the blit operation.
- * @param colorBuffer If true, copy color buffer components.
- * @param depthBuffer If true, copy depth buffer components.
- * @param stencilBuffer If true, copy stencil buffer components.
- */
-void FrameBuffer::Blit(const std::shared_ptr<FrameBuffer>& src,
-                       const std::shared_ptr<FrameBuffer>& dst,
-                       const TextureFilter& filter,
-                       const BufferState& buffersActive)
-{
-    // Ensure that source and destination framebuffers are defined
-    CORE_ASSERT(src && dst, "Trying to blit undefined framebuffer(s)");
-    
-    // Determine the mask based on selected buffer components
-    GLbitfield mask = utils::graphics::gl::ToOpenGLClearMask(buffersActive);
-    
-    // Bind the source framebuffer for reading and the destination framebuffer for drawing
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, src->m_ID);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst->m_ID);
-    // Perform the blit operation
-    glBlitFramebuffer(0, 0, src->m_Spec.Width, src->m_Spec.Height,
-                      0, 0, dst->m_Spec.Width, dst->m_Spec.Height,
-                      mask, utils::textures::gl::ToOpenGLFilter(filter, false));
-    
-    // Unbind the framebuffers
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-/**
- * Blit a specific color attachment from a source framebuffer to a destination framebuffer.
- *
- * @param src The source framebuffer from which to copy the color attachment.
- * @param dst The destination framebuffer to which the color attachment is copied.
- * @param srcIndex The index of the color attachment in the source framebuffer.
- * @param dstIndex The index of the color attachment in the destination framebuffer.
- * @param filter The filtering method used for the blit operation.
- */
-void FrameBuffer::BlitColorAttachments(const std::shared_ptr<FrameBuffer>& src,
-                                       const std::shared_ptr<FrameBuffer>& dst,
-                                       const unsigned int srcIndex, const unsigned int dstIndex,
-                                       const TextureFilter& filter)
-{
-    // Bind the source framebuffer and set the read buffer to the specified color attachment
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, src->m_ID);
-    glReadBuffer(GL_COLOR_ATTACHMENT0 + srcIndex);
-    
-    // Bind the destination framebuffer and set the draw buffer to the specified color attachment
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst->m_ID);
-    glDrawBuffer(GL_COLOR_ATTACHMENT0 + dstIndex);
-    
-    // Copy the block of pixels from the source to the destination color attachment
-    glBlitFramebuffer(0, 0, src->m_Spec.Width, src->m_Spec.Height,
-                      0, 0, dst->m_Spec.Width, dst->m_Spec.Height,
-                      GL_COLOR_BUFFER_BIT, utils::textures::gl::ToOpenGLFilter(filter, false));
-    
-    // Unbind the framebuffers and restore the default draw buffer
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glDrawBuffer(GL_BACK);
 }
 
 /**
@@ -259,169 +112,57 @@ void FrameBuffer::AdjustSampleCount(const unsigned int samples)
 }
 
 /**
- * Define/re-define the framebuffer and its attachments.
+ * Blit the contents of a source framebuffer to a destination framebuffer.
+ *
+ * @param src The source framebuffer from which to copy the contents.
+ * @param dst The destination framebuffer to which the contents are copied.
+ * @param filter The filtering method used for the blit operation.
+ * @param colorBuffer If true, copy color buffer components.
+ * @param depthBuffer If true, copy depth buffer components.
+ * @param stencilBuffer If true, copy stencil buffer components.
  */
-void FrameBuffer::Invalidate()
+void FrameBuffer::Blit(const std::shared_ptr<FrameBuffer>& src,
+                       const std::shared_ptr<FrameBuffer>& dst,
+                       const TextureFilter& filter, const BufferState& buffersActive)
 {
-    // Check if framebuffer already exists, if so, delete it
-    if (m_ID)
+    switch (Renderer::GetAPI())
     {
-        ReleaseFramebuffer();
-
-        m_ColorAttachments.clear();
-        m_DepthAttachment = 0;
+        case RendererAPI::API::None:
+            CORE_ASSERT(false, "RendererAPI::None is not supported!");
+            return nullptr;
+        case RendererAPI::API::OpenGL:
+            return OpenGLFrameBuffer::Blit(std::dynamic_pointer_cast<OpenGLFrameBuffer>(src),
+                                           std::dynamic_pointer_cast<OpenGLFrameBuffer>(dst),
+                                           filter, buffersActive);
     }
-    
-    // Create the framebuffer
-    glGenFramebuffers(1, &m_ID);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_ID);
-    
-    // Color attachments
-    if (!m_ColorAttachmentsSpec.empty())
-    {
-        // Based on the defined specifications, generate the corresponding attachments
-        m_ColorAttachments.resize(m_ColorAttachmentsSpec.size());
-        
-        for (unsigned int i = 0; i < m_ColorAttachments.size(); i++)
-        {
-            TextureType &type = m_ColorAttachmentsSpec[i].Type;
-            TextureFormat &format = m_ColorAttachmentsSpec[i].Format;
-            
-            // Define the attachment depending on its type (1D, 2D, 3D, ...)
-            auto createTexture = [&]() -> std::shared_ptr<Texture> {
-                switch (type)
-                {
-                    case TextureType::TEXTURE1D: 
-                        return Texture1D::Create(m_ColorAttachmentsSpec[i]);
-                    case TextureType::TEXTURE2D: 
-                        return Texture2D::Create(m_ColorAttachmentsSpec[i], m_Spec.Samples);
-                    case TextureType::TEXTURE3D: 
-                        return Texture3D::Create(m_ColorAttachmentsSpec[i]);
-                    case TextureType::TEXTURECUBE: 
-                        return TextureCube::Create(m_ColorAttachmentsSpec[i]);
-                    case TextureType::None:
-                    default: return nullptr;
-                }
-            };
-            m_ColorAttachments[i] = createTexture();
-            
-            // Check if the attachment has been properly defined
-            if (!m_ColorAttachments[i] || format == TextureFormat::None || utils::textures::IsDepthFormat(format))
-            {
-                CORE_WARN("Data in color attachment not properly defined");
-                continue;
-            }
-            
-            // Create the texture for the color attachment
-            m_ColorAttachments[i]->CreateTexture(nullptr);
-            
-            GLenum target = utils::textures::gl::ToOpenGLTextureTarget(m_ColorAttachments[i]->m_Spec.Type);
-            switch (type)
-            {
-                case TextureType::TEXTURE1D:
-                    glFramebufferTexture1D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, target, m_ColorAttachments[i]->m_ID, 0);
-                    break;
-                case TextureType::TEXTURE2D:
-                    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, target, m_ColorAttachments[i]->m_ID, 0);
-                    break;
-                case TextureType::TEXTURE3D:
-                    glFramebufferTexture3D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, target , m_ColorAttachments[i]->m_ID, 0, 0);
-                    break;
-                case TextureType::TEXTURECUBE:
-                    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, target , m_ColorAttachments[i]->m_ID, 0);
-                    break;
-                case TextureType::None:
-                default:
-                    break;
-            }
-        }
-    }
-    
-    // Depth attachment
-    if(m_DepthAttachmentSpec.Format != TextureFormat::None &&
-       utils::textures::IsDepthFormat(m_DepthAttachmentSpec.Format))
-    {
-        m_DepthAttachment = Texture2D::Create(m_DepthAttachmentSpec, m_Spec.Samples);
-        m_DepthAttachment->CreateTexture(nullptr);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, utils::textures::gl::ToOpenGLDepthAttachment(m_DepthAttachment->m_Spec.Format),
-                               utils::textures::gl::ToOpenGLTextureTarget(m_DepthAttachment->m_Spec.Type), m_DepthAttachment->m_ID, 0);
-    }
-    
-    // Draw the color attachments
-    if (m_ColorAttachments.size() > 1)
-    {
-        CORE_ASSERT(m_ColorAttachments.size() <= 4, "Using more than 4 color attachments in the Framebuffer!");
-        GLenum buffers[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-        glDrawBuffers((int)m_ColorAttachments.size(), buffers);
-    }
-    // Only depth-pass
-    else if (m_ColorAttachments.empty())
-    {
-        glDrawBuffer(GL_NONE);
-    }
-    
-    CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is incomplete!");
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    CORE_ASSERT(false, "Unknown Renderer API!");
+    return nullptr;
 }
 
 /**
- * Releases the resources associated with the framebuffer.
- */
-void FrameBuffer::ReleaseFramebuffer()
-{
-    glDeleteFramebuffers(1, &m_ID);
-    m_DepthAttachment->ReleaseTexture();
-    for (auto& attachment : m_ColorAttachments)
-        attachment->ReleaseTexture();
-}
-
-/**
- * Save a color attachment into an output file.
+ * Blit a specific color attachment from a source framebuffer to a destination framebuffer.
  *
- * Reference:
- * https://lencerf.github.io/post/2019-09-21-save-the-opengl-rendering-to-image-file/
- *
- * @param index Index to the color attachment to be saved.
- * @param path File path.
+ * @param src The source framebuffer from which to copy the color attachment.
+ * @param dst The destination framebuffer to which the color attachment is copied.
+ * @param srcIndex The index of the color attachment in the source framebuffer.
+ * @param dstIndex The index of the color attachment in the destination framebuffer.
+ * @param filter The filtering method used for the blit operation.
  */
-void FrameBuffer::SaveAttachment(const unsigned int index, const std::filesystem::path &path)
+void FrameBuffer::BlitColorAttachments(const std::shared_ptr<FrameBuffer>& src,
+                                       const std::shared_ptr<FrameBuffer>& dst,
+                                       const unsigned int srcIndex, const unsigned int dstIndex,
+                                       const TextureFilter& filter)
 {
-    auto& format = m_ColorAttachmentsSpec[index].Format;
-    int channels = utils::textures::GetChannelCount(format);
-    
-    std::string extension = path.extension().string();
-    std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
-    
-    // Ensure the number of channel is in a valid range
-    if (channels < 1 || channels > 4)
-        CORE_ASSERT(false, "Invalid number of channels in the color attachment!");
-    
-    // Define the buffer to allocate the attachment data
-    int stride = channels * m_Spec.Width;
-    channels += (stride % 4) ? (4 - stride % 4) : 0;
-    int bufferSize = stride * m_Spec.Height;
-    void* buffer = utils::textures::AllocateTextureBuffer(format, bufferSize);
-    
-    // Read the pixel data
-    BindForReadAttachment(index);
-    glPixelStorei(GL_PACK_ALIGNMENT, channels);
-    glReadPixels(0, 0, m_Spec.Width, m_Spec.Height,
-                 utils::textures::gl::ToOpenGLBaseFormat(format),
-                 utils::textures::gl::ToOpenGLDataFormat(format),
-                 buffer);
-
-    // TODO: support more file formats
-    // Save data into the file
-    stbi_flip_vertically_on_write(true);
-    
-    if (extension == ".png")
-        stbi_write_png(path.string().c_str(), m_Spec.Width, m_Spec.Height, channels, buffer, stride);
-    else if (extension == ".jpg" || extension == ".jpeg")
-        stbi_write_jpg(path.string().c_str(), m_Spec.Width, m_Spec.Height, channels, buffer, 100);  // Quality parameter (0-100)
-    else if (extension == ".hdr")
-        stbi_write_hdr(path.string().c_str(), m_Spec.Width, m_Spec.Height, channels, (float*)buffer);
-    else
-        CORE_WARN("Unsupported file format!");
-    
-    utils::textures::FreeTextureBuffer(format, buffer);
+    switch (Renderer::GetAPI())
+    {
+        case RendererAPI::API::None:
+            CORE_ASSERT(false, "RendererAPI::None is not supported!");
+            return nullptr;
+        case RendererAPI::API::OpenGL:
+            return OpenGLFrameBuffer::BlitColorAttachments(std::dynamic_pointer_cast<OpenGLFrameBuffer>(src),
+                                                           std::dynamic_pointer_cast<OpenGLFrameBuffer>(dst),
+                                                           srcIndex, dstIndex, filter);
+    }
+    CORE_ASSERT(false, "Unknown Renderer API!");
+    return nullptr;
 }

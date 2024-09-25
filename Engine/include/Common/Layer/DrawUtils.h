@@ -152,6 +152,8 @@ inline bool TextureLoader(std::shared_ptr<Texture2D> &texture,
                           std::filesystem::path &filePath, const char *label,
                           const char *filter, const bool &flip = true)
 {
+    CORE_ASSERT(false, "Function needs to be define to support Metal");
+    /*
     // Define result (texture has been updated)
     bool updated = false;
     
@@ -191,6 +193,7 @@ inline bool TextureLoader(std::shared_ptr<Texture2D> &texture,
     ImGui::Columns(1);
     
     return updated;
+     */
 }
     
 } // namespace Draw

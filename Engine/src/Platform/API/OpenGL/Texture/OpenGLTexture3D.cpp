@@ -9,9 +9,8 @@
  * Create a base 3D texture.
  */
 OpenGLTexture3D::OpenGLTexture3D()
-    : Texture3D()
+    : Texture3D(), OpenGLTexture()
 {
-    OpenGLTexture::GLCreate(m_ID);
     m_Spec.Type = TextureType::TEXTURE3D;
 }
 
@@ -21,9 +20,8 @@ OpenGLTexture3D::OpenGLTexture3D()
  * @param spec The texture specifications.
  */
 OpenGLTexture3D::OpenGLTexture3D(const TextureSpecification& spec)
-    : Texture3D(spec)
+    : Texture3D(spec), OpenGLTexture()
 {
-    OpenGLTexture::GLCreate(m_ID);
     m_Spec.Type = TextureType::TEXTURE3D;
 }
 

@@ -58,7 +58,7 @@ struct TextureSpecification
 };
 
 // Forward declarations
-class FrameBuffer;
+class OpenGLFrameBuffer;
 
 /**
  * Abstract base class representing a texture resource.
@@ -112,7 +112,7 @@ public:
     
     // Friend class definition(s)
     // ----------------------------------------
-    friend class FrameBuffer;
+    friend class OpenGLFrameBuffer;
     
 protected:
     // Constructor(s)
@@ -146,8 +146,6 @@ protected:
     // Texture variables
     // ----------------------------------------
 protected:
-    ///< ID of the texture.
-    uint32_t m_ID = 0;
     ///< Texture specifications.
     TextureSpecification m_Spec;
     
@@ -200,7 +198,7 @@ struct TextureHelper
             return texture;\
         TextureSpecification spec;\
         TextureHelper<TextureType>::SetSize(spec, 1);\
-        spec.Format = TextureFormat::RGB8;\
+        spec.Format = TextureFormat::RGB16F;\
         spec.Wrap = TextureWrap::Repeat;\
         const unsigned char whitePixel[] = {255, 255, 255};\
         texture = TextureType::CreateFromData(whitePixel, spec);\

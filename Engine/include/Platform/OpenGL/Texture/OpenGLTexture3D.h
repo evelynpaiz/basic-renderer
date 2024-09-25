@@ -13,7 +13,7 @@
  * @note Copying and moving `OpenGLTexture3D` objects is disabled o prevent unintended
  * resource ownership issues.
  */
-class OpenGLTexture3D : public Texture3D
+class OpenGLTexture3D : public Texture3D, public OpenGLTexture
 {
 public:
     // Constructor(s)/Destructor

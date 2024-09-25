@@ -32,7 +32,7 @@ public:
             { TextureType::TEXTURE2D, TextureFormat::RGBA8 },
             { TextureType::TEXTURE2D, TextureFormat::DEPTH16 }
         };
-        m_Framebuffer = std::make_shared<FrameBuffer>(viewportSpec);
+        m_Framebuffer = FrameBuffer::Create(viewportSpec);
         
         // Define the material to be displayed in the viewport
         m_Material = shaderPath.empty() ? std::make_shared<SimpleTextureMaterial>() :

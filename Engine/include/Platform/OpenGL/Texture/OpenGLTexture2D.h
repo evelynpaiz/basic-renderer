@@ -16,7 +16,7 @@
  * @note Copying and moving `OpenGLTexture2D` objects is disabled to prevent
  * unintended resource ownership issues.
  */
-class OpenGLTexture2D : public Texture2D
+class OpenGLTexture2D : public Texture2D, public OpenGLTexture
 {
 public:
     // Constructor(s)/Destructor

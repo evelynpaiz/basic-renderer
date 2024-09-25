@@ -13,9 +13,8 @@
  * Create a base 2D texture.
  */
 OpenGLTexture2D::OpenGLTexture2D(uint8_t samples)
-    : Texture2D(samples)
+    : Texture2D(samples), OpenGLTexture()
 {
-    OpenGLTexture::GLCreate(m_ID);
     m_Spec.Type = samples > 1 ? TextureType::TEXTURE2D_MULTISAMPLE : TextureType::TEXTURE2D;
 }
 
@@ -26,9 +25,8 @@ OpenGLTexture2D::OpenGLTexture2D(uint8_t samples)
  */
 OpenGLTexture2D::OpenGLTexture2D(const TextureSpecification& spec,
                                  uint8_t samples)
-    : Texture2D(spec, samples)
+    : Texture2D(spec, samples), OpenGLTexture()
 {
-    OpenGLTexture::GLCreate(m_ID);
     m_Spec.Type = samples > 1 ? TextureType::TEXTURE2D_MULTISAMPLE : TextureType::TEXTURE2D;
 }
 
@@ -65,9 +63,8 @@ OpenGLTexture2D::OpenGLTexture2D(const void *data,
  */
 OpenGLTexture2D::OpenGLTexture2D(const std::filesystem::path& filePath,
                                  bool flip)
-    : Texture2D(filePath, flip)
+    : Texture2D(filePath, flip), OpenGLTexture()
 {
-    OpenGLTexture::GLCreate(m_ID);
     m_Spec.Type = TextureType::TEXTURE2D;
     
     LoadFromFile(filePath);
@@ -82,9 +79,8 @@ OpenGLTexture2D::OpenGLTexture2D(const std::filesystem::path& filePath,
  */
 OpenGLTexture2D::OpenGLTexture2D(const std::filesystem::path& filePath,
                                  const TextureSpecification& spec, bool flip)
-    : Texture2D(filePath, spec, flip)
+    : Texture2D(filePath, spec, flip), OpenGLTexture()
 {
-    OpenGLTexture::GLCreate(m_ID);
     m_Spec.Type = TextureType::TEXTURE2D;
     
     LoadFromFile(filePath);
