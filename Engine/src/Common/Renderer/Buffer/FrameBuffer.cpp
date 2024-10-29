@@ -397,7 +397,6 @@ void FrameBuffer::SaveAttachment(const unsigned int index, const std::filesystem
     
     // Define the buffer to allocate the attachment data
     int stride = channels * m_Spec.Width;
-    channels += (stride % 4) ? (4 - stride % 4) : 0;
     int bufferSize = stride * m_Spec.Height;
     void* buffer = utils::AllocateBufferForFormat(format, bufferSize);
     
