@@ -54,14 +54,18 @@ void Scene::Draw(const RenderPassSpecification &pass)
         Renderer::SetViewport(0, 0, pass.Size.value().x, pass.Size.value().y);
     
     // Clear the framebuffer with the specified color (if provided), or clear it with the active buffers
-    if (pass.Framebuffer && pass.Color.has_value())
-        Renderer::Clear(pass.Color.value(), pass.Framebuffer->GetActiveBuffers());
-    else if (pass.Framebuffer)
-        Renderer::Clear(pass.Framebuffer->GetActiveBuffers());
-    else if (pass.Color.has_value())
-        Renderer::Clear(pass.Color.value());
-    else
-        Renderer::Clear();
+    bool clear = pass.SkipClear.has_value() ? !*pass.SkipClear : true;
+    if (clear)
+    {
+        if (pass.Framebuffer && pass.Color.has_value())
+            Renderer::Clear(pass.Color.value(), pass.Framebuffer->GetActiveBuffers());
+        else if (pass.Framebuffer)
+            Renderer::Clear(pass.Framebuffer->GetActiveBuffers());
+        else if (pass.Color.has_value())
+            Renderer::Clear(pass.Color.value());
+        else
+            Renderer::Clear();
+    }
     
     // Render each model with its associated material
     for (auto& pair : pass.Models)

@@ -1,3 +1,6 @@
+// Ref code: https://graphics.stanford.edu/papers/envmap/
+// Ref env. maps: https://www.pauldebevec.com/Probes/
+
 #shader vertex
 #version 330 core
 
