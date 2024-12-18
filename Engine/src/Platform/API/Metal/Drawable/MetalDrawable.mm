@@ -108,8 +108,10 @@ void MetalDrawable::SetPipelineState() const
     m_State->PipelineDescriptor.vertexFunction = vertexFunction;
     m_State->PipelineDescriptor.fragmentFunction = fragmentFunction;
     m_State->PipelineDescriptor.vertexDescriptor = m_State->VertexDescriptor;
+    
     // TODO: needs to be defined by the framebuffer information directly.
     m_State->PipelineDescriptor.colorAttachments[0].pixelFormat = MTLPixelFormatRGBA8Unorm;
+    m_State->PipelineDescriptor.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float;
     
     // Define the pipeline state
     NSError* error = nil;

@@ -30,6 +30,9 @@ private:
     ///< Light sources in the scene.
     LightLibrary m_Lights;
     
+    Viewport m_Viewport;
+    
+    
     // Disable the copying or moving of this resource
     // ----------------------------------------
 public:

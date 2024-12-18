@@ -15,13 +15,18 @@ public:
     // ----------------------------------------
     void Init() override;
     
-    // Clear
+    // Render
     // ----------------------------------------
-    void Clear(const BufferState& buffersActive = {}) override;
-    void Clear(const glm::vec4& color, const BufferState& buffersActive = {}) override;
+    void SetRenderTarget(const RenderTargetBuffers& targets) override;
+    void SetRenderTarget(const glm::vec4& color,
+                         const RenderTargetBuffers& targets) override;
     
-    // Draw
-    // ----------------------------------------
+    void SetRenderTarget(const RenderTargetBuffers& targets,
+                         const std::shared_ptr<FrameBuffer>& framebuffer) override;
+    void SetRenderTarget(const glm::vec4& color,
+                         const RenderTargetBuffers& targets,
+                         const std::shared_ptr<FrameBuffer>& framebuffer) override;
+    
     void Draw(const std::shared_ptr<Drawable>& drawable,
               const PrimitiveType &primitive = PrimitiveType::Triangle) override;
     

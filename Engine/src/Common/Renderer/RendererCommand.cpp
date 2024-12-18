@@ -12,24 +12,51 @@ void RendererCommand::Init()
 }
 
 /**
- * Clear the buffers to preset values.
+ * Sets the active rendering targets and clears the specified buffers.
  *
- * @param buffersActive State of the buffers.
+ * @param targets Active rendering targets.
  */
-void RendererCommand::Clear(const BufferState& buffersActive)
+void RendererCommand::SetRenderTarget(const RenderTargetBuffers& targets)
 {
-    s_API->Clear(buffersActive);
+    s_API->SetRenderTarget(targets);
 }
 
 /**
- * Clear the buffers to preset values.
+ * Sets the active rendering targets and clears the specified buffers.
  *
  * @param color Background color.
- * @param buffersActive State of the buffers.
+ * @param targets Active rendering targets.
  */
-void RendererCommand::Clear(const glm::vec4& color, const BufferState& buffersActive)
+void RendererCommand::SetRenderTarget(const glm::vec4& color,
+                                      const RenderTargetBuffers& targets)
 {
-    s_API->Clear(color, buffersActive);
+    s_API->SetRenderTarget(color, targets);
+}
+
+/**
+ * Sets the active rendering targets and clears the specified buffers of a framebuffer.
+ *
+ * @param framebuffer Framebuffer whose targets should be activated.
+ */
+void RendererCommand::SetRenderTarget(const std::shared_ptr<FrameBuffer>& framebuffer,
+                                      const std::optional<RenderTargetBuffers>& targets)
+{
+    s_API->SetRenderTarget(targets.has_value() ? targets.value() : framebuffer->GetActiveRenderTargets(),
+                           framebuffer);
+}
+
+/**
+ * Sets the active rendering targets and clears the specified buffers of a framebuffer.
+ *
+ * @param color Background color.
+ * @param framebuffer Framebuffer whose targets should be activated and cleared.
+ */
+void RendererCommand::SetRenderTarget(const glm::vec4& color,
+                                      const std::shared_ptr<FrameBuffer>& framebuffer,
+                                      const std::optional<RenderTargetBuffers>& targets)
+{
+    s_API->SetRenderTarget(color, targets.has_value() ? targets.value() : framebuffer->GetActiveRenderTargets(),
+                           framebuffer);
 }
 
 /**

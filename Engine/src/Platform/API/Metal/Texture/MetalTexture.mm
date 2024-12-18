@@ -67,6 +67,10 @@ void MetalTexture::MTLCreateTexture(const void *data,
         MTLDefineTexture(spec, samples);
         MTLDefineSampler(spec);
     }
+    
+    // If data not defined, only define the texture and return
+    if (!data)
+        return;
 
     // Get a reference to the internal Metal texture
     id<MTLTexture> texture = reinterpret_cast<id<MTLTexture>>(m_TextureData->Texture);

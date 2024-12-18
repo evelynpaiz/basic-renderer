@@ -106,13 +106,19 @@ public:
                     "Trying to get color attachment out of scope!");
         return m_ColorAttachments[index];
     }
+    /// @brief Get all the color attachments defined in the framebuffer.
+    /// @return The color attachments (texture references).
+    const std::vector<std::shared_ptr<Texture>>& GetColorAttachments() const
+    {
+        return m_ColorAttachments;
+    }
     /// @brief Get the framebuffer depth attachment.
     /// @return The depth attachment (texture reference).
     const std::shared_ptr<Texture>& GetDepthAttachment() const { return m_DepthAttachment; }
     
-    /// @brief Get the active buffers in this framebuffer.
-    /// @return The state of the color, depth and stencil buffers.
-    BufferState GetActiveBuffers() const { return m_ActiveBuffers; }
+    /// @brief Get the active rendering targets for this framebuffer.
+    /// @return The state of the color, depth and stencil targets state.
+    RenderTargetBuffers GetActiveRenderTargets() const { return m_ActiveTargets; }
     
     virtual std::vector<char> GetAttachmentData(const unsigned int index) = 0;
     
@@ -134,7 +140,7 @@ public:
     static void Blit(const std::shared_ptr<FrameBuffer>& src,
                      const std::shared_ptr<FrameBuffer>& dst,
                      const TextureFilter& filter = TextureFilter::Nearest,
-                     const BufferState& buffersActive = {});
+                     const RenderTargetBuffers& targets = {});
     static void BlitColorAttachments(const std::shared_ptr<FrameBuffer>& src,
                                      const std::shared_ptr<FrameBuffer>& dst,
                                      const unsigned int srcIndex, const unsigned int dstIndex,
@@ -156,13 +162,14 @@ protected:
     // ----------------------------------------
     FrameBuffer(const FrameBufferSpecification& spec);
     
-    // Destructor
-    // ----------------------------------------
-    virtual void ReleaseFramebuffer() = 0;
-    
     // Reset
     // ----------------------------------------
     virtual void Invalidate() = 0;
+    void DefineAttachments();
+    
+    // Destructor
+    // ----------------------------------------
+    virtual void ReleaseFramebuffer();
 
     // Framebuffer variables
     // ----------------------------------------
@@ -180,7 +187,7 @@ protected:
     TextureSpecification m_DepthAttachmentSpec;
     
     ///< The states active in the framebuffer.
-    BufferState m_ActiveBuffers = { false, false, false };
+    RenderTargetBuffers m_ActiveTargets = { false, false, false };
     
     // Disable the copying or moving of this resource
     // ----------------------------------------

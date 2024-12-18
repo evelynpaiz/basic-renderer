@@ -185,13 +185,13 @@ void OpenGLFrameBuffer::ClearAttachment(const unsigned int index, const int valu
 void OpenGLFrameBuffer::Blit(const std::shared_ptr<OpenGLFrameBuffer>& src,
                              const std::shared_ptr<OpenGLFrameBuffer>& dst,
                              const TextureFilter& filter,
-                             const BufferState& buffersActive)
+                             const RenderTargetBuffers& targets)
 {
     // Ensure that source and destination framebuffers are defined
     CORE_ASSERT(src && dst, "Trying to blit undefined framebuffer(s)");
     
     // Determine the mask based on selected buffer components
-    GLbitfield mask = utils::graphics::gl::ToOpenGLClearMask(buffersActive);
+    GLbitfield mask = utils::graphics::gl::ToOpenGLClearMask(targets);
     
     // Bind the source framebuffer for reading and the destination framebuffer for drawing
     glBindFramebuffer(GL_READ_FRAMEBUFFER, src->m_ID);
@@ -244,88 +244,48 @@ void OpenGLFrameBuffer::Invalidate()
 {
     // Check if framebuffer already exists, if so, delete it
     if (m_ID)
-    {
         ReleaseFramebuffer();
-
-        m_ColorAttachments.clear();
-        m_DepthAttachment = 0;
-    }
     
     // Create the framebuffer
     glGenFramebuffers(1, &m_ID);
     glBindFramebuffer(GL_FRAMEBUFFER, m_ID);
     
-    // Color attachments
-    if (!m_ColorAttachmentsSpec.empty())
+    // Define the framebuffer texture(s)
+    DefineAttachments();
+    
+    // Attach defined textures to framebuffer
+    for (unsigned int i = 0; i < m_ColorAttachments.size(); i++)
     {
-        // Based on the defined specifications, generate the corresponding attachments
-        m_ColorAttachments.resize(m_ColorAttachmentsSpec.size());
+        TextureType type = m_ColorAttachments[i]->GetSpecification().Type;
+        GLenum target = utils::textures::gl::ToOpenGLTextureTarget(type);
         
-        for (unsigned int i = 0; i < m_ColorAttachments.size(); i++)
+        switch (type)
         {
-            TextureType &type = m_ColorAttachmentsSpec[i].Type;
-            TextureFormat &format = m_ColorAttachmentsSpec[i].Format;
-            
-            // Define the attachment depending on its type (1D, 2D, 3D, ...)
-            auto createTexture = [&]() -> std::shared_ptr<Texture> {
-                switch (type)
-                {
-                    case TextureType::TEXTURE1D: 
-                        return Texture1D::Create(m_ColorAttachmentsSpec[i]);
-                    case TextureType::TEXTURE2D: 
-                        return Texture2D::Create(m_ColorAttachmentsSpec[i], m_Spec.Samples);
-                    case TextureType::TEXTURE3D: 
-                        return Texture3D::Create(m_ColorAttachmentsSpec[i]);
-                    case TextureType::TEXTURECUBE: 
-                        return TextureCube::Create(m_ColorAttachmentsSpec[i]);
-                    case TextureType::None:
-                    default: return nullptr;
-                }
-            };
-            m_ColorAttachments[i] = createTexture();
-            
-            // Check if the attachment has been properly defined
-            if (!m_ColorAttachments[i] || format == TextureFormat::None || utils::textures::IsDepthFormat(format))
-            {
-                CORE_WARN("Data in color attachment not properly defined");
-                continue;
-            }
-            
-            // Create the texture for the color attachment
-            m_ColorAttachments[i]->CreateTexture(nullptr);
-            
-            GLenum target = utils::textures::gl::ToOpenGLTextureTarget(m_ColorAttachments[i]->m_Spec.Type);
-            switch (type)
-            {
-                case TextureType::TEXTURE1D:
-                    glFramebufferTexture1D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, target,
-                                           OpenGLTexture::GLGetTextureID(m_ColorAttachments[i]), 0);
-                    break;
-                case TextureType::TEXTURE2D:
-                    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, target,
-                                           OpenGLTexture::GLGetTextureID(m_ColorAttachments[i]), 0);
-                    break;
-                case TextureType::TEXTURE3D:
-                    glFramebufferTexture3D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, target,
-                                           OpenGLTexture::GLGetTextureID(m_ColorAttachments[i]), 0, 0);
-                    break;
-                case TextureType::TEXTURECUBE:
-                    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, target,
-                                           OpenGLTexture::GLGetTextureID(m_ColorAttachments[i]), 0);
-                    break;
-                case TextureType::None:
-                default:
-                    break;
-            }
+            case TextureType::TEXTURE1D:
+                glFramebufferTexture1D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, target,
+                                       OpenGLTexture::GLGetTextureID(m_ColorAttachments[i]), 0);
+                break;
+            case TextureType::TEXTURE2D:
+                glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, target,
+                                       OpenGLTexture::GLGetTextureID(m_ColorAttachments[i]), 0);
+                break;
+            case TextureType::TEXTURE3D:
+                glFramebufferTexture3D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, target,
+                                       OpenGLTexture::GLGetTextureID(m_ColorAttachments[i]), 0, 0);
+                break;
+            case TextureType::TEXTURECUBE:
+                glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, target,
+                                       OpenGLTexture::GLGetTextureID(m_ColorAttachments[i]), 0);
+                break;
+            case TextureType::None:
+            default:
+                break;
         }
     }
     
     // Depth attachment
-    if(m_DepthAttachmentSpec.Format != TextureFormat::None &&
-       utils::textures::IsDepthFormat(m_DepthAttachmentSpec.Format))
+    if(m_DepthAttachment)
     {
-        m_DepthAttachment = Texture2D::Create(m_DepthAttachmentSpec, m_Spec.Samples);
-        m_DepthAttachment->CreateTexture(nullptr);
         glFramebufferTexture2D(GL_FRAMEBUFFER, utils::textures::gl::ToOpenGLDepthAttachment(m_DepthAttachment->m_Spec.Format),
                                utils::textures::gl::ToOpenGLTextureTarget(m_DepthAttachment->m_Spec.Type), OpenGLTexture::GLGetTextureID(m_DepthAttachment), 0);
     }
@@ -353,10 +313,7 @@ void OpenGLFrameBuffer::Invalidate()
 void OpenGLFrameBuffer::ReleaseFramebuffer()
 {
     glDeleteFramebuffers(1, &m_ID);
-    if (m_DepthAttachment)
-        m_DepthAttachment->ReleaseTexture();
-    for (auto& attachment : m_ColorAttachments)
-        attachment->ReleaseTexture();
+    FrameBuffer::ReleaseFramebuffer();
 }
 
 /**

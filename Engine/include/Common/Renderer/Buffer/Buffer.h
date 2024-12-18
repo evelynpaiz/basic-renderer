@@ -35,7 +35,7 @@ public:
 /**
  * Structure to represent the state of color, depth, and stencil buffers.
  */
-struct BufferState
+struct RenderTargetBuffers
 {
     // Constructor(s)
     // ----------------------------------------
@@ -43,7 +43,7 @@ struct BufferState
     /// @param color Whether the color buffer is active (default: true).
     /// @param depth Whether the depth buffer is active (default: false).
     /// @param stencil Whether the stencil buffer is active (default: false).
-    BufferState(bool color = true, bool depth = false, bool stencil = false)
+    RenderTargetBuffers(bool color = true, bool depth = false, bool stencil = false)
         : colorBufferActive(color), depthBufferActive(depth), stencilBufferActive(stencil)
     {}
     

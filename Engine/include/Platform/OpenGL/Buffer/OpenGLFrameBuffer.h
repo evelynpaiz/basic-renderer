@@ -1,8 +1,6 @@
 #pragma once
 
 #include "Common/Renderer/Buffer/FrameBuffer.h"
-// TODO: Remove
-//#include "Platform/OpenGL/Texture/OpenGLTextureUtils.h"
 
 class OpenGLFrameBuffer : public FrameBuffer
 {
@@ -34,7 +32,7 @@ public:
     static void Blit(const std::shared_ptr<OpenGLFrameBuffer>& src,
                      const std::shared_ptr<OpenGLFrameBuffer>& dst,
                      const TextureFilter& filter = TextureFilter::Nearest,
-                     const BufferState& buffersActive = {});
+                     const RenderTargetBuffers& targets = {});
     static void BlitColorAttachments(const std::shared_ptr<OpenGLFrameBuffer>& src,
                                      const std::shared_ptr<OpenGLFrameBuffer>& dst,
                                      const unsigned int srcIndex, const unsigned int dstIndex,

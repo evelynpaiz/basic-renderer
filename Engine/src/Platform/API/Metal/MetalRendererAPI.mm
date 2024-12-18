@@ -23,27 +23,61 @@ void MetalRendererAPI::Init()
 }
 
 /**
- * Clear the buffers to preset values.
+ * Sets the active rendering targets and clears the specified buffers.
  *
- * @param buffersActive State of the buffers.
+ * @param targets Active rendering targets.
  */
-void MetalRendererAPI::Clear(const BufferState& buffersActive)
+void MetalRendererAPI::SetRenderTarget(const RenderTargetBuffers& targets)
 {
-    Clear(glm::vec4(glm::vec4(0.0f)), buffersActive);
+    SetRenderTarget(glm::vec4(glm::vec4(0.0f)), targets);
 }
 
 /**
- * Clear the buffers to preset values.
+ * Sets the active rendering targets and clears the specified buffers.
  *
  * @param color Background color.
- * @param buffersActive State of the buffers.
+ * @param targets Active rendering targets.
  */
-void MetalRendererAPI::Clear(const glm::vec4& color, const BufferState& buffersActive)
+void MetalRendererAPI::SetRenderTarget(const glm::vec4& color,
+                                       const RenderTargetBuffers& targets)
 {
     // Clear the buffer with the selected color
-    m_Context->Clear(color);
+    m_Context->SetRenderTarget(color, targets);
+    SetDepthTesting(targets.depthBufferActive);
 }
 
+/**
+ * Sets the active rendering targets and clears the specified buffers of a framebuffer.
+ *
+ * @param framebuffer Framebuffer whose targets should be activated.
+ */
+void MetalRendererAPI::SetRenderTarget(const RenderTargetBuffers& targets,
+                                       const std::shared_ptr<FrameBuffer>& framebuffer)
+{
+    SetRenderTarget(glm::vec4(glm::vec4(0.0f)), targets, framebuffer);
+}
+
+/**
+ * Sets the active rendering targets and clears the specified buffers of a framebuffer.
+ *
+ * @param color Background color.
+ * @param framebuffer Framebuffer whose targets should be activated and cleared.
+ */
+void MetalRendererAPI::SetRenderTarget(const glm::vec4& color,
+                                       const RenderTargetBuffers& targets,
+                                       const std::shared_ptr<FrameBuffer>& framebuffer)
+{
+    // Clear the buffer with the selected color
+    m_Context->SetRenderTarget(color, targets, framebuffer);
+    SetDepthTesting(targets.depthBufferActive);
+}
+
+/**
+ * Renders primitives from a drawable object using indexed drawing.
+ *
+ * @param drawable The drawable object containing the vertex and index buffers for rendering.
+ * @param primitive The type of primitive to be drawn (e.g., Points, Lines, Triangles).
+ */
 void MetalRendererAPI::Draw(const std::shared_ptr<Drawable>& drawable,
                             const PrimitiveType &primitive)
 {
@@ -82,4 +116,10 @@ void MetalRendererAPI::SetViewport(unsigned int x, unsigned int y, unsigned int 
  * @param enable Enable or not the depth testing.
  */
 void MetalRendererAPI::SetDepthTesting(bool enabled)
-{}
+{
+    if (!enabled)
+        return;
+    
+    // Defines a depth stencil state into the current command encoder
+    m_Context->SetDepthStencilState();
+}

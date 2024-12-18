@@ -2,6 +2,7 @@
 
 #include "Common/Renderer/Drawable/Drawable.h"
 #include "Common/Renderer/Material/Material.h"
+#include "Common/Renderer/Buffer/FrameBuffer.h"
 
 #include "Common/Renderer/RendererUtils.h"
 
@@ -44,8 +45,15 @@ public:
     
     // Clear
     // ----------------------------------------
-    virtual void Clear(const BufferState& buffersActive = {}) = 0;
-    virtual void Clear(const glm::vec4& color, const BufferState& buffersActive = {}) = 0;
+    virtual void SetRenderTarget(const RenderTargetBuffers& targets) = 0;
+    virtual void SetRenderTarget(const glm::vec4& color,
+                                 const RenderTargetBuffers& targets) = 0;
+    
+    virtual void SetRenderTarget(const RenderTargetBuffers& targets,
+                                 const std::shared_ptr<FrameBuffer>& framebuffer) = 0;
+    virtual void SetRenderTarget(const glm::vec4& color,
+                                 const RenderTargetBuffers& targets,
+                                 const std::shared_ptr<FrameBuffer>& framebuffer) = 0;
     
     // Draw
     // ----------------------------------------

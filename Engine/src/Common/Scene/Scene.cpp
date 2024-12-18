@@ -50,13 +50,13 @@ void Scene::Draw(const RenderPassSpecification &pass)
     
     // Clear the framebuffer with the specified color (if provided), or clear it with the active buffers
     if (pass.Framebuffer && pass.Color.has_value())
-        RendererCommand::Clear(pass.Color.value(), pass.Framebuffer->GetActiveBuffers());
+        RendererCommand::SetRenderTarget(pass.Color.value(), pass.Framebuffer);
     else if (pass.Framebuffer)
-        RendererCommand::Clear(pass.Framebuffer->GetActiveBuffers());
+        RendererCommand::SetRenderTarget(pass.Framebuffer);
     else if (pass.Color.has_value())
-        RendererCommand::Clear(pass.Color.value());
+        RendererCommand::SetRenderTarget(pass.Color.value());
     else
-        RendererCommand::Clear();
+        RendererCommand::SetRenderTarget();
     
     // Begin the scene with the provided camera, or without a camera if none is provided
     if (pass.Camera)

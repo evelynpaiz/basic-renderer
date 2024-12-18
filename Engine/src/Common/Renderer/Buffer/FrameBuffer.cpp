@@ -1,7 +1,13 @@
 #include "enginepch.h"
 #include "Common/Renderer/Buffer/FrameBuffer.h"
 
+#include "Common/Renderer/Texture/Texture1D.h"
+#include "Common/Renderer/Texture/Texture2D.h"
+#include "Common/Renderer/Texture/Texture3D.h"
+#include "Common/Renderer/Texture/TextureCube.h"
+
 #include "Platform/OpenGL/Buffer/OpenGLFrameBuffer.h"
+#include "Platform/Metal/Buffer/MetalFrameBuffer.h"
 
 #include "Common/Renderer/Renderer.h"
 
@@ -18,8 +24,9 @@
  */
 std::shared_ptr<FrameBuffer> FrameBuffer::Create(const FrameBufferSpecification& spec)
 {
-    //CREATE_RENDERER_OBJECT(FrameBuffer, spec)
+    CREATE_RENDERER_OBJECT(FrameBuffer, spec)
     
+    /*
     switch (Renderer::GetAPI())
     {
         case RendererAPI::API::None:
@@ -30,6 +37,7 @@ std::shared_ptr<FrameBuffer> FrameBuffer::Create(const FrameBufferSpecification&
     }
     CORE_ASSERT(false, "Unknown Renderer API!");
     return nullptr;
+     */
 }
 
 /**
@@ -59,7 +67,7 @@ FrameBuffer::FrameBuffer(const FrameBufferSpecification& spec)
             
             // TODO: Add the stencil buffer activation too.
             m_DepthAttachmentSpec = spec;
-            m_ActiveBuffers.depthBufferActive = true;
+            m_ActiveTargets.depthBufferActive = true;
         }
         // Color attachment
         else
@@ -67,7 +75,7 @@ FrameBuffer::FrameBuffer(const FrameBufferSpecification& spec)
             spec.Filter = TextureFilter::Linear;
             
             m_ColorAttachmentsSpec.emplace_back(spec);
-            m_ActiveBuffers.colorBufferActive = true;
+            m_ActiveTargets.colorBufferActive = true;
         }
     }
 }
@@ -123,7 +131,7 @@ void FrameBuffer::AdjustSampleCount(const unsigned int samples)
  */
 void FrameBuffer::Blit(const std::shared_ptr<FrameBuffer>& src,
                        const std::shared_ptr<FrameBuffer>& dst,
-                       const TextureFilter& filter, const BufferState& buffersActive)
+                       const TextureFilter& filter, const RenderTargetBuffers& targets)
 {
     switch (Renderer::GetAPI())
     {
@@ -133,7 +141,7 @@ void FrameBuffer::Blit(const std::shared_ptr<FrameBuffer>& src,
         case RendererAPI::API::OpenGL:
             return OpenGLFrameBuffer::Blit(std::dynamic_pointer_cast<OpenGLFrameBuffer>(src),
                                            std::dynamic_pointer_cast<OpenGLFrameBuffer>(dst),
-                                           filter, buffersActive);
+                                           filter, targets);
     }
     CORE_ASSERT(false, "Unknown Renderer API!");
     return nullptr;
@@ -165,4 +173,76 @@ void FrameBuffer::BlitColorAttachments(const std::shared_ptr<FrameBuffer>& src,
     }
     CORE_ASSERT(false, "Unknown Renderer API!");
     return nullptr;
+}
+
+/**
+ * Defines the attachments for the framebuffer.
+ */
+void FrameBuffer::DefineAttachments()
+{
+    // Define the depth attachment
+    if(m_DepthAttachmentSpec.Format != TextureFormat::None &&
+       utils::textures::IsDepthFormat(m_DepthAttachmentSpec.Format))
+    {
+        m_DepthAttachment = Texture2D::Create(m_DepthAttachmentSpec, m_Spec.Samples);
+        m_DepthAttachment->CreateTexture(nullptr);
+    }
+    
+    // Define color attachments
+    if (m_ColorAttachmentsSpec.empty())
+        return;
+    
+    // Resize the color attachment array based on the number of specifications
+    m_ColorAttachments.resize(m_ColorAttachmentsSpec.size());
+    
+    // Iterate through each color attachment specification
+    for (unsigned int i = 0; i < m_ColorAttachments.size(); i++)
+    {
+        // Get the type and format from the specification
+        TextureType &type = m_ColorAttachmentsSpec[i].Type;
+        
+        // Lambda function to create the texture based on the type
+        auto createTexture = [&]() -> std::shared_ptr<Texture> {
+            switch (type)
+            {
+                case TextureType::TEXTURE1D:
+                    return Texture1D::Create(m_ColorAttachmentsSpec[i]);
+                case TextureType::TEXTURE2D:
+                case TextureType::TEXTURE2D_MULTISAMPLE:
+                    return Texture2D::Create(m_ColorAttachmentsSpec[i], m_Spec.Samples);
+                case TextureType::TEXTURE3D:
+                    return Texture3D::Create(m_ColorAttachmentsSpec[i]);
+                case TextureType::TEXTURECUBE:
+                    return TextureCube::Create(m_ColorAttachmentsSpec[i]);
+                case TextureType::None:
+                default: return nullptr;
+            }
+        };
+        // Create the texture using the lambda function
+        m_ColorAttachments[i] = createTexture();
+        
+        // Check for errors during texture creation
+        if (!m_ColorAttachments[i])
+        {
+            CORE_WARN("Data in color attachment not properly defined");
+            continue;
+        }
+        
+        // Finally, create the texture data
+        m_ColorAttachments[i]->CreateTexture(nullptr);
+    }
+}
+
+/**
+ * Releases the resources associated with the framebuffer.
+ */
+void FrameBuffer::ReleaseFramebuffer()
+{
+    if (m_DepthAttachment)
+        m_DepthAttachment->ReleaseTexture();
+    for (auto& attachment : m_ColorAttachments)
+        attachment->ReleaseTexture();
+    
+    m_ColorAttachments.clear();
+    m_DepthAttachment = nullptr;
 }

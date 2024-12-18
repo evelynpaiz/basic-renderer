@@ -275,7 +275,7 @@ void EnvironmentLight::RenderCubeMap(const std::array<glm::mat4, 6>& views, cons
             RendererCommand::SetViewport(0, 0, viewportWidth, viewportHeight);
 
         // Clear the active buffers in the framebuffer
-        RendererCommand::Clear(framebuffer->GetActiveBuffers());
+        RendererCommand::SetRenderTarget(framebuffer);
         
         // Begin rendering scene with the specified view and projection matrices
         Renderer::BeginScene(views[i], projection);

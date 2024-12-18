@@ -15,27 +15,52 @@ void OpenGLRendererAPI::Init()
 {}
 
 /**
- * Clear the buffers to preset values.
+ * Sets the active rendering targets and clears the specified buffers.
  *
- * @param bufferState State of the buffers.
+ * @param targets Active rendering targets.
  */
-void OpenGLRendererAPI::Clear(const BufferState& bufferState)
+void OpenGLRendererAPI::SetRenderTarget(const RenderTargetBuffers& targets)
 {
     // Clear buffers
-    glClear(utils::graphics::gl::ToOpenGLClearMask(bufferState));
-    SetDepthTesting(bufferState.depthBufferActive);
+    glClear(utils::graphics::gl::ToOpenGLClearMask(targets));
+    SetDepthTesting(targets.depthBufferActive);
 }
 
 /**
- * Clear the buffers to preset values.
+ * Sets the active rendering targets and clears the specified buffers.
  *
  * @param color Background color.
- * @param buffersActive State of the buffers.
+ * @param targets Active rendering targets.
  */
-void OpenGLRendererAPI::Clear(const glm::vec4& color, const BufferState& buffersActive)
+void OpenGLRendererAPI::SetRenderTarget(const glm::vec4& color,
+                                        const RenderTargetBuffers& targets)
 {
     glClearColor(color.r, color.g, color.b, color.a);
-    Clear(buffersActive);
+    SetRenderTarget(targets);
+}
+
+/**
+ * Sets the active rendering targets and clears the specified buffers of a framebuffer.
+ *
+ * @param framebuffer Framebuffer whose targets should be activated.
+ */
+void OpenGLRendererAPI::SetRenderTarget(const RenderTargetBuffers& targets,
+                                        const std::shared_ptr<FrameBuffer>& framebuffer)
+{
+    SetRenderTarget(targets);
+}
+
+/**
+ * Sets the active rendering targets and clears the specified buffers of a framebuffer.
+ *
+ * @param color Background color.
+ * @param framebuffer Framebuffer whose targets should be activated and cleared.
+ */
+void OpenGLRendererAPI::SetRenderTarget(const glm::vec4& color,
+                                        const RenderTargetBuffers& targets,
+                                        const std::shared_ptr<FrameBuffer>& framebuffer)
+{
+    SetRenderTarget(color, targets);
 }
 
 /**

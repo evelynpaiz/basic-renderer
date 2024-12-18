@@ -112,6 +112,7 @@ public:
     
     // Friend class definition(s)
     // ----------------------------------------
+    friend class FrameBuffer;
     friend class OpenGLFrameBuffer;
     
 protected:
@@ -198,7 +199,7 @@ struct TextureHelper
             return texture;\
         TextureSpecification spec;\
         TextureHelper<TextureType>::SetSize(spec, 1);\
-        spec.Format = TextureFormat::RGB16F;\
+        spec.Format = TextureFormat::RGB8;\
         spec.Wrap = TextureWrap::Repeat;\
         const unsigned char whitePixel[] = {255, 255, 255};\
         texture = TextureType::CreateFromData(whitePixel, spec);\

@@ -2,7 +2,12 @@
 
 #include "Common/Renderer/GraphicsContext.h"
 
+#include "Common/Renderer/Buffer/Buffer.h"
+#include "Common/Renderer/Buffer/FrameBuffer.h"
+
 struct GLFWwindow;
+
+struct MetalRenderState;
 
 /**
  *  Manages a Metal graphics context.
@@ -13,9 +18,6 @@ struct GLFWwindow;
  */
 class MetalContext : public GraphicsContext
 {
-public:
-    struct MetalState;
-    
 public:
     // Constructor(s)
     // ----------------------------------------
@@ -36,11 +38,25 @@ public:
     // ----------------------------------------
     static void SetWindowHints();
     void SetVerticalSync(bool enabled) override;
+    void SetDepthStencilState();
     
     // Draw
     // ----------------------------------------
-    void Clear(const glm::vec4& color = glm::vec4(0.0f));
+    void SetRenderTarget(const glm::vec4& color,
+                         const RenderTargetBuffers& targets,
+                         const std::shared_ptr<FrameBuffer>& framebuffer = nullptr);
+    
     void SwapBuffers() override;
+    
+private:
+    // Initialization
+    // ----------------------------------------
+    void InitializeMetalDeviceResources();
+    void InitializeScreenTarget();
+    
+    void CreateScreenDepthTexture();
+    
+    void CreateDepthStencilState();
     
     // Graphics context variables
     // ----------------------------------------
@@ -49,5 +65,6 @@ private:
     GLFWwindow* m_WindowHandle;
     
     ///< Holds the core Metal objects required for rendering.
+    struct MetalState;
     std::shared_ptr<MetalState> m_State;
 };

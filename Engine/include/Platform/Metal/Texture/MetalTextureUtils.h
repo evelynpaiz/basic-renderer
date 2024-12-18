@@ -164,10 +164,16 @@ inline unsigned int GetMetalChannelCount(TextureFormat format)
     {
         case TextureFormat::R16F:
         case TextureFormat::R8:
-        case TextureFormat::R8UI: return 1;
+        case TextureFormat::R8UI:               return 1;
+            
+        case TextureFormat::DEPTH16:
+        case TextureFormat::DEPTH24:
+        case TextureFormat::DEPTH32:
+        case TextureFormat::DEPTH32F:
+        case TextureFormat::DEPTH24STENCIL8:    return 1;
             
         case TextureFormat::RG8:
-        case TextureFormat::RG8UI: return 2;
+        case TextureFormat::RG8UI:              return 2;
             
         case TextureFormat::RGB32F:
         case TextureFormat::RGB16F:
@@ -177,14 +183,9 @@ inline unsigned int GetMetalChannelCount(TextureFormat format)
         case TextureFormat::RGBA32F:
         case TextureFormat::RGBA16F:
         case TextureFormat::RGBA8:
-        case TextureFormat::RGBA8UI: return 4;
+        case TextureFormat::RGBA8UI:            return 4;
             
-        case TextureFormat::None:
-        case TextureFormat::DEPTH16:
-        case TextureFormat::DEPTH24:
-        case TextureFormat::DEPTH32:
-        case TextureFormat::DEPTH32F:
-        case TextureFormat::DEPTH24STENCIL8: return 0;
+        case TextureFormat::None:               return 0;
     }
     
     CORE_ASSERT(false, "Unknown (or unsupported) texture format!");

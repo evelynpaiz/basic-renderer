@@ -86,7 +86,7 @@ public:
     void Render()
     {
         RendererCommand::SetViewport(0, 0, m_Width, m_Height);
-        RendererCommand::Clear();
+        RendererCommand::SetRenderTarget();
         
         Renderer::BeginScene();
         m_Geometry->SetMaterial(m_Material);
@@ -101,7 +101,7 @@ public:
     {
         framebuffer->Bind();
         
-        RendererCommand::Clear(framebuffer->GetActiveBuffers());
+        RendererCommand::SetRenderTarget(framebuffer);
         
         Renderer::BeginScene();
         m_Geometry->SetMaterial(material);

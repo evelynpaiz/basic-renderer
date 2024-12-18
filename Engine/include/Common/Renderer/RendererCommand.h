@@ -3,6 +3,7 @@
 #include "Common/Renderer/RendererAPI.h"
 
 #include <glm/glm.hpp>
+#include <optional>
 
 /**
  * A static class that provides an interface to the rendering API.
@@ -18,13 +19,18 @@ public:
     // ----------------------------------------
     static void Init();
     
-    // Clear
-    // ----------------------------------------
-    static void Clear(const BufferState& buffersActive = {});
-    static void Clear(const glm::vec4& color, const BufferState& buffersActive = {});
-    
     // Render
     // ----------------------------------------
+    static void SetRenderTarget(const RenderTargetBuffers& targets = {});
+    static void SetRenderTarget(const glm::vec4& color, 
+                                const RenderTargetBuffers& targets = {});
+    
+    static void SetRenderTarget(const std::shared_ptr<FrameBuffer>& framebuffer,
+                                const std::optional<RenderTargetBuffers>& targets = std::nullopt);
+    static void SetRenderTarget(const glm::vec4& color,
+                                const std::shared_ptr<FrameBuffer>& framebuffer,
+                                const std::optional<RenderTargetBuffers>& targets = std::nullopt);
+    
     static void Draw(const std::shared_ptr<Drawable>& drawable,
                      const PrimitiveType &primitive = PrimitiveType::Triangle);
     
