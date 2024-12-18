@@ -28,6 +28,10 @@
 
 #include "Resources/shaders/environment/chunks/SHIrradiance.glsl"
 
+///< Mathematical constants.
+const float PI = 3.14159265359f;
+const float INV_PI = 1.0f / PI;
+
 // Entry point of the fragment shader
 void main()
 {
